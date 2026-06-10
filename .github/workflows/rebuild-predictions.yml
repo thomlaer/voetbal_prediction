@@ -80,7 +80,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv data/extracted/oddsportal_worldcup2026_fixture_odds_raw.csv
+          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv
           if git diff --cached --quiet; then
             echo "No output changes."
           else
