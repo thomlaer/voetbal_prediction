@@ -1,105 +1,105 @@
-match_number,date,stage,group,home_team,away_team,score,predicted_winner,confidence
-1,2026-06-11,Group Stage,A,Mexico,South Africa,2-0,Mexico,high
-2,2026-06-11,Group Stage,A,South Korea,Czech Republic,1-1,Draw,low
-3,2026-06-12,Group Stage,B,Canada,Bosnia and Herzegovina,2-0,Canada,medium
-4,2026-06-12,Group Stage,D,United States,Paraguay,1-0,United States,low
-5,2026-06-13,Group Stage,B,Qatar,Switzerland,0-2,Switzerland,high
-6,2026-06-13,Group Stage,C,Brazil,Morocco,2-1,Brazil,medium
-7,2026-06-13,Group Stage,C,Haiti,Scotland,1-2,Scotland,medium
-8,2026-06-14,Group Stage,D,Australia,Turkey,0-1,Turkey,medium
-9,2026-06-14,Group Stage,E,Germany,Curaçao,2-1,Germany,high
-10,2026-06-14,Group Stage,F,Netherlands,Japan,2-1,Netherlands,low
-11,2026-06-14,Group Stage,E,Ivory Coast,Ecuador,0-1,Ecuador,low
-12,2026-06-14,Group Stage,F,Sweden,Tunisia,2-1,Sweden,low
-13,2026-06-15,Group Stage,H,Spain,Cape Verde,3-0,Spain,high
-14,2026-06-15,Group Stage,G,Belgium,Egypt,2-1,Belgium,medium
-15,2026-06-15,Group Stage,H,Saudi Arabia,Uruguay,0-1,Uruguay,medium
-16,2026-06-15,Group Stage,G,Iran,New Zealand,2-1,Iran,medium
-17,2026-06-16,Group Stage,I,France,Senegal,2-1,France,medium
-18,2026-06-16,Group Stage,I,Iraq,Norway,0-2,Norway,high
-19,2026-06-16,Group Stage,J,Argentina,Algeria,2-0,Argentina,high
-20,2026-06-17,Group Stage,J,Austria,Jordan,2-1,Austria,medium
-21,2026-06-17,Group Stage,K,Portugal,DR Congo,2-0,Portugal,high
-22,2026-06-17,Group Stage,L,England,Croatia,2-1,England,low
-23,2026-06-17,Group Stage,L,Ghana,Panama,2-1,Ghana,low
-24,2026-06-17,Group Stage,K,Uzbekistan,Colombia,1-2,Colombia,medium
-25,2026-06-18,Group Stage,A,Czech Republic,South Africa,1-0,Czech Republic,low
-26,2026-06-18,Group Stage,B,Switzerland,Bosnia and Herzegovina,2-0,Switzerland,medium
-27,2026-06-18,Group Stage,B,Canada,Qatar,2-0,Canada,high
-28,2026-06-18,Group Stage,A,Mexico,South Korea,2-1,Mexico,medium
-29,2026-06-19,Group Stage,D,United States,Australia,1-0,United States,low
-30,2026-06-19,Group Stage,C,Scotland,Morocco,1-2,Morocco,low
-31,2026-06-19,Group Stage,C,Brazil,Haiti,2-1,Brazil,high
-32,2026-06-20,Group Stage,D,Turkey,Paraguay,2-1,Turkey,low
-33,2026-06-20,Group Stage,F,Netherlands,Sweden,2-1,Netherlands,medium
-34,2026-06-20,Group Stage,E,Germany,Ivory Coast,2-1,Germany,medium
-35,2026-06-20,Group Stage,E,Ecuador,Curaçao,3-0,Ecuador,high
-36,2026-06-21,Group Stage,F,Tunisia,Japan,0-1,Japan,medium
-37,2026-06-21,Group Stage,H,Spain,Saudi Arabia,3-0,Spain,high
-38,2026-06-21,Group Stage,G,Belgium,Iran,2-1,Belgium,medium
-39,2026-06-21,Group Stage,H,Uruguay,Cape Verde,2-0,Uruguay,high
-40,2026-06-21,Group Stage,G,New Zealand,Egypt,1-2,Egypt,medium
-41,2026-06-22,Group Stage,J,Argentina,Austria,1-0,Argentina,medium
-42,2026-06-22,Group Stage,I,France,Iraq,2-1,France,high
-43,2026-06-22,Group Stage,I,Norway,Senegal,2-1,Norway,low
-44,2026-06-22,Group Stage,J,Jordan,Algeria,1-2,Algeria,medium
-45,2026-06-23,Group Stage,K,Portugal,Uzbekistan,2-0,Portugal,high
-46,2026-06-23,Group Stage,L,England,Ghana,3-0,England,high
-47,2026-06-23,Group Stage,L,Panama,Croatia,1-2,Croatia,medium
-48,2026-06-23,Group Stage,K,Colombia,DR Congo,2-0,Colombia,medium
-49,2026-06-24,Group Stage,B,Bosnia and Herzegovina,Qatar,1-0,Bosnia and Herzegovina,medium
-50,2026-06-24,Group Stage,B,Switzerland,Canada,2-1,Switzerland,low
-51,2026-06-24,Group Stage,C,Scotland,Brazil,0-1,Brazil,medium
-52,2026-06-24,Group Stage,C,Morocco,Haiti,2-1,Morocco,high
-53,2026-06-24,Group Stage,A,Czech Republic,Mexico,1-2,Mexico,low
-54,2026-06-24,Group Stage,A,South Africa,South Korea,0-1,South Korea,low
-55,2026-06-25,Group Stage,E,Curaçao,Ivory Coast,0-2,Ivory Coast,high
-56,2026-06-25,Group Stage,E,Ecuador,Germany,1-2,Germany,low
-57,2026-06-25,Group Stage,F,Tunisia,Netherlands,0-1,Netherlands,medium
-58,2026-06-25,Group Stage,F,Japan,Sweden,2-1,Japan,low
-59,2026-06-25,Group Stage,D,Turkey,United States,2-1,Turkey,low
-60,2026-06-25,Group Stage,D,Paraguay,Australia,2-1,Paraguay,low
-61,2026-06-26,Group Stage,I,Norway,France,1-2,France,medium
-62,2026-06-26,Group Stage,I,Senegal,Iraq,2-1,Senegal,medium
-63,2026-06-26,Group Stage,H,Cape Verde,Saudi Arabia,1-2,Saudi Arabia,low
-64,2026-06-26,Group Stage,H,Uruguay,Spain,0-1,Spain,medium
-65,2026-06-26,Group Stage,G,New Zealand,Belgium,1-2,Belgium,high
-66,2026-06-26,Group Stage,G,Egypt,Iran,1-1,Draw,low
-67,2026-06-27,Group Stage,L,Croatia,Ghana,2-0,Croatia,medium
-68,2026-06-27,Group Stage,L,Panama,England,0-2,England,high
-69,2026-06-27,Group Stage,K,Colombia,Portugal,1-2,Portugal,low
-70,2026-06-27,Group Stage,K,DR Congo,Uzbekistan,2-1,DR Congo,low
-71,2026-06-27,Group Stage,J,Algeria,Austria,1-1,Draw,low
-72,2026-06-27,Group Stage,J,Jordan,Argentina,0-2,Argentina,high
-73,2026-06-28,Round of 32,,South Korea,Canada,1-2,Canada,medium
-74,2026-06-29,Round of 32,,Brazil,Japan,2-1,Brazil,medium
-75,2026-06-29,Round of 32,,Germany,Paraguay,1-0,Germany,medium
-76,2026-06-29,Round of 32,,Netherlands,Morocco,2-1,Netherlands,medium
-77,2026-06-30,Round of 32,,Ecuador,Norway,2-1,Ecuador,medium
-78,2026-06-30,Round of 32,,France,Iran,2-0,France,high
-79,2026-06-30,Round of 32,,Mexico,Senegal,2-1,Mexico,medium
-80,2026-07-01,Round of 32,,England,Ivory Coast,2-0,England,high
-81,2026-07-01,Round of 32,,Belgium,Czech Republic,2-0,Belgium,high
-82,2026-07-01,Round of 32,,Turkey,Algeria,1-0,Turkey,high
-83,2026-07-02,Round of 32,,Spain,Austria,2-0,Spain,high
-84,2026-07-02,Round of 32,,Colombia,Croatia,2-1,Colombia,medium
-85,2026-07-02,Round of 32,,Switzerland,Sweden,2-0,Switzerland,high
-86,2026-07-03,Round of 32,,United States,Egypt,2-1,United States,medium
-87,2026-07-03,Round of 32,,Argentina,Uruguay,2-0,Argentina,high
-88,2026-07-03,Round of 32,,Portugal,Scotland,2-0,Portugal,high
-89,2026-07-04,Round of 16,,Canada,Germany,1-2,Germany,medium
-90,2026-07-04,Round of 16,,Brazil,Ecuador,2-1,Brazil,medium
-91,2026-07-05,Round of 16,,Netherlands,France,1-2,France,medium
-92,2026-07-05,Round of 16,,Mexico,England,1-2,England,medium
-93,2026-07-06,Round of 16,,Spain,Colombia,2-0,Spain,high
-94,2026-07-06,Round of 16,,Belgium,Turkey,2-1,Belgium,low
-95,2026-07-07,Round of 16,,United States,Portugal,0-2,Portugal,high
-96,2026-07-07,Round of 16,,Switzerland,Argentina,0-2,Argentina,high
-97,2026-07-09,Quarterfinals,,Germany,Brazil,0-1,Brazil,medium
-98,2026-07-10,Quarterfinals,,Spain,Belgium,1-0,Spain,high
-99,2026-07-11,Quarterfinals,,France,England,1-0,France,medium
-100,2026-07-11,Quarterfinals,,Portugal,Argentina,0-1,Argentina,medium
-101,2026-07-14,Semifinals,,Brazil,Spain,0-1,Spain,high
-102,2026-07-15,Semifinals,,France,Argentina,0-1,Argentina,low
-103,2026-07-18,Third Place Playoff,,Brazil,France,0-1,France,medium
-104,2026-07-19,Final,,Spain,Argentina,1-0,Spain,medium
+﻿match_number,date,stage,group,home_team,away_team,score,home_score,away_score,predicted_winner,confidence,safe_score,upside_score,recommended_rule,model_favourite_prob,prob_home_win,prob_draw,prob_away_win
+1,2026-06-11,Group Stage,A,Mexico,South Africa,2-0,2,0,Mexico,high,1-0,2-0,wk2022_tuned_strong_2_0,0.7215962630135145,0.7215962630135145,0.1757012037707192,0.1027025332157662
+2,2026-06-11,Group Stage,A,South Korea,Czech Republic,1-1,1,1,Draw,low,1-0,1-1,wk2022_tuned_close_draw,0.4242630411898778,0.4242630411898778,0.2634497824727467,0.3122871763373755
+3,2026-06-12,Group Stage,B,Canada,Bosnia and Herzegovina,2-0,2,0,Canada,medium,1-0,2-0,wk2022_tuned_medium_2_0,0.5918328445712755,0.5918328445712755,0.2258839556716783,0.1822831997570462
+4,2026-06-12,Group Stage,D,United States,Paraguay,1-0,1,0,United States,low,1-0,2-1,safe_expected_points,0.4801173316637108,0.4801173316637108,0.2503276341968283,0.2695550341394608
+5,2026-06-13,Group Stage,B,Qatar,Switzerland,0-2,0,2,Switzerland,high,0-1,0-2,wk2022_tuned_strong_2_0,0.776657026891223,0.0861637630513161,0.1371792100574607,0.776657026891223
+6,2026-06-13,Group Stage,C,Brazil,Morocco,2-1,2,1,Brazil,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.5683792053375577,0.5683792053375577,0.2240821444536284,0.2075386502088138
+7,2026-06-13,Group Stage,C,Haiti,Scotland,1-2,1,2,Scotland,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.6189380144384707,0.1779680432096055,0.2030939423519238,0.6189380144384707
+8,2026-06-14,Group Stage,D,Australia,Turkey,1-2,1,2,Turkey,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.5564248177865312,0.2134279285773163,0.2301472536361525,0.5564248177865312
+9,2026-06-14,Group Stage,E,Germany,Curaçao,2-1,2,1,Germany,high,2-0,2-1,wk2022_tuned_strong_2_1,0.8984529516609215,0.8984529516609215,0.0611856846978595,0.0403613636412189
+10,2026-06-14,Group Stage,F,Netherlands,Japan,2-1,2,1,Netherlands,low,1-0,2-1,wk2022_tuned_small_2_1,0.4662307716220363,0.4662307716220363,0.2254861818073316,0.3082830465706321
+11,2026-06-14,Group Stage,E,Ivory Coast,Ecuador,0-1,0,1,Ecuador,low,0-1,1-2,safe_expected_points,0.4881691322311658,0.2284789326799974,0.2833519350888366,0.4881691322311658
+12,2026-06-14,Group Stage,F,Sweden,Tunisia,2-1,2,1,Sweden,low,1-0,2-1,wk2022_tuned_small_2_1,0.4766033883870362,0.4766033883870362,0.2409762429017405,0.2824203687112232
+13,2026-06-15,Group Stage,H,Spain,Cape Verde,3-0,3,0,Spain,high,2-0,3-0,wk2022_tuned_strong_3_0,0.8778393469885276,0.8778393469885276,0.0814197026103943,0.040740950401078
+14,2026-06-15,Group Stage,G,Belgium,Egypt,2-1,2,1,Belgium,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.5677372451095362,0.5677372451095362,0.2110995081195473,0.2211632467709164
+15,2026-06-15,Group Stage,H,Saudi Arabia,Uruguay,0-1,0,1,Uruguay,medium,0-1,0-1,safe_expected_points,0.677912562650607,0.1272683143992245,0.1948191229501686,0.677912562650607
+16,2026-06-15,Group Stage,G,Iran,New Zealand,2-1,2,1,Iran,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.5682814166265995,0.5682814166265995,0.2241561280184136,0.2075624553549868
+17,2026-06-16,Group Stage,I,France,Senegal,2-1,2,1,France,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.647271944620831,0.647271944620831,0.191602315266526,0.1611257401126428
+18,2026-06-16,Group Stage,I,Iraq,Norway,0-2,0,2,Norway,high,0-1,0-2,wk2022_tuned_strong_2_0,0.7632236589137316,0.1001518630673878,0.1366244780188806,0.7632236589137316
+19,2026-06-16,Group Stage,J,Argentina,Algeria,2-0,2,0,Argentina,high,1-0,2-0,wk2022_tuned_medium_2_0,0.7105134787918317,0.7105134787918317,0.1753311027552512,0.1141554184529171
+20,2026-06-17,Group Stage,J,Austria,Jordan,2-1,2,1,Austria,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.6925031112736654,0.6925031112736654,0.1639696836179915,0.143527205108343
+21,2026-06-17,Group Stage,K,Portugal,DR Congo,2-0,2,0,Portugal,high,1-0,2-0,wk2022_tuned_strong_2_0,0.7492407572176212,0.7492407572176212,0.1549252734498166,0.0958339693325621
+22,2026-06-17,Group Stage,L,England,Croatia,2-1,2,1,England,low,1-0,2-1,wk2022_tuned_medium_2_1,0.5380933909516271,0.5380933909516271,0.2226771325162421,0.2392294765321308
+23,2026-06-17,Group Stage,L,Ghana,Panama,2-1,2,1,Ghana,low,1-0,2-1,wk2022_tuned_small_2_1,0.3894187578409151,0.3894187578409151,0.233040672443931,0.3775405697151537
+24,2026-06-17,Group Stage,K,Uzbekistan,Colombia,1-2,1,2,Colombia,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.6852349963907615,0.1298962361732093,0.1848687674360292,0.6852349963907615
+25,2026-06-18,Group Stage,A,Czech Republic,South Africa,1-0,1,0,Czech Republic,low,1-0,2-1,safe_expected_points,0.4965636530350618,0.4965636530350618,0.2444115736828348,0.2590247732821032
+26,2026-06-18,Group Stage,B,Switzerland,Bosnia and Herzegovina,2-0,2,0,Switzerland,medium,1-0,2-0,wk2022_tuned_medium_2_0,0.635677875985399,0.635677875985399,0.2006194196105581,0.1637027044040428
+27,2026-06-18,Group Stage,B,Canada,Qatar,2-0,2,0,Canada,high,1-0,2-0,wk2022_tuned_strong_2_0,0.751318953791787,0.751318953791787,0.159587246263724,0.0890937999444889
+28,2026-06-18,Group Stage,A,Mexico,South Korea,2-1,2,1,Mexico,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.5577405591478412,0.5577405591478412,0.2352165059891972,0.2070429348629615
+29,2026-06-19,Group Stage,D,United States,Australia,2-1,2,1,United States,low,1-0,2-1,wk2022_tuned_medium_2_1,0.5413999177638507,0.5413999177638507,0.2207562026608906,0.2378438795752587
+30,2026-06-19,Group Stage,C,Scotland,Morocco,1-2,1,2,Morocco,low,0-1,1-2,wk2022_tuned_small_2_1,0.5118287598476768,0.2389607031306233,0.2492105370216998,0.5118287598476768
+31,2026-06-19,Group Stage,C,Brazil,Haiti,2-1,2,1,Brazil,high,2-0,2-1,wk2022_tuned_strong_2_1,0.8738425329621589,0.8738425329621589,0.0796433730908658,0.0465140939469753
+32,2026-06-20,Group Stage,D,Turkey,Paraguay,2-1,2,1,Turkey,low,1-0,2-1,wk2022_tuned_small_2_1,0.4201789218333104,0.4201789218333104,0.2555143717046929,0.3243067064619967
+33,2026-06-20,Group Stage,F,Netherlands,Sweden,2-1,2,1,Netherlands,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.5977739543890702,0.5977739543890702,0.2070122369544858,0.195213808656444
+34,2026-06-20,Group Stage,E,Germany,Ivory Coast,2-1,2,1,Germany,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.6372032863409668,0.6372032863409668,0.1927675279515425,0.1700291857074907
+35,2026-06-20,Group Stage,E,Ecuador,Curaçao,2-1,2,1,Ecuador,high,2-0,2-1,wk2022_tuned_strong_2_1,0.8111514508087504,0.8111514508087504,0.1153387897415118,0.0735097594497378
+36,2026-06-21,Group Stage,F,Tunisia,Japan,0-1,0,1,Japan,medium,0-1,0-1,safe_expected_points,0.587887367078795,0.1754642082874465,0.2366484246337585,0.587887367078795
+37,2026-06-21,Group Stage,H,Spain,Saudi Arabia,3-0,3,0,Spain,high,2-0,3-0,wk2022_tuned_strong_3_0,0.8630723328190378,0.8630723328190378,0.0908628051571326,0.0460648620238295
+38,2026-06-21,Group Stage,G,Belgium,Iran,2-1,2,1,Belgium,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.6155481853787093,0.6155481853787093,0.1812658811975863,0.2031859334237043
+39,2026-06-21,Group Stage,H,Uruguay,Cape Verde,2-0,2,0,Uruguay,high,2-0,2-0,safe_expected_points,0.708529473285599,0.708529473285599,0.1758045248058267,0.1156660019085743
+40,2026-06-21,Group Stage,G,New Zealand,Egypt,1-2,1,2,Egypt,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.5518715862189308,0.2124650802108065,0.2356633335702626,0.5518715862189308
+41,2026-06-22,Group Stage,J,Argentina,Austria,1-0,1,0,Argentina,medium,1-0,1-0,safe_expected_points,0.621786622070895,0.621786622070895,0.2084131871754759,0.1698001907536291
+42,2026-06-22,Group Stage,I,France,Iraq,2-1,2,1,France,high,2-0,2-1,wk2022_tuned_strong_2_1,0.8374716870395262,0.8374716870395262,0.1038050805756286,0.0587232323848451
+43,2026-06-22,Group Stage,I,Norway,Senegal,2-1,2,1,Norway,low,1-0,2-1,wk2022_tuned_small_2_1,0.4498832113126702,0.4498832113126702,0.2405685129576521,0.3095482757296777
+44,2026-06-22,Group Stage,J,Jordan,Algeria,1-2,1,2,Algeria,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.6091059346348653,0.1874514643747865,0.2034426009903483,0.6091059346348653
+45,2026-06-23,Group Stage,K,Portugal,Uzbekistan,2-0,2,0,Portugal,high,1-0,2-0,wk2022_tuned_strong_2_0,0.7319448863200291,0.7319448863200291,0.1569074810132309,0.11114763266674
+46,2026-06-23,Group Stage,L,England,Ghana,3-0,3,0,England,high,2-0,3-0,wk2022_tuned_strong_3_0,0.7607134231521954,0.7607134231521954,0.1499059532192249,0.0893806236285796
+47,2026-06-23,Group Stage,L,Panama,Croatia,1-2,1,2,Croatia,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.610925568263945,0.1646724050437301,0.2244020266923249,0.610925568263945
+48,2026-06-23,Group Stage,K,Colombia,DR Congo,2-0,2,0,Colombia,medium,1-0,2-0,wk2022_tuned_medium_2_0,0.6886993373538917,0.6886993373538917,0.1858227891695105,0.1254778734765978
+49,2026-06-24,Group Stage,B,Bosnia and Herzegovina,Qatar,1-0,1,0,Bosnia and Herzegovina,medium,1-0,2-1,safe_expected_points,0.5810821177679772,0.5810821177679772,0.2258581751562317,0.193059707075791
+50,2026-06-24,Group Stage,B,Switzerland,Canada,2-1,2,1,Switzerland,low,1-0,2-1,wk2022_tuned_small_2_1,0.4499049954034588,0.4499049954034588,0.2414918172170472,0.3086031873794939
+51,2026-06-24,Group Stage,C,Scotland,Brazil,1-2,1,2,Brazil,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.672666225905537,0.1427489026480997,0.1845848714463632,0.672666225905537
+52,2026-06-24,Group Stage,C,Morocco,Haiti,2-1,2,1,Morocco,high,2-0,2-1,wk2022_tuned_strong_2_1,0.7327205756904448,0.7327205756904448,0.1632892591424109,0.1039901651671442
+53,2026-06-24,Group Stage,A,Czech Republic,Mexico,1-2,1,2,Mexico,low,0-1,1-2,wk2022_tuned_medium_2_1,0.5255053993065418,0.2345329974520776,0.2399616032413805,0.5255053993065418
+54,2026-06-24,Group Stage,A,South Africa,South Korea,0-1,0,1,South Korea,low,0-1,1-2,safe_expected_points,0.5362422122904826,0.2275680770425087,0.2361897106670087,0.5362422122904826
+55,2026-06-25,Group Stage,E,Curaçao,Ivory Coast,0-2,0,2,Ivory Coast,high,0-1,0-2,wk2022_tuned_strong_2_0,0.7203154047116872,0.1182146181207661,0.1614699771675466,0.7203154047116872
+56,2026-06-25,Group Stage,E,Ecuador,Germany,1-2,1,2,Germany,low,0-1,1-2,wk2022_tuned_medium_2_1,0.5386803772858718,0.2384527982745919,0.2228668244395363,0.5386803772858718
+57,2026-06-25,Group Stage,F,Japan,Sweden,2-1,2,1,Japan,low,1-0,2-1,wk2022_tuned_small_2_1,0.516562856672773,0.516562856672773,0.2290022260360778,0.2544349172911491
+58,2026-06-25,Group Stage,F,Tunisia,Netherlands,0-1,0,1,Netherlands,medium,0-1,0-1,safe_expected_points,0.6476754160707964,0.1533975457798937,0.1989270381493098,0.6476754160707964
+59,2026-06-25,Group Stage,D,Paraguay,Australia,1-0,1,0,Paraguay,low,1-0,2-1,safe_expected_points,0.4814578057737293,0.4814578057737293,0.2551872890457017,0.263354905180569
+60,2026-06-25,Group Stage,D,Turkey,United States,2-1,2,1,Turkey,low,1-0,2-1,wk2022_tuned_small_2_1,0.415786473316336,0.415786473316336,0.2330984635224254,0.3511150631612386
+61,2026-06-26,Group Stage,I,Norway,France,1-2,1,2,France,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.5644474493886433,0.2116833053317875,0.2238692452795691,0.5644474493886433
+62,2026-06-26,Group Stage,I,Senegal,Iraq,2-1,2,1,Senegal,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.6641772196506637,0.6641772196506637,0.1834891686710073,0.152333611678329
+63,2026-06-26,Group Stage,H,Cape Verde,Saudi Arabia,1-1,1,1,Draw,low,0-1,1-1,wk2022_tuned_close_draw,0.4026809348577698,0.3368808399052371,0.2604382252369932,0.4026809348577698
+64,2026-06-26,Group Stage,H,Uruguay,Spain,0-1,0,1,Spain,medium,0-1,0-1,safe_expected_points,0.6084224302108596,0.1783249539879459,0.2132526158011944,0.6084224302108596
+65,2026-06-26,Group Stage,G,New Zealand,Belgium,1-2,1,2,Belgium,high,0-2,1-2,wk2022_tuned_strong_2_1,0.7398100680196278,0.1143655059247022,0.1458244260556699,0.7398100680196278
+66,2026-06-26,Group Stage,G,Egypt,Iran,1-1,1,1,Draw,low,1-0,1-1,wk2022_tuned_close_draw,0.3804972741646416,0.3804972741646416,0.2716886001405612,0.3478141256947972
+67,2026-06-27,Group Stage,L,Croatia,Ghana,2-0,2,0,Croatia,medium,1-0,2-0,wk2022_tuned_medium_2_0,0.637508004923198,0.637508004923198,0.2087812842536087,0.1537107108231933
+68,2026-06-27,Group Stage,L,Panama,England,0-2,0,2,England,high,0-1,0-2,wk2022_tuned_strong_2_0,0.7245930392265324,0.1127365961751885,0.162670364598279,0.7245930392265324
+69,2026-06-27,Group Stage,K,Colombia,Portugal,1-2,1,2,Portugal,low,0-1,1-2,wk2022_tuned_small_2_1,0.4368827408436656,0.3162279908383928,0.2468892683179415,0.4368827408436656
+70,2026-06-27,Group Stage,K,DR Congo,Uzbekistan,2-1,2,1,DR Congo,low,1-0,2-1,wk2022_tuned_small_2_1,0.3796353877390757,0.3796353877390757,0.2475373392263971,0.3728272730345271
+71,2026-06-27,Group Stage,J,Algeria,Austria,1-1,1,1,Draw,low,0-1,1-1,wk2022_tuned_close_draw,0.4450503187956449,0.2930611702847215,0.2618885109196336,0.4450503187956449
+72,2026-06-27,Group Stage,J,Jordan,Argentina,1-2,1,2,Argentina,high,0-2,1-2,wk2022_tuned_strong_2_1,0.7858676403090312,0.0851273166424404,0.1290050430485282,0.7858676403090312
+73,2026-06-28,Round of 32,,South Korea,Canada,1-2,1,2,Canada,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.585,0.41500000000000004,0.0,0.585
+74,2026-06-29,Round of 32,,Brazil,Japan,2-1,2,1,Brazil,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.644,0.644,0.0,0.356
+75,2026-06-29,Round of 32,,Germany,Paraguay,1-0,1,0,Germany,medium,1-0,1-0,safe_expected_points,0.688,0.688,0.0,0.31200000000000006
+76,2026-06-29,Round of 32,,Netherlands,Morocco,2-1,2,1,Netherlands,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.672,0.672,0.0,0.32799999999999996
+77,2026-06-30,Round of 32,,Ecuador,Norway,2-1,2,1,Ecuador,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.552,0.552,0.0,0.44799999999999995
+78,2026-06-30,Round of 32,,France,Iran,2-0,2,0,France,high,1-0,2-0,wk2022_tuned_strong_2_0,0.849,0.849,0.0,0.15100000000000002
+79,2026-06-30,Round of 32,,Mexico,Senegal,2-1,2,1,Mexico,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.614,0.614,0.0,0.386
+80,2026-07-01,Round of 32,,England,Ivory Coast,2-0,2,0,England,high,2-0,2-0,safe_expected_points,0.874,0.874,0.0,0.126
+81,2026-07-01,Round of 32,,Belgium,Czech Republic,2-0,2,0,Belgium,high,1-0,2-0,wk2022_tuned_strong_2_0,0.732,0.732,0.0,0.268
+82,2026-07-01,Round of 32,,Turkey,Algeria,1-0,1,0,Turkey,high,1-0,1-0,safe_expected_points,0.712,0.712,0.0,0.28800000000000003
+83,2026-07-02,Round of 32,,Spain,Austria,2-0,2,0,Spain,high,2-0,2-0,safe_expected_points,0.879,0.879,0.0,0.121
+84,2026-07-02,Round of 32,,Colombia,Croatia,2-1,2,1,Colombia,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.568,0.568,0.0,0.43200000000000005
+85,2026-07-02,Round of 32,,Switzerland,Scotland,1-0,1,0,Switzerland,high,1-0,1-0,safe_expected_points,0.718,0.718,0.0,0.28200000000000003
+86,2026-07-03,Round of 32,,United States,Egypt,2-1,2,1,United States,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.615,0.615,0.0,0.385
+87,2026-07-03,Round of 32,,Argentina,Uruguay,2-0,2,0,Argentina,high,1-0,2-0,wk2022_tuned_strong_2_0,0.769,0.769,0.0,0.23099999999999998
+88,2026-07-03,Round of 32,,Portugal,Bosnia and Herzegovina,2-0,2,0,Portugal,high,2-0,2-0,safe_expected_points,0.898,0.898,0.0,0.10199999999999998
+89,2026-07-04,Round of 16,,Canada,Germany,1-2,1,2,Germany,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.674,0.32599999999999996,0.0,0.674
+90,2026-07-04,Round of 16,,Brazil,Ecuador,2-1,2,1,Brazil,medium,1-0,2-1,wk2022_tuned_medium_2_1,0.599,0.599,0.0,0.401
+91,2026-07-05,Round of 16,,Netherlands,France,1-2,1,2,France,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.656,0.344,0.0,0.656
+92,2026-07-05,Round of 16,,Mexico,England,1-2,1,2,England,medium,0-1,1-2,wk2022_tuned_medium_2_1,0.638,0.362,0.0,0.638
+93,2026-07-06,Round of 16,,Spain,Colombia,2-0,2,0,Spain,high,1-0,2-0,wk2022_tuned_strong_2_0,0.756,0.756,0.0,0.244
+94,2026-07-06,Round of 16,,Belgium,Turkey,2-1,2,1,Belgium,low,0-1,2-1,wk2022_tuned_small_2_1,0.512,0.512,0.0,0.488
+95,2026-07-07,Round of 16,,United States,Portugal,0-2,0,2,Portugal,high,0-1,0-2,wk2022_tuned_strong_2_0,0.759,0.241,0.0,0.759
+96,2026-07-07,Round of 16,,Switzerland,Argentina,0-2,0,2,Argentina,high,0-1,0-2,wk2022_tuned_strong_2_0,0.745,0.255,0.0,0.745
+97,2026-07-09,Quarterfinals,,Germany,Brazil,0-1,0,1,Brazil,medium,0-1,1-2,safe_expected_points,0.568,0.43200000000000005,0.0,0.568
+98,2026-07-10,Quarterfinals,,Spain,Belgium,1-0,1,0,Spain,high,1-0,2-0,safe_expected_points,0.82,0.82,0.0,0.18000000000000005
+99,2026-07-11,Quarterfinals,,France,England,1-0,1,0,France,medium,1-0,2-1,safe_expected_points,0.563,0.563,0.0,0.43700000000000006
+100,2026-07-11,Quarterfinals,,Portugal,Argentina,0-1,0,1,Argentina,medium,0-1,1-2,safe_expected_points,0.666,0.33399999999999996,0.0,0.666
+101,2026-07-14,Semifinals,,Brazil,Spain,0-1,0,1,Spain,high,0-1,0-2,safe_expected_points,0.721,0.279,0.0,0.721
+102,2026-07-15,Semifinals,,France,Argentina,0-1,0,1,Argentina,low,0-1,1-2,safe_expected_points,0.548,0.45199999999999996,0.0,0.548
+103,2026-07-18,Third Place Playoff,,Brazil,France,0-1,0,1,France,medium,0-1,1-2,safe_expected_points,0.602,0.398,0.0,0.602
+104,2026-07-19,Final,,Spain,Argentina,1-0,1,0,Spain,medium,1-0,2-1,safe_expected_points,0.585,0.585,0.0,0.41500000000000004
