@@ -1,0 +1,105 @@
+date,kickoff_at,match_number,home_team,away_team,tournament,stage,group,city,country,venue,region_cluster,airport_code,neutral,home_is_placeholder,away_is_placeholder
+2026-06-11,2026-06-11 15:00:00-06,1,Mexico,South Africa,FIFA World Cup,Group Stage,A,Mexico City,Mexico,Estadio Azteca,Central,MEX,False,False,False
+2026-06-11,2026-06-11 22:00:00-06,2,South Korea,Winner UEFA Playoff D,FIFA World Cup,Group Stage,A,Guadalajara,Mexico,Estadio Akron,Central,GDL,True,False,True
+2026-06-12,2026-06-12 15:00:00-04,3,Canada,Winner UEFA Playoff A,FIFA World Cup,Group Stage,B,Toronto,Canada,BMO Field,East,YYZ,False,False,True
+2026-06-12,2026-06-12 21:00:00-07,4,United States,Paraguay,FIFA World Cup,Group Stage,D,Los Angeles,United States,SoFi Stadium,West,LAX,False,False,False
+2026-06-13,2026-06-13 15:00:00-07,5,Qatar,Switzerland,FIFA World Cup,Group Stage,B,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,False,False
+2026-06-13,2026-06-13 18:00:00-04,6,Brazil,Morocco,FIFA World Cup,Group Stage,C,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,False,False
+2026-06-13,2026-06-13 21:00:00-04,7,Haiti,Scotland,FIFA World Cup,Group Stage,C,Boston,United States,Gillette Stadium,East,BOS,True,False,False
+2026-06-14,2026-06-14 00:00:00-07,8,Australia,Winner UEFA Playoff C,FIFA World Cup,Group Stage,D,Vancouver,Canada,BC Place,West,YVR,True,False,True
+2026-06-14,2026-06-14 13:00:00-05,9,Germany,Curaçao,FIFA World Cup,Group Stage,E,Houston,United States,NRG Stadium,Central,IAH,True,False,False
+2026-06-14,2026-06-14 16:00:00-05,10,Netherlands,Japan,FIFA World Cup,Group Stage,F,Dallas,United States,AT&T Stadium,Central,DAL,True,False,False
+2026-06-14,2026-06-14 19:00:00-04,11,Côte d'Ivoire,Ecuador,FIFA World Cup,Group Stage,E,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,False,False
+2026-06-14,2026-06-14 22:00:00-06,12,Winner UEFA Playoff B,Tunisia,FIFA World Cup,Group Stage,F,Monterrey,Mexico,Estadio BBVA,Central,MTY,True,True,False
+2026-06-15,2026-06-15 12:00:00-04,13,Spain,Cape Verde,FIFA World Cup,Group Stage,H,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,False,False
+2026-06-15,2026-06-15 15:00:00-07,14,Belgium,Egypt,FIFA World Cup,Group Stage,G,Seattle,United States,Lumen Field,West,SEA,True,False,False
+2026-06-15,2026-06-15 18:00:00-04,15,Saudi Arabia,Uruguay,FIFA World Cup,Group Stage,H,Miami,United States,Hard Rock Stadium,East,MIA,True,False,False
+2026-06-15,2026-06-15 21:00:00-07,16,Iran,New Zealand,FIFA World Cup,Group Stage,G,Los Angeles,United States,SoFi Stadium,West,LAX,True,False,False
+2026-06-16,2026-06-16 15:00:00-04,17,France,Senegal,FIFA World Cup,Group Stage,I,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,False,False
+2026-06-16,2026-06-16 18:00:00-04,18,Winner FIFA Playoff 2,Norway,FIFA World Cup,Group Stage,I,Boston,United States,Gillette Stadium,East,BOS,True,True,False
+2026-06-16,2026-06-16 21:00:00-05,19,Argentina,Algeria,FIFA World Cup,Group Stage,J,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,False,False
+2026-06-17,2026-06-17 00:00:00-07,20,Austria,Jordan,FIFA World Cup,Group Stage,J,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,False,False
+2026-06-17,2026-06-17 13:00:00-05,21,Portugal,Winner FIFA Playoff 1,FIFA World Cup,Group Stage,K,Houston,United States,NRG Stadium,Central,IAH,True,False,True
+2026-06-17,2026-06-17 16:00:00-05,22,England,Croatia,FIFA World Cup,Group Stage,L,Dallas,United States,AT&T Stadium,Central,DAL,True,False,False
+2026-06-17,2026-06-17 19:00:00-04,23,Ghana,Panama,FIFA World Cup,Group Stage,L,Toronto,Canada,BMO Field,East,YYZ,True,False,False
+2026-06-17,2026-06-17 22:00:00-06,24,Uzbekistan,Colombia,FIFA World Cup,Group Stage,K,Mexico City,Mexico,Estadio Azteca,Central,MEX,True,False,False
+2026-06-18,2026-06-18 12:00:00-04,25,Winner UEFA Playoff D,South Africa,FIFA World Cup,Group Stage,A,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,True,False
+2026-06-18,2026-06-18 15:00:00-07,26,Switzerland,Winner UEFA Playoff A,FIFA World Cup,Group Stage,B,Los Angeles,United States,SoFi Stadium,West,LAX,True,False,True
+2026-06-18,2026-06-18 18:00:00-07,27,Canada,Qatar,FIFA World Cup,Group Stage,B,Vancouver,Canada,BC Place,West,YVR,False,False,False
+2026-06-18,2026-06-18 21:00:00-06,28,Mexico,South Korea,FIFA World Cup,Group Stage,A,Guadalajara,Mexico,Estadio Akron,Central,GDL,False,False,False
+2026-06-19,2026-06-19 15:00:00-07,29,United States,Australia,FIFA World Cup,Group Stage,D,Seattle,United States,Lumen Field,West,SEA,False,False,False
+2026-06-19,2026-06-19 18:00:00-04,30,Scotland,Morocco,FIFA World Cup,Group Stage,C,Boston,United States,Gillette Stadium,East,BOS,True,False,False
+2026-06-19,2026-06-19 21:00:00-04,31,Brazil,Haiti,FIFA World Cup,Group Stage,C,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,False,False
+2026-06-20,2026-06-20 00:00:00-07,32,Winner UEFA Playoff C,Paraguay,FIFA World Cup,Group Stage,D,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,True,False
+2026-06-20,2026-06-20 13:00:00-05,33,Netherlands,Winner UEFA Playoff B,FIFA World Cup,Group Stage,F,Houston,United States,NRG Stadium,Central,IAH,True,False,True
+2026-06-20,2026-06-20 16:00:00-04,34,Germany,Côte d'Ivoire,FIFA World Cup,Group Stage,E,Toronto,Canada,BMO Field,East,YYZ,True,False,False
+2026-06-20,2026-06-20 20:00:00-05,35,Ecuador,Curaçao,FIFA World Cup,Group Stage,E,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,False,False
+2026-06-21,2026-06-21 00:00:00-06,36,Tunisia,Japan,FIFA World Cup,Group Stage,F,Monterrey,Mexico,Estadio BBVA,Central,MTY,True,False,False
+2026-06-21,2026-06-21 12:00:00-04,37,Spain,Saudi Arabia,FIFA World Cup,Group Stage,H,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,False,False
+2026-06-21,2026-06-21 15:00:00-07,38,Belgium,Iran,FIFA World Cup,Group Stage,G,Los Angeles,United States,SoFi Stadium,West,LAX,True,False,False
+2026-06-21,2026-06-21 18:00:00-04,39,Uruguay,Cape Verde,FIFA World Cup,Group Stage,H,Miami,United States,Hard Rock Stadium,East,MIA,True,False,False
+2026-06-21,2026-06-21 21:00:00-07,40,New Zealand,Egypt,FIFA World Cup,Group Stage,G,Vancouver,Canada,BC Place,West,YVR,True,False,False
+2026-06-22,2026-06-22 13:00:00-05,41,Argentina,Austria,FIFA World Cup,Group Stage,J,Dallas,United States,AT&T Stadium,Central,DAL,True,False,False
+2026-06-22,2026-06-22 17:00:00-04,42,France,Winner FIFA Playoff 2,FIFA World Cup,Group Stage,I,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,False,True
+2026-06-22,2026-06-22 20:00:00-04,43,Norway,Senegal,FIFA World Cup,Group Stage,I,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,False,False
+2026-06-22,2026-06-22 23:00:00-07,44,Jordan,Algeria,FIFA World Cup,Group Stage,J,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,False,False
+2026-06-23,2026-06-23 13:00:00-05,45,Portugal,Uzbekistan,FIFA World Cup,Group Stage,K,Houston,United States,NRG Stadium,Central,IAH,True,False,False
+2026-06-23,2026-06-23 16:00:00-04,46,England,Ghana,FIFA World Cup,Group Stage,L,Boston,United States,Gillette Stadium,East,BOS,True,False,False
+2026-06-23,2026-06-23 19:00:00-04,47,Panama,Croatia,FIFA World Cup,Group Stage,L,Toronto,Canada,BMO Field,East,YYZ,True,False,False
+2026-06-23,2026-06-23 22:00:00-06,48,Colombia,Winner FIFA Playoff 1,FIFA World Cup,Group Stage,K,Guadalajara,Mexico,Estadio Akron,Central,GDL,True,False,True
+2026-06-24,2026-06-24 15:00:00-07,49,Switzerland,Canada,FIFA World Cup,Group Stage,B,Vancouver,Canada,BC Place,West,YVR,False,False,False
+2026-06-24,2026-06-24 15:00:00-07,50,Winner UEFA Playoff A,Qatar,FIFA World Cup,Group Stage,B,Seattle,United States,Lumen Field,West,SEA,True,True,False
+2026-06-24,2026-06-24 18:00:00-04,51,Scotland,Brazil,FIFA World Cup,Group Stage,C,Miami,United States,Hard Rock Stadium,East,MIA,True,False,False
+2026-06-24,2026-06-24 18:00:00-04,52,Morocco,Haiti,FIFA World Cup,Group Stage,C,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,False,False
+2026-06-24,2026-06-24 21:00:00-06,53,Winner UEFA Playoff D,Mexico,FIFA World Cup,Group Stage,A,Mexico City,Mexico,Estadio Azteca,Central,MEX,False,True,False
+2026-06-24,2026-06-24 21:00:00-06,54,South Africa,South Korea,FIFA World Cup,Group Stage,A,Monterrey,Mexico,Estadio BBVA,Central,MTY,True,False,False
+2026-06-25,2026-06-25 16:00:00-04,55,Curaçao,Côte d'Ivoire,FIFA World Cup,Group Stage,E,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,False,False
+2026-06-25,2026-06-25 16:00:00-04,56,Ecuador,Germany,FIFA World Cup,Group Stage,E,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,False,False
+2026-06-25,2026-06-25 19:00:00-05,57,Japan,Winner UEFA Playoff B,FIFA World Cup,Group Stage,F,Dallas,United States,AT&T Stadium,Central,DAL,True,False,True
+2026-06-25,2026-06-25 19:00:00-05,58,Tunisia,Netherlands,FIFA World Cup,Group Stage,F,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,False,False
+2026-06-25,2026-06-25 22:00:00-07,59,Winner UEFA Playoff C,United States,FIFA World Cup,Group Stage,D,Los Angeles,United States,SoFi Stadium,West,LAX,False,True,False
+2026-06-25,2026-06-25 22:00:00-07,60,Paraguay,Australia,FIFA World Cup,Group Stage,D,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,False,False
+2026-06-26,2026-06-26 15:00:00-04,61,Norway,France,FIFA World Cup,Group Stage,I,Boston,United States,Gillette Stadium,East,BOS,True,False,False
+2026-06-26,2026-06-26 15:00:00-04,62,Senegal,Winner FIFA Playoff 2,FIFA World Cup,Group Stage,I,Toronto,Canada,BMO Field,East,YYZ,True,False,True
+2026-06-26,2026-06-26 20:00:00-05,63,Cape Verde,Saudi Arabia,FIFA World Cup,Group Stage,H,Houston,United States,NRG Stadium,Central,IAH,True,False,False
+2026-06-26,2026-06-26 20:00:00-06,64,Uruguay,Spain,FIFA World Cup,Group Stage,H,Guadalajara,Mexico,Estadio Akron,Central,GDL,True,False,False
+2026-06-26,2026-06-26 23:00:00-07,65,Egypt,Iran,FIFA World Cup,Group Stage,G,Seattle,United States,Lumen Field,West,SEA,True,False,False
+2026-06-26,2026-06-26 23:00:00-07,66,New Zealand,Belgium,FIFA World Cup,Group Stage,G,Vancouver,Canada,BC Place,West,YVR,True,False,False
+2026-06-27,2026-06-27 17:00:00-04,67,Panama,England,FIFA World Cup,Group Stage,L,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,False,False
+2026-06-27,2026-06-27 17:00:00-04,68,Croatia,Ghana,FIFA World Cup,Group Stage,L,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,False,False
+2026-06-27,2026-06-27 19:30:00-04,69,Colombia,Portugal,FIFA World Cup,Group Stage,K,Miami,United States,Hard Rock Stadium,East,MIA,True,False,False
+2026-06-27,2026-06-27 19:30:00-04,70,Winner FIFA Playoff 1,Uzbekistan,FIFA World Cup,Group Stage,K,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,True,False
+2026-06-27,2026-06-27 22:00:00-05,71,Algeria,Austria,FIFA World Cup,Group Stage,J,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,False,False
+2026-06-27,2026-06-27 22:00:00-05,72,Jordan,Argentina,FIFA World Cup,Group Stage,J,Dallas,United States,AT&T Stadium,Central,DAL,True,False,False
+2026-06-28,2026-06-28 15:00:00-07,73,nan,nan,FIFA World Cup,Round of 32,2A vs 2B,Los Angeles,United States,SoFi Stadium,West,LAX,True,True,True
+2026-06-29,2026-06-29 13:00:00-05,74,nan,nan,FIFA World Cup,Round of 32,1C vs 2F,Houston,United States,NRG Stadium,Central,IAH,True,True,True
+2026-06-29,2026-06-29 16:30:00-04,75,nan,nan,FIFA World Cup,Round of 32,1E vs 3ABCDF,Boston,United States,Gillette Stadium,East,BOS,True,True,True
+2026-06-29,2026-06-29 21:00:00-06,76,nan,nan,FIFA World Cup,Round of 32,1F vs 2C,Monterrey,Mexico,Estadio BBVA,Central,MTY,True,True,True
+2026-06-30,2026-06-30 13:00:00-05,77,nan,nan,FIFA World Cup,Round of 32,2E vs 2I,Dallas,United States,AT&T Stadium,Central,DAL,True,True,True
+2026-06-30,2026-06-30 17:00:00-04,78,nan,nan,FIFA World Cup,Round of 32,1I vs 3CDFGH,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,True,True
+2026-06-30,2026-06-30 21:00:00-06,79,nan,nan,FIFA World Cup,Round of 32,1A vs 3CEFHI,Mexico City,Mexico,Estadio Azteca,Central,MEX,True,True,True
+2026-07-01,2026-07-01 12:00:00-04,80,nan,nan,FIFA World Cup,Round of 32,1L vs 3EHIJK,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,True,True
+2026-07-01,2026-07-01 16:00:00-07,81,nan,nan,FIFA World Cup,Round of 32,1G vs 3AEHIJ,Seattle,United States,Lumen Field,West,SEA,True,True,True
+2026-07-01,2026-07-01 20:00:00-07,82,nan,nan,FIFA World Cup,Round of 32,1D vs 3BEFIJ,San Francisco Bay Area,United States,Levi's Stadium,West,SFO,True,True,True
+2026-07-02,2026-07-02 15:00:00-07,83,nan,nan,FIFA World Cup,Round of 32,1H vs 2J,Los Angeles,United States,SoFi Stadium,West,LAX,True,True,True
+2026-07-02,2026-07-02 19:00:00-04,84,nan,nan,FIFA World Cup,Round of 32,2K vs 2L,Toronto,Canada,BMO Field,East,YYZ,True,True,True
+2026-07-02,2026-07-02 23:00:00-07,85,nan,nan,FIFA World Cup,Round of 32,1B vs 3EFGIJ,Vancouver,Canada,BC Place,West,YVR,True,True,True
+2026-07-03,2026-07-03 14:00:00-05,86,nan,nan,FIFA World Cup,Round of 32,2D vs 2G,Dallas,United States,AT&T Stadium,Central,DAL,True,True,True
+2026-07-03,2026-07-03 18:00:00-04,87,nan,nan,FIFA World Cup,Round of 32,1J vs 2H,Miami,United States,Hard Rock Stadium,East,MIA,True,True,True
+2026-07-03,2026-07-03 21:30:00-05,88,nan,nan,FIFA World Cup,Round of 32,1K vs 3DEIJL,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,True,True
+2026-07-04,2026-07-04 13:00:00-05,89,nan,nan,FIFA World Cup,Round of 16,W73 vs W75,Houston,United States,NRG Stadium,Central,IAH,True,True,True
+2026-07-04,2026-07-04 17:00:00-04,90,nan,nan,FIFA World Cup,Round of 16,W74 vs W77,Philadelphia,United States,Lincoln Financial Field,East,PHL,True,True,True
+2026-07-05,2026-07-05 16:00:00-04,91,nan,nan,FIFA World Cup,Round of 16,W76 vs W78,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,True,True
+2026-07-05,2026-07-05 20:00:00-06,92,nan,nan,FIFA World Cup,Round of 16,W79 vs W80,Mexico City,Mexico,Estadio Azteca,Central,MEX,True,True,True
+2026-07-06,2026-07-06 15:00:00-05,93,nan,nan,FIFA World Cup,Round of 16,W83 vs W84,Dallas,United States,AT&T Stadium,Central,DAL,True,True,True
+2026-07-06,2026-07-06 20:00:00-07,94,nan,nan,FIFA World Cup,Round of 16,W81 vs W82,Seattle,United States,Lumen Field,West,SEA,True,True,True
+2026-07-07,2026-07-07 12:00:00-04,95,nan,nan,FIFA World Cup,Round of 16,W86 vs W88,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,True,True
+2026-07-07,2026-07-07 16:00:00-07,96,nan,nan,FIFA World Cup,Round of 16,W85 vs W87,Vancouver,Canada,BC Place,West,YVR,True,True,True
+2026-07-09,2026-07-09 16:00:00-04,97,nan,nan,FIFA World Cup,Quarterfinals,W89 vs W90,Boston,United States,Gillette Stadium,East,BOS,True,True,True
+2026-07-10,2026-07-10 15:00:00-07,98,nan,nan,FIFA World Cup,Quarterfinals,W93 vs W94,Los Angeles,United States,SoFi Stadium,West,LAX,True,True,True
+2026-07-11,2026-07-11 17:00:00-04,99,nan,nan,FIFA World Cup,Quarterfinals,W91 vs W92,Miami,United States,Hard Rock Stadium,East,MIA,True,True,True
+2026-07-11,2026-07-11 21:00:00-05,100,nan,nan,FIFA World Cup,Quarterfinals,W95 vs W100,Kansas City,United States,Arrowhead Stadium,Central,MCI,True,True,True
+2026-07-14,2026-07-14 15:00:00-05,101,nan,nan,FIFA World Cup,Semifinals,W97 vs W98,Dallas,United States,AT&T Stadium,Central,DAL,True,True,True
+2026-07-15,2026-07-15 15:00:00-04,102,nan,nan,FIFA World Cup,Semifinals,W99 vs W100,Atlanta,United States,Mercedes-Benz Stadium,East,ATL,True,True,True
+2026-07-18,2026-07-18 17:00:00-04,103,nan,nan,FIFA World Cup,Third Place Playoff,RU101 vs RU102,Miami,United States,Hard Rock Stadium,East,MIA,True,True,True
+2026-07-19,2026-07-19 15:00:00-04,104,nan,nan,FIFA World Cup,Final,W101 vs W102,New York/New Jersey,United States,MetLife Stadium,East,EWR,True,True,True

@@ -1,0 +1,50 @@
+voetball app
+
+gele/rode kaarten naar dataset
+schoten op doel, schoten mis 
+corners 
+fouls 
+balbezit
+
+
+ik heb nu in "C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted" alle odds toegevoed, ten minste heel veel
+daarin staan alle squads van de teams ind e afgeloepn dagen, deze kan je koppelen aan het andere bestand toch waar staat hoeveel iemand waard is 
+ik heb hier meerdere bestanden
+"C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted\oddsportal_international_closing_1x2_raw.csv"
+"C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted\wikipedia_tournament_squads.csv"
+"C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted\oddsportal_worldcup_closing_1x2.csv"
+"C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted\oddsportal_worldcup_closing_1x2_raw.csv"
+"C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\extracted\oddsportal_international_closing_1x2.csv"
+misschien kan je het koppelen aan goal scores, maar zorg ervoordat goal scores nooit kijkt naar wat er daarna is gebeurd, dus dat de goal scores na de match al ziet dat de goal is gebeurd, kun je deze features toevoegen en kijken of er wat gebeurd, dit zijn de closing odds 
+dit gaf de andere chat van codex maar idk of dit kan .venv\Scripts\python.exe train_xgboost_worldcup.py --odds-csv data/extracted/oddsportal_international_closing_1x2.csv
+
+want met dit bestand kan je gelijk zien wie heeft gescored, mss ook handig en kan je koppelen aan de bepaalde match toch? "C:\Users\thoml\OneDrive\Documenten\voetbal_prediction\data\goalscorers.csv" 
+
+die squads zijn trouwens dus standaard squads, niet persee per match 
+
+
+
+
+csv maken
+
+oke maak het script, en verwijder ook de onnodige scirpt van de weights op oudere matches, en maak dan deze 3 csv files 
+en doe alles 
+hierbij alle links
+wk 2014
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1150
+wk2018
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1488
+ms skan j eook zelf kijken want er staat een sluifje in de link waar alle data in staat, ik zal je nu per competitie 1 sturen 
+
+hier staan alle competities
+https://www.soccerbase.com/tournaments/home.sd
+maar om het makkkelijker ovo rje te maken 
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=155
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=68#roundTab=roundTab_0
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=98
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=84#roundTab=roundTab_0
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=83
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=381
+en dat was alles toch of heb je meer ndig 
+
+

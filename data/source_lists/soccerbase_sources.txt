@@ -1,0 +1,17 @@
+# Direct tournament seasons
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1150
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1488
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1764
+
+# Competition pages; the extractor expands the visible season selector.
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=155
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=68
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=98
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=84
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=83
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=381
+
+# CONCACAF Gold Cup seasons back to and including 2015.
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=2015
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1703
+https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1434

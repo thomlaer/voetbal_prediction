@@ -1,0 +1,51 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Generated app/build files
+github_vercel_app/.next/
+github_vercel_app/node_modules/
+github_vercel_app/out/
+github_vercel_app/.vercel/
+
+# Generated model artifacts
+models_*/
+outputs_*/
+outputs/
+*.joblib
+PriorLabsTabPFN/
+
+# Very large local/source datasets that should not be pushed directly.
+data/kagglehub/
+data/github/
+data/backups/
+data/fjelstul_worldcup/
+data/extracted/soccerbase_lineups.csv
+data/extracted/soccerbase_lineups_used.csv
+data/extracted/soccerbase_lineups_wc2022.csv
+data/extracted/beat_the_bookie_closing_1x2.csv
+data/extracted/*_raw.csv
+data/extracted/*_raw_*.csv
+data/extracted/*_backup*.csv
+data/extracted/*_pre_*.csv
+data/extracted/oddsportal_worldcup_closing_1x2.csv
+data/extracted/oddsportal_worldcup2026_fixture_odds_schedule_*.csv
+!data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv
+data/extracted/sofifa_yearly_player_ratings.csv
+data/extracted/xfkz_country_market_injury_snapshots.csv
+data/extracted/xfkz_current_national_players.csv
+data/extracted/worldcities_city_locations.csv
+data/extracted/worldcities_country_representatives.csv
+simplemaps_worldcities_basicv1.901/
+simplemaps_worldcities_basicv1.901.zip
+international-fifa-club-world-cup-*.csv
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Local analysis documents
+*.pdf
+*.xlsx
+!github_vercel_app/public/files/*.xlsx

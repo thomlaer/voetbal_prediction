@@ -1,0 +1,105 @@
+match_number,date,stage,group,home_team,away_team,score,predicted_winner,confidence
+1,2026-06-11,Group Stage,A,Mexico,South Africa,2-0,Mexico,high
+2,2026-06-11,Group Stage,A,South Korea,Czech Republic,1-1,Draw,low
+3,2026-06-12,Group Stage,B,Canada,Bosnia and Herzegovina,2-0,Canada,medium
+4,2026-06-12,Group Stage,D,United States,Paraguay,1-0,United States,low
+5,2026-06-13,Group Stage,B,Qatar,Switzerland,0-2,Switzerland,high
+6,2026-06-13,Group Stage,C,Brazil,Morocco,2-1,Brazil,medium
+7,2026-06-13,Group Stage,C,Haiti,Scotland,1-2,Scotland,medium
+8,2026-06-14,Group Stage,D,Australia,Turkey,0-1,Turkey,medium
+9,2026-06-14,Group Stage,E,Germany,Curaçao,2-1,Germany,high
+10,2026-06-14,Group Stage,F,Netherlands,Japan,2-1,Netherlands,low
+11,2026-06-14,Group Stage,E,Ivory Coast,Ecuador,0-1,Ecuador,low
+12,2026-06-14,Group Stage,F,Sweden,Tunisia,2-1,Sweden,low
+13,2026-06-15,Group Stage,H,Spain,Cape Verde,3-0,Spain,high
+14,2026-06-15,Group Stage,G,Belgium,Egypt,2-1,Belgium,medium
+15,2026-06-15,Group Stage,H,Saudi Arabia,Uruguay,0-1,Uruguay,medium
+16,2026-06-15,Group Stage,G,Iran,New Zealand,2-1,Iran,medium
+17,2026-06-16,Group Stage,I,France,Senegal,2-1,France,medium
+18,2026-06-16,Group Stage,I,Iraq,Norway,0-2,Norway,high
+19,2026-06-16,Group Stage,J,Argentina,Algeria,2-0,Argentina,high
+20,2026-06-17,Group Stage,J,Austria,Jordan,2-1,Austria,medium
+21,2026-06-17,Group Stage,K,Portugal,DR Congo,2-0,Portugal,high
+22,2026-06-17,Group Stage,L,England,Croatia,2-1,England,low
+23,2026-06-17,Group Stage,L,Ghana,Panama,2-1,Ghana,low
+24,2026-06-17,Group Stage,K,Uzbekistan,Colombia,1-2,Colombia,medium
+25,2026-06-18,Group Stage,A,Czech Republic,South Africa,1-0,Czech Republic,low
+26,2026-06-18,Group Stage,B,Switzerland,Bosnia and Herzegovina,2-0,Switzerland,medium
+27,2026-06-18,Group Stage,B,Canada,Qatar,2-0,Canada,high
+28,2026-06-18,Group Stage,A,Mexico,South Korea,2-1,Mexico,medium
+29,2026-06-19,Group Stage,D,United States,Australia,1-0,United States,low
+30,2026-06-19,Group Stage,C,Scotland,Morocco,1-2,Morocco,low
+31,2026-06-19,Group Stage,C,Brazil,Haiti,2-1,Brazil,high
+32,2026-06-20,Group Stage,D,Turkey,Paraguay,2-1,Turkey,low
+33,2026-06-20,Group Stage,F,Netherlands,Sweden,2-1,Netherlands,medium
+34,2026-06-20,Group Stage,E,Germany,Ivory Coast,2-1,Germany,medium
+35,2026-06-20,Group Stage,E,Ecuador,Curaçao,3-0,Ecuador,high
+36,2026-06-21,Group Stage,F,Tunisia,Japan,0-1,Japan,medium
+37,2026-06-21,Group Stage,H,Spain,Saudi Arabia,3-0,Spain,high
+38,2026-06-21,Group Stage,G,Belgium,Iran,2-1,Belgium,medium
+39,2026-06-21,Group Stage,H,Uruguay,Cape Verde,2-0,Uruguay,high
+40,2026-06-21,Group Stage,G,New Zealand,Egypt,1-2,Egypt,medium
+41,2026-06-22,Group Stage,J,Argentina,Austria,1-0,Argentina,medium
+42,2026-06-22,Group Stage,I,France,Iraq,2-1,France,high
+43,2026-06-22,Group Stage,I,Norway,Senegal,2-1,Norway,low
+44,2026-06-22,Group Stage,J,Jordan,Algeria,1-2,Algeria,medium
+45,2026-06-23,Group Stage,K,Portugal,Uzbekistan,2-0,Portugal,high
+46,2026-06-23,Group Stage,L,England,Ghana,3-0,England,high
+47,2026-06-23,Group Stage,L,Panama,Croatia,1-2,Croatia,medium
+48,2026-06-23,Group Stage,K,Colombia,DR Congo,2-0,Colombia,medium
+49,2026-06-24,Group Stage,B,Bosnia and Herzegovina,Qatar,1-0,Bosnia and Herzegovina,medium
+50,2026-06-24,Group Stage,B,Switzerland,Canada,2-1,Switzerland,low
+51,2026-06-24,Group Stage,C,Scotland,Brazil,0-1,Brazil,medium
+52,2026-06-24,Group Stage,C,Morocco,Haiti,2-1,Morocco,high
+53,2026-06-24,Group Stage,A,Czech Republic,Mexico,1-2,Mexico,low
+54,2026-06-24,Group Stage,A,South Africa,South Korea,0-1,South Korea,low
+55,2026-06-25,Group Stage,E,Curaçao,Ivory Coast,0-2,Ivory Coast,high
+56,2026-06-25,Group Stage,E,Ecuador,Germany,1-2,Germany,low
+57,2026-06-25,Group Stage,F,Tunisia,Netherlands,0-1,Netherlands,medium
+58,2026-06-25,Group Stage,F,Japan,Sweden,2-1,Japan,low
+59,2026-06-25,Group Stage,D,Turkey,United States,2-1,Turkey,low
+60,2026-06-25,Group Stage,D,Paraguay,Australia,2-1,Paraguay,low
+61,2026-06-26,Group Stage,I,Norway,France,1-2,France,medium
+62,2026-06-26,Group Stage,I,Senegal,Iraq,2-1,Senegal,medium
+63,2026-06-26,Group Stage,H,Cape Verde,Saudi Arabia,1-2,Saudi Arabia,low
+64,2026-06-26,Group Stage,H,Uruguay,Spain,0-1,Spain,medium
+65,2026-06-26,Group Stage,G,New Zealand,Belgium,1-2,Belgium,high
+66,2026-06-26,Group Stage,G,Egypt,Iran,1-1,Draw,low
+67,2026-06-27,Group Stage,L,Croatia,Ghana,2-0,Croatia,medium
+68,2026-06-27,Group Stage,L,Panama,England,0-2,England,high
+69,2026-06-27,Group Stage,K,Colombia,Portugal,1-2,Portugal,low
+70,2026-06-27,Group Stage,K,DR Congo,Uzbekistan,2-1,DR Congo,low
+71,2026-06-27,Group Stage,J,Algeria,Austria,1-1,Draw,low
+72,2026-06-27,Group Stage,J,Jordan,Argentina,0-2,Argentina,high
+73,2026-06-28,Round of 32,,South Korea,Canada,1-2,Canada,medium
+74,2026-06-29,Round of 32,,Brazil,Japan,2-1,Brazil,medium
+75,2026-06-29,Round of 32,,Germany,Paraguay,1-0,Germany,medium
+76,2026-06-29,Round of 32,,Netherlands,Morocco,2-1,Netherlands,medium
+77,2026-06-30,Round of 32,,Ecuador,Norway,2-1,Ecuador,medium
+78,2026-06-30,Round of 32,,France,Iran,2-0,France,high
+79,2026-06-30,Round of 32,,Mexico,Senegal,2-1,Mexico,medium
+80,2026-07-01,Round of 32,,England,Ivory Coast,2-0,England,high
+81,2026-07-01,Round of 32,,Belgium,Czech Republic,2-0,Belgium,high
+82,2026-07-01,Round of 32,,Turkey,Algeria,1-0,Turkey,high
+83,2026-07-02,Round of 32,,Spain,Austria,2-0,Spain,high
+84,2026-07-02,Round of 32,,Colombia,Croatia,2-1,Colombia,medium
+85,2026-07-02,Round of 32,,Switzerland,Sweden,2-0,Switzerland,high
+86,2026-07-03,Round of 32,,United States,Egypt,2-1,United States,medium
+87,2026-07-03,Round of 32,,Argentina,Uruguay,2-0,Argentina,high
+88,2026-07-03,Round of 32,,Portugal,Scotland,2-0,Portugal,high
+89,2026-07-04,Round of 16,,Canada,Germany,1-2,Germany,medium
+90,2026-07-04,Round of 16,,Brazil,Ecuador,2-1,Brazil,medium
+91,2026-07-05,Round of 16,,Netherlands,France,1-2,France,medium
+92,2026-07-05,Round of 16,,Mexico,England,1-2,England,medium
+93,2026-07-06,Round of 16,,Spain,Colombia,2-0,Spain,high
+94,2026-07-06,Round of 16,,Belgium,Turkey,2-1,Belgium,low
+95,2026-07-07,Round of 16,,United States,Portugal,0-2,Portugal,high
+96,2026-07-07,Round of 16,,Switzerland,Argentina,0-2,Argentina,high
+97,2026-07-09,Quarterfinals,,Germany,Brazil,0-1,Brazil,medium
+98,2026-07-10,Quarterfinals,,Spain,Belgium,1-0,Spain,high
+99,2026-07-11,Quarterfinals,,France,England,1-0,France,medium
+100,2026-07-11,Quarterfinals,,Portugal,Argentina,0-1,Argentina,medium
+101,2026-07-14,Semifinals,,Brazil,Spain,0-1,Spain,high
+102,2026-07-15,Semifinals,,France,Argentina,0-1,Argentina,low
+103,2026-07-18,Third Place Playoff,,Brazil,France,0-1,France,medium
+104,2026-07-19,Final,,Spain,Argentina,1-0,Spain,medium

@@ -1,0 +1,110 @@
+name: Rebuild predictions
+
+on:
+  workflow_dispatch:
+    inputs:
+      previous_label:
+        description: "Previous YYYYMMDD label for score diff, optional"
+        required: false
+        default: ""
+      simulations:
+        description: "Monte Carlo simulations"
+        required: false
+        default: "10000"
+      model_profile:
+        description: "Model profile"
+        required: false
+        type: choice
+        default: "best_default"
+        options:
+          - "best_default"
+          - "full_with_lineups"
+      use_lineups:
+        description: "Enable Soccerbase lineup feature flag"
+        required: false
+        type: boolean
+        default: false
+      update_soccerbase:
+        description: "Refresh Soccerbase lineups/stats/cards during the run"
+        required: false
+        type: boolean
+        default: false
+      deploy_to_vercel:
+        description: "Deploy the dashboard to Vercel after rebuilding"
+        required: false
+        type: boolean
+        default: false
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: github_vercel_app/package-lock.json
+
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Install app dependencies
+        working-directory: github_vercel_app
+        run: npm ci
+
+      - name: Rebuild model output
+        env:
+          LABEL: ${{ github.run_id }}
+          PREVIOUS_LABEL: ${{ inputs.previous_label }}
+          SIMULATIONS: ${{ inputs.simulations || '10000' }}
+          MODEL_PROFILE: ${{ inputs.model_profile || 'best_default' }}
+          USE_LINEUPS: ${{ inputs.use_lineups && '1' || '0' }}
+          UPDATE_SOCCERBASE: ${{ inputs.update_soccerbase && '1' || '0' }}
+        run: bash github_vercel_app/scripts/rebuild_predictions.sh
+
+      - name: Build Vercel app
+        working-directory: github_vercel_app
+        run: npm run build
+
+      - name: Commit updated dashboard data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv data/extracted/oddsportal_worldcup2026_fixture_odds_raw.csv
+          if git diff --cached --quiet; then
+            echo "No output changes."
+          else
+            git commit -m "Update WK predictions"
+            git push
+          fi
+
+      - name: Deploy dashboard to Vercel
+        if: ${{ inputs.deploy_to_vercel }}
+        working-directory: github_vercel_app
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "Missing VERCEL_TOKEN secret."
+            exit 1
+          fi
+          if [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Missing VERCEL_ORG_ID or VERCEL_PROJECT_ID secret."
+            exit 1
+          fi
+          npm install -g vercel@54.11.1
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
