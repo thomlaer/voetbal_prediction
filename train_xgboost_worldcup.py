@@ -2790,6 +2790,28 @@ def add_player_side_features(
         )
 
 
+def resolve_transfermarkt_dir(transfermarkt_dir: Path) -> Path:
+    if transfermarkt_dir.exists():
+        return transfermarkt_dir
+    versions_dir = transfermarkt_dir.parent
+    if not versions_dir.exists():
+        return transfermarkt_dir
+    candidates = [
+        path
+        for path in versions_dir.iterdir()
+        if path.is_dir()
+        and (path / "players.csv").exists()
+        and (path / "appearances.csv").exists()
+        and (path / "competitions.csv").exists()
+    ]
+    if not candidates:
+        return transfermarkt_dir
+    return max(
+        candidates,
+        key=lambda path: (int(path.name) if path.name.isdigit() else -1, path.stat().st_mtime),
+    )
+
+
 def attach_transfermarkt_player_features(
     matches: pd.DataFrame,
     transfermarkt_dir: Path | None,
@@ -2798,6 +2820,7 @@ def attach_transfermarkt_player_features(
 ) -> tuple[pd.DataFrame, bool]:
     if transfermarkt_dir is None:
         return matches, False
+    transfermarkt_dir = resolve_transfermarkt_dir(Path(transfermarkt_dir))
     if not transfermarkt_dir.exists():
         print(f"Skipping player features: {transfermarkt_dir} does not exist.", file=sys.stderr)
         return matches, False

@@ -39,6 +39,38 @@ DEFAULT_GOALSCORERS = Path("data/goalscorers.csv")
 
 
 OUTCOME_COLUMNS = ["prob_home_win", "prob_draw", "prob_away_win"]
+TOPSCORER_COLUMNS = [
+    "rank",
+    "team",
+    "player",
+    "position",
+    "caps",
+    "international_goals",
+    "sofifa_matched",
+    "sofifa_overall",
+    "sofifa_shooting",
+    "sofifa_finishing",
+    "team_expected_matches",
+    "team_expected_group_goals",
+    "team_expected_goals",
+    "team_champion_prob",
+    "raw_scorer_weight",
+    "team_weight_sum",
+    "goal_share",
+    "expected_group_stage_goals",
+    "expected_goals",
+    "prob_4plus_goals",
+    "topscorer_score",
+    "star_scorer_power",
+    "recommended_topscorer_score",
+    "golden_boot_rank",
+    "scorito_points_per_goal",
+    "expected_group_stage_scorito_points",
+    "expected_scorito_points",
+    "recommended_group_stage_topscorer_score",
+    "recommended_scorito_topscorer_score",
+    "group_stage_rank",
+]
 WORLD_CUP_2022_TUNED_SCORE_PARAMS = {
     "draw_margin": 0.18,
     "draw_min_prob": 0.26,
@@ -703,12 +735,16 @@ def scorito_points_per_goal(position: Any) -> int:
 
 
 def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) -> pd.DataFrame:
-    if not args.squads.exists() or not args.sofifa.exists():
-        return pd.DataFrame()
+    if not args.squads.exists():
+        return pd.DataFrame(columns=TOPSCORER_COLUMNS)
     squads = pd.read_csv(args.squads)
     squads = squads[squads["team"].notna() & squads["player"].notna()].copy()
-    sofifa = latest_sofifa_by_player(args.sofifa)
-    sofifa_indexes = build_sofifa_indexes(sofifa)
+    if args.sofifa.exists():
+        sofifa = latest_sofifa_by_player(args.sofifa)
+        sofifa_indexes = build_sofifa_indexes(sofifa)
+    else:
+        print(f"Skipping SoFIFA topscorer enrichment: {args.sofifa} does not exist.")
+        sofifa_indexes = build_sofifa_indexes(pd.DataFrame())
     team_probs = expected_matches_and_goals(team_probs)
     team_goal_map = dict(zip(team_probs["team"], team_probs["expected_tournament_goals"]))
     team_group_goal_map = dict(zip(team_probs["team"], team_probs["expected_group_gf"]))
@@ -763,7 +799,7 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
         )
     ranking = pd.DataFrame(rows)
     if ranking.empty:
-        return ranking
+        return pd.DataFrame(columns=TOPSCORER_COLUMNS)
     ranking["team_weight_sum"] = ranking.groupby("team")["raw_scorer_weight"].transform("sum")
     ranking["goal_share"] = np.where(
         ranking["team_weight_sum"].gt(0),
