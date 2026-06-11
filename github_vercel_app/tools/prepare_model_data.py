@@ -43,6 +43,10 @@ def download_dataset(root: Path, owner_slug: str) -> None:
     if dataset_present(root, owner_slug):
         print(f"Dataset already present: {owner_slug}")
         return
+    download_latest_dataset(root, owner_slug)
+
+
+def download_latest_dataset(root: Path, owner_slug: str) -> None:
     os.environ["KAGGLEHUB_CACHE"] = str(root / DATASETS_BASE)
     import kagglehub
 
@@ -60,7 +64,7 @@ def run_python(root: Path, *args: str) -> None:
 def main() -> None:
     args = parse_args()
     root = args.model_root.resolve()
-    download_dataset(root, TRANSFERMARKT_DATASET)
+    download_latest_dataset(root, TRANSFERMARKT_DATASET)
     if args.include_external_elo:
         download_dataset(root, EXTERNAL_ELO_DATASET)
     if args.include_sofifa:

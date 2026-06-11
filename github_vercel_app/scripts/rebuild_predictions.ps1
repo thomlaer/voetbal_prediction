@@ -127,10 +127,15 @@ try {
         --output-dir $drawOut `
         --schedule "data\extracted\oddsportal_worldcup2026_fixture_odds_schedule.csv"
 
-    Invoke-Native $python -X utf8 "github_vercel_app\tools\publish_latest_outputs.py" `
-        --model-root $ModelRoot `
-        --run-dir (Join-Path $ModelRoot $drawOut) `
-        --previous-label $PreviousLabel
+    $publishArgs = @(
+        "-X", "utf8", "github_vercel_app\tools\publish_latest_outputs.py",
+        "--model-root", $ModelRoot,
+        "--run-dir", (Join-Path $ModelRoot $drawOut)
+    )
+    if ($PreviousLabel) {
+        $publishArgs += @("--previous-label", $PreviousLabel)
+    }
+    Invoke-Native $python @publishArgs
 }
 finally {
     Pop-Location

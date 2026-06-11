@@ -2791,8 +2791,6 @@ def add_player_side_features(
 
 
 def resolve_transfermarkt_dir(transfermarkt_dir: Path) -> Path:
-    if transfermarkt_dir.exists():
-        return transfermarkt_dir
     versions_dir = transfermarkt_dir.parent
     if not versions_dir.exists():
         return transfermarkt_dir
@@ -2806,10 +2804,13 @@ def resolve_transfermarkt_dir(transfermarkt_dir: Path) -> Path:
     ]
     if not candidates:
         return transfermarkt_dir
-    return max(
+    latest = max(
         candidates,
         key=lambda path: (int(path.name) if path.name.isdigit() else -1, path.stat().st_mtime),
     )
+    if latest != transfermarkt_dir:
+        print(f"Using latest Transfermarkt player-scores version: {latest}")
+    return latest
 
 
 def attach_transfermarkt_player_features(
