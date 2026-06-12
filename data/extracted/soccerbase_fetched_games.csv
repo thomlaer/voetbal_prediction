@@ -8727,3 +8727,15 @@ soccerbase_game_id,date,home_team,away_team,status
 955807,2026-10-01,Israel,Kosovo,cached_from_soccerbase_match_stats
 955808,2026-10-01,Ireland,Austria,cached_from_soccerbase_match_stats
 955904,2026-10-01,Malta,Gibraltar,cached_from_soccerbase_match_stats
+948896,2026-06-12,South Korea,Czech Rep,lineup_fetched
+948897,2026-06-11,Mexico,South Africa,lineup_fetched
+957949,2026-06-11,Bolivia,Algeria,lineup_fetched
+957892,2026-06-10,Iraq,Venezuela,lineup_fetched
+957889,2026-06-09,China,Thailand,lineup_fetched
+957896,2026-06-09,Indonesia,Mozambique,lineup_fetched
+957951,2026-06-07,Kenya,Lesotho,lineup_fetched
+958310,2026-06-06,Jamaica,South Africa,lineup_fetched
+957897,2026-06-06,Puerto Rico,Saudi Arabia,lineup_fetched
+958011,2026-06-04,Iran,Mali,lineup_fetched
+957950,2026-06-04,Lesotho,Kenya,lineup_fetched
+957946,2026-05-30,Jamaica,Nigeria,lineup_fetched

@@ -254,12 +254,8 @@ export default async function Home() {
   const upcomingPredictions = data.predictions.filter((row) => !isPlayed(row));
   const starts = stageStartKeys(data.predictions);
   const snapshotKey = dateKey(data.metadata.generated_at);
-  const lockedUpcoming = upcomingPredictions.filter((row) => isStageLocked(row.stage, starts, snapshotKey));
   const fillablePredictions = upcomingPredictions.filter((row) => !isStageLocked(row.stage, starts, snapshotKey));
   const currentFillStage = firstOpenStage(fillablePredictions, starts, snapshotKey);
-  const fillAdviceRows = currentFillStage
-    ? fillablePredictions.filter((row) => row.stage === currentFillStage)
-    : [];
   const knockouts = upcomingPredictions.filter((row) => row.stage !== "Group Stage");
   const groups = grouped(data.group_standings);
   const rounds = stageRows(data.predictions);
@@ -272,7 +268,7 @@ export default async function Home() {
     <main className="page">
       <header className="topbar">
         <div className="topbar-inner">
-          <a className="brand" href="#invullen">
+          <a className="brand" href="#rondes">
             <strong>Voetbal Prediction</strong>
             <span>Scorito dashboard voor mobiel</span>
           </a>
@@ -280,7 +276,6 @@ export default async function Home() {
             <a href="#wijzigingen">Wijzigingen</a>
             <a href="#gespeeld">Gespeeld</a>
             <a href="#rondes">Rondes</a>
-            <a href="#invullen">Invullen</a>
             <a href="#groepen">Groepen</a>
             <a href="#knockout">Knockout</a>
             <a href="#kampioen">Kampioen</a>
@@ -496,67 +491,6 @@ export default async function Home() {
                 </div>
               );
             })}
-          </div>
-        </section>
-
-        <section id="invullen" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Scorito Invullen</h2>
-              <p className="section-subtitle">
-                {currentFillStage
-                  ? `${stageLabel(currentFillStage)} - alleen de ronde die nog niet vergrendeld is.`
-                  : "Geen open invulronde in deze dashboarddata."}
-              </p>
-            </div>
-          </div>
-          {lockedUpcoming.length ? (
-            <div className="inline-note">
-              {lockedUpcoming.length} toekomstige wedstrijden zijn al vergrendeld voor invullen en blijven buiten deze lijst.
-            </div>
-          ) : null}
-          <div className="table-shell">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Wedstrijd</th>
-                  <th>Score</th>
-                  <th>Winnaar</th>
-                  <th>Kans</th>
-                  <th>Conf.</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fillAdviceRows.length ? (
-                  fillAdviceRows.map((row) => (
-                    <tr key={`${row.stage}-${row.match_number}`}>
-                      <td className="mono">{row.match_number}</td>
-                      <td>
-                        <strong>{row.home_team}</strong> - {row.away_team}
-                        <div className="metric-note">
-                          {row.group ? `Poule ${row.group}` : stageLabel(row.stage)} - {row.date}
-                        </div>
-                      </td>
-                      <td>
-                        <span className="score">{row.score}</span>
-                      </td>
-                      <td>{row.predicted_winner}</td>
-                      <td className="mono">{pct(row.model_favourite_prob)}</td>
-                      <td>
-                        <span className={`pill ${confidenceClass(row.confidence)}`}>
-                          {row.confidence || "-"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6}>Geen open wedstrijden voor de volgende invulronde.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
           </div>
         </section>
 
