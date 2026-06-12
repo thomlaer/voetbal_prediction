@@ -13,7 +13,7 @@ import time
 import unicodedata
 import urllib.parse
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Iterable
 
@@ -88,6 +88,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stats-output", default="data/extracted/soccerbase_match_stats.csv")
     parser.add_argument("--cards-output", default="data/extracted/soccerbase_cards_events.csv")
     parser.add_argument("--report-output", default="outputs/soccerbase_extraction_report.csv")
+    parser.add_argument("--fetched-games-cache", default="data/extracted/soccerbase_fetched_games.csv")
     parser.add_argument("--player-data", default="", help="Path to Kaggle fifa_players.csv or its directory.")
     parser.add_argument("--download-kaggle", action="store_true", help="Download Kaggle player data via kagglehub.")
     parser.add_argument("--delay-ms", type=int, default=200)
@@ -97,6 +98,12 @@ def parse_args() -> argparse.Namespace:
         "--incremental",
         action="store_true",
         help="Preserve existing output CSV rows and only fetch Soccerbase game ids that are not present yet.",
+    )
+    parser.add_argument(
+        "--incremental-lookback-days",
+        type=int,
+        default=60,
+        help="In incremental mode, only fetch missing completed matches from the last N days. Use 0 for no date window.",
     )
     parser.add_argument("--skip-errors", action="store_true")
     return parser.parse_args()
@@ -720,6 +727,48 @@ def existing_soccerbase_game_ids(paths: Iterable[str]) -> set[str]:
     return game_ids
 
 
+def parsed_match_date(match: MatchRow) -> date | None:
+    value = pd.to_datetime(match.date, errors="coerce")
+    if pd.isna(value):
+        return None
+    return value.date()
+
+
+def filter_incremental_matches(
+    matches: list[MatchRow],
+    skip_game_ids: set[str],
+    lookback_days: int,
+) -> tuple[list[MatchRow], dict[str, int]]:
+    today = date.today()
+    cutoff = today - timedelta(days=lookback_days) if lookback_days > 0 else None
+
+    filtered: list[MatchRow] = []
+    counts = {
+        "existing": 0,
+        "future": 0,
+        "older_than_window": 0,
+        "missing_completed": 0,
+        "unknown_date": 0,
+    }
+    for match in matches:
+        if str(match.soccerbase_game_id) in skip_game_ids:
+            counts["existing"] += 1
+            continue
+        match_day = parsed_match_date(match)
+        if match_day is None:
+            counts["unknown_date"] += 1
+            continue
+        if match_day > today:
+            counts["future"] += 1
+            continue
+        if cutoff is not None and match_day < cutoff:
+            counts["older_than_window"] += 1
+            continue
+        filtered.append(match)
+        counts["missing_completed"] += 1
+    return filtered, counts
+
+
 def merge_rows(
     existing: list[dict[str, object]],
     new_rows: list[dict[str, object]],
@@ -737,6 +786,26 @@ def merge_rows(
         output.append(row)
         seen.add(key)
     return output
+
+
+def cache_rows_from_lineups(lineups: list[dict[str, object]]) -> list[dict[str, object]]:
+    seen: set[str] = set()
+    rows: list[dict[str, object]] = []
+    for row in lineups:
+        game_id = str(row.get("soccerbase_game_id", "")).strip()
+        if not game_id or game_id in seen:
+            continue
+        seen.add(game_id)
+        rows.append(
+            {
+                "soccerbase_game_id": game_id,
+                "date": row.get("date", ""),
+                "home_team": row.get("home_team", ""),
+                "away_team": row.get("away_team", ""),
+                "status": "lineup_fetched",
+            }
+        )
+    return rows
 
 
 def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
@@ -816,22 +885,49 @@ def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> t
     matches = list(matches_by_id.values())
     if args.max_games:
         matches = matches[: args.max_games]
-    if skip_game_ids:
+    if args.incremental:
         original_count = len(matches)
-        matches = [match for match in matches if str(match.soccerbase_game_id) not in skip_game_ids]
-        skipped_count = original_count - len(matches)
+        matches, incremental_counts = filter_incremental_matches(
+            matches,
+            skip_game_ids or set(),
+            args.incremental_lookback_days,
+        )
         report_rows.append(
             {
                 "url": "",
                 "season": "",
                 "competition": "incremental_cache",
                 "tabs": "",
-                "matches_found": skipped_count,
-                "status": "skipped_existing_games",
+                "matches_found": original_count,
+                "status": "incremental_filter",
+                "error": (
+                    f"existing={incremental_counts['existing']}; "
+                    f"future={incremental_counts['future']}; "
+                    f"older_than_window={incremental_counts['older_than_window']}; "
+                    f"unknown_date={incremental_counts['unknown_date']}; "
+                    f"missing_completed={incremental_counts['missing_completed']}"
+                ),
+            }
+        )
+        report_rows.append(
+            {
+                "url": "",
+                "season": "",
+                "competition": "incremental_cache",
+                "tabs": "",
+                "matches_found": len(matches),
+                "status": "fetch_missing_completed_games",
                 "error": "",
             }
         )
-        print(f"Incremental mode: skipped {skipped_count:,} existing Soccerbase games; fetching {len(matches):,} new games.")
+        print(
+            "Incremental mode: "
+            f"existing={incremental_counts['existing']:,}, "
+            f"future={incremental_counts['future']:,}, "
+            f"older_than_window={incremental_counts['older_than_window']:,}, "
+            f"missing_completed={incremental_counts['missing_completed']:,}. "
+            f"Fetching {len(matches):,} missing completed games."
+        )
     lineups: list[dict] = []
     cards: list[dict] = []
     stats = [blank_stats_row(match) for match in matches]
@@ -875,8 +971,9 @@ def main() -> int:
     existing_lineups = read_existing_csv(args.lineups_output) if args.incremental else []
     existing_stats = read_existing_csv(args.stats_output) if args.incremental else []
     existing_cards = read_existing_csv(args.cards_output) if args.incremental else []
+    existing_cache = read_existing_csv(args.fetched_games_cache) if args.incremental else []
     skip_game_ids = (
-        existing_soccerbase_game_ids([args.stats_output, args.lineups_output, args.cards_output])
+        existing_soccerbase_game_ids([args.fetched_games_cache, args.lineups_output])
         if args.incremental
         else set()
     )
@@ -895,6 +992,13 @@ def main() -> int:
             cards,
             ["soccerbase_game_id", "team", "player_id", "player_name", "card_type", "minute"],
         )
+        fetched_cache = merge_rows(
+            existing_cache,
+            cache_rows_from_lineups(lineups),
+            ["soccerbase_game_id"],
+        )
+    else:
+        fetched_cache = cache_rows_from_lineups(lineups)
 
     write_csv(
         args.lineups_output,
@@ -980,10 +1084,16 @@ def main() -> int:
         report_rows,
         ["url", "season", "competition", "tabs", "matches_found", "status", "error"],
     )
+    write_csv(
+        args.fetched_games_cache,
+        fetched_cache,
+        ["soccerbase_game_id", "date", "home_team", "away_team", "status"],
+    )
     print(f"Wrote {len(lineups):,} lineup/player rows to {args.lineups_output}")
     print(f"Wrote {len(stats):,} match stat rows to {args.stats_output}")
     print(f"Wrote {len(cards):,} card rows to {args.cards_output}")
     print(f"Wrote report to {args.report_output}")
+    print(f"Wrote {len(fetched_cache):,} fetched-game cache rows to {args.fetched_games_cache}")
     return 0
 
 
