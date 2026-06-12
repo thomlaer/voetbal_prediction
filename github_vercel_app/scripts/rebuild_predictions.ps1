@@ -53,6 +53,7 @@ try {
     if ($UpdateSoccerbase) {
         Invoke-Native $python -X utf8 "extract_soccerbase_match_data.py" `
             --skip-errors `
+            --incremental `
             --lineups-output "data\extracted\soccerbase_lineups_used.csv" `
             --stats-output "data\extracted\soccerbase_match_stats.csv" `
             --cards-output "data\extracted\soccerbase_cards_events.csv" `

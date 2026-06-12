@@ -93,6 +93,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--delay-ms", type=int, default=200)
     parser.add_argument("--max-tournaments", type=int, default=0)
     parser.add_argument("--max-games", type=int, default=0)
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="Preserve existing output CSV rows and only fetch Soccerbase game ids that are not present yet.",
+    )
     parser.add_argument("--skip-errors", action="store_true")
     return parser.parse_args()
 
@@ -690,7 +695,51 @@ def write_csv(path: str, rows: list[dict[str, object]], preferred: list[str]) ->
         writer.writerows(rows)
 
 
-def scrape(args: argparse.Namespace) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+def read_existing_csv(path: str) -> list[dict[str, object]]:
+    csv_path = Path(path)
+    if not csv_path.exists():
+        return []
+    with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def existing_soccerbase_game_ids(paths: Iterable[str]) -> set[str]:
+    game_ids: set[str] = set()
+    for path in paths:
+        csv_path = Path(path)
+        if not csv_path.exists():
+            continue
+        with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            if "soccerbase_game_id" not in (reader.fieldnames or []):
+                continue
+            for row in reader:
+                game_id = str(row.get("soccerbase_game_id", "")).strip()
+                if game_id:
+                    game_ids.add(game_id)
+    return game_ids
+
+
+def merge_rows(
+    existing: list[dict[str, object]],
+    new_rows: list[dict[str, object]],
+    key_fields: list[str],
+) -> list[dict[str, object]]:
+    output = list(existing)
+    seen = {
+        tuple(str(row.get(field, "")).strip() for field in key_fields)
+        for row in existing
+    }
+    for row in new_rows:
+        key = tuple(str(row.get(field, "")).strip() for field in key_fields)
+        if key in seen:
+            continue
+        output.append(row)
+        seen.add(key)
+    return output
+
+
+def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     session = request_session()
     tournament_targets: list[tuple[str, str]] = []
     for source_url in load_urls(args):
@@ -767,6 +816,22 @@ def scrape(args: argparse.Namespace) -> tuple[list[dict], list[dict], list[dict]
     matches = list(matches_by_id.values())
     if args.max_games:
         matches = matches[: args.max_games]
+    if skip_game_ids:
+        original_count = len(matches)
+        matches = [match for match in matches if str(match.soccerbase_game_id) not in skip_game_ids]
+        skipped_count = original_count - len(matches)
+        report_rows.append(
+            {
+                "url": "",
+                "season": "",
+                "competition": "incremental_cache",
+                "tabs": "",
+                "matches_found": skipped_count,
+                "status": "skipped_existing_games",
+                "error": "",
+            }
+        )
+        print(f"Incremental mode: skipped {skipped_count:,} existing Soccerbase games; fetching {len(matches):,} new games.")
     lineups: list[dict] = []
     cards: list[dict] = []
     stats = [blank_stats_row(match) for match in matches]
@@ -807,8 +872,29 @@ def main() -> int:
     else:
         print("No Kaggle player data loaded.")
 
-    lineups, stats, cards, report_rows = scrape(args)
+    existing_lineups = read_existing_csv(args.lineups_output) if args.incremental else []
+    existing_stats = read_existing_csv(args.stats_output) if args.incremental else []
+    existing_cards = read_existing_csv(args.cards_output) if args.incremental else []
+    skip_game_ids = (
+        existing_soccerbase_game_ids([args.stats_output, args.lineups_output, args.cards_output])
+        if args.incremental
+        else set()
+    )
+
+    lineups, stats, cards, report_rows = scrape(args, skip_game_ids)
     lineups = matcher.enrich(lineups)
+    if args.incremental:
+        lineups = merge_rows(
+            existing_lineups,
+            lineups,
+            ["soccerbase_game_id", "team", "player_id", "player_name", "squad_status"],
+        )
+        stats = merge_rows(existing_stats, stats, ["soccerbase_game_id"])
+        cards = merge_rows(
+            existing_cards,
+            cards,
+            ["soccerbase_game_id", "team", "player_id", "player_name", "card_type", "minute"],
+        )
 
     write_csv(
         args.lineups_output,
