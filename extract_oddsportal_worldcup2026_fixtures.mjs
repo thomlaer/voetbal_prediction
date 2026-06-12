@@ -25,6 +25,7 @@ const DECRYPTION_SALT_TEXT = "5b9a8f2c3e6d1a4b7c8e9d0f1a2b3c4d";
 const TEAM_ALIASES = new Map(
   Object.entries({
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Czech Rep": "Czech Republic",
     Curacao: "Curaçao",
     "D.R. Congo": "DR Congo",
     USA: "United States",
@@ -200,6 +201,91 @@ function modelTeamName(value) {
   return TEAM_ALIASES.get(text) || text;
 }
 
+function normalizeTeamKey(value) {
+  const text = modelTeamName(value)
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+  const aliases = new Map(
+    Object.entries({
+      "bosnia hz": "bosnia and herzegovina",
+      "cote d ivoire": "ivory coast",
+      "czech rep": "czech republic",
+      "czechia": "czech republic",
+      "d r congo": "dr congo",
+      "usa": "united states",
+    }),
+  );
+  return aliases.get(text) || text;
+}
+
+function isPlaceholderTeam(value) {
+  const text = String(value || "").trim().toLowerCase();
+  return (
+    !text ||
+    text === "nan" ||
+    text.startsWith("winner ") ||
+    text.startsWith("group ") ||
+    /^w\d+/.test(text) ||
+    /^ru\d+/.test(text)
+  );
+}
+
+function dateDiffDays(left, right) {
+  const leftTime = Date.parse(`${left}T00:00:00Z`);
+  const rightTime = Date.parse(`${right}T00:00:00Z`);
+  if (!Number.isFinite(leftTime) || !Number.isFinite(rightTime)) {
+    return Number.POSITIVE_INFINITY;
+  }
+  return Math.abs(Math.round((leftTime - rightTime) / 86_400_000));
+}
+
+function oddsFitsFixture(fixture, odds) {
+  if (!odds || dateDiffDays(fixture.date, odds.oddsportal_date_utc) > 1) {
+    return false;
+  }
+  const homePlaceholder = isPlaceholderTeam(fixture.home_team);
+  const awayPlaceholder = isPlaceholderTeam(fixture.away_team);
+  if (!homePlaceholder && normalizeTeamKey(fixture.home_team) !== normalizeTeamKey(odds.home_team)) {
+    return false;
+  }
+  if (!awayPlaceholder && normalizeTeamKey(fixture.away_team) !== normalizeTeamKey(odds.away_team)) {
+    return false;
+  }
+  return !homePlaceholder || !awayPlaceholder;
+}
+
+function scoreOddsFixtureMatch(fixture, odds) {
+  const diff = dateDiffDays(fixture.date, odds.oddsportal_date_utc);
+  const homeExact =
+    !isPlaceholderTeam(fixture.home_team) &&
+    normalizeTeamKey(fixture.home_team) === normalizeTeamKey(odds.home_team);
+  const awayExact =
+    !isPlaceholderTeam(fixture.away_team) &&
+    normalizeTeamKey(fixture.away_team) === normalizeTeamKey(odds.away_team);
+  return (homeExact ? 3 : 0) + (awayExact ? 3 : 0) + (1 - diff) * 0.5;
+}
+
+function findOddsForFixture(fixture, oddsRows, usedOddsIndexes) {
+  let best = null;
+  for (let index = 0; index < oddsRows.length; index += 1) {
+    if (usedOddsIndexes.has(index) || !oddsFitsFixture(fixture, oddsRows[index])) {
+      continue;
+    }
+    const score = scoreOddsFixtureMatch(fixture, oddsRows[index]);
+    if (!best || score > best.score) {
+      best = { index, odds: oddsRows[index], score };
+    }
+  }
+  if (!best) {
+    return null;
+  }
+  usedOddsIndexes.add(best.index);
+  return best.odds;
+}
+
 function oddsByColumn(row, oddsData) {
   const item = oddsData?.[row.encodeEventId] || {};
   const odds = Array.isArray(item.odds) ? item.odds : [];
@@ -355,10 +441,10 @@ function buildSchedule(fixtures, oddsRows) {
   const groupFixtures = fixtures.filter((row) => String(row.stage || "").toLowerCase().includes("group"));
   const scheduleRows = [];
   const reportRows = [];
-  let oddsIndex = 0;
+  const usedOddsIndexes = new Set();
   for (const fixture of fixtures) {
     const isGroup = String(fixture.stage || "").toLowerCase().includes("group");
-    const odds = isGroup ? oddsRows[oddsIndex++] : null;
+    const odds = isGroup ? findOddsForFixture(fixture, oddsRows, usedOddsIndexes) : null;
     const oddsHasValues = odds ? oddsAvailable(odds) : false;
     const [placeholderHome, placeholderAway] = splitPlaceholder(fixture.group);
     const output = {
@@ -416,14 +502,31 @@ function buildSchedule(fixtures, oddsRows) {
       merge_source: output.merge_source,
     });
   }
-  return { scheduleRows, reportRows, groupFixtures };
+  return { scheduleRows, reportRows, groupFixtures, matchedOdds: usedOddsIndexes.size };
+}
+
+function validateSchedule(scheduleRows, expectedGroupRows) {
+  const groupRows = scheduleRows.filter((row) => String(row.stage || "").toLowerCase().includes("group"));
+  if (groupRows.length !== expectedGroupRows) {
+    throw new Error(`Expected ${expectedGroupRows} group fixture rows, got ${groupRows.length}.`);
+  }
+  const seen = new Map();
+  for (const row of groupRows) {
+    const key = [row.date, normalizeTeamKey(row.home_team), normalizeTeamKey(row.away_team)].join("|");
+    seen.set(key, (seen.get(key) || 0) + 1);
+  }
+  const duplicates = [...seen.entries()].filter(([, count]) => count > 1);
+  if (duplicates.length) {
+    throw new Error(`Duplicate group fixtures after odds merge: ${duplicates.map(([key]) => key).join("; ")}`);
+  }
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const oddsRows = await scrapeOddsPortal(args.url);
   const fixtures = parseCsv(fs.readFileSync(args.fixtures, "utf8"));
-  const { scheduleRows, reportRows, groupFixtures } = buildSchedule(fixtures, oddsRows);
+  const { scheduleRows, reportRows, groupFixtures, matchedOdds } = buildSchedule(fixtures, oddsRows);
+  validateSchedule(scheduleRows, groupFixtures.length);
   writeCsv(args.rawOutput, oddsRows, [
     "source",
     "source_url",
@@ -488,6 +591,7 @@ async function main() {
   const withOdds = scheduleRows.filter((row) => row.odds_available === "1").length;
   console.log(`OddsPortal group fixtures: ${oddsRows.length}`);
   console.log(`Local group fixture slots: ${groupFixtures.length}`);
+  console.log(`Matched OddsPortal group fixtures: ${matchedOdds}`);
   console.log(`Wrote ${scheduleRows.length} schedule rows to ${args.output}`);
   console.log(`Rows with 1X2 odds: ${withOdds}`);
   console.log(`Rows without odds: ${scheduleRows.length - withOdds}`);

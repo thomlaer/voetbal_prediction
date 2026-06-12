@@ -151,10 +151,13 @@ def merge_schedule_predictions(
     predictions = pd.read_csv(predictions_path)
     schedule["date"] = pd.to_datetime(schedule["date"], errors="coerce")
     predictions["date"] = pd.to_datetime(predictions["date"], errors="coerce")
+    merge_keys = ["date", "home_team", "away_team", "tournament"]
+    if predictions.duplicated(merge_keys).any():
+        predictions = predictions.drop_duplicates(merge_keys, keep="last")
 
     merged = schedule.merge(
         predictions,
-        on=["date", "home_team", "away_team", "tournament"],
+        on=merge_keys,
         how="left",
         suffixes=("", "_model"),
     )
