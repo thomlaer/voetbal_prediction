@@ -30,6 +30,7 @@ DEFAULT_OUTPUT_DIR = Path("outputs_worldcup2026_default")
 SCHEDULE = Path("data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv")
 MODEL_PREDS = Path("outputs_worldcup2026_default/future_predictions_xgboost.csv")
 RANKINGS = Path("fifa_ranking-2026-04-01.csv")
+DEFAULT_RESULTS = Path("data/results.csv")
 ODDS_WEIGHT = 0.70
 
 
@@ -262,11 +263,12 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--schedule", type=Path, default=SCHEDULE)
     parser.add_argument("--model-predictions", type=Path, default=MODEL_PREDS)
+    parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
     parser.add_argument("--odds-weight", type=float, default=ODDS_WEIGHT)
     args = parser.parse_args()
 
     print("Data laden...")
-    fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight)
+    fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight, args.results)
     group_fixtures = fixtures[fixtures["stage"].eq("Group Stage")].copy()
     fifa_points = load_latest_fifa_points(RANKINGS)
     strength = build_team_strength(group_fixtures, fifa_points)
