@@ -5,6 +5,7 @@ param(
     [switch]$SkipDownload,
     [switch]$SkipOdds,
     [switch]$UpdateSoccerbase,
+    [switch]$SkipSoccerbaseRefresh,
     [switch]$UseLineups,
     [int]$Simulations = 10000,
     [ValidateSet("best_default", "full_with_lineups")]
@@ -50,7 +51,7 @@ try {
             --report "outputs\oddsportal_worldcup2026_fixture_odds_report.csv"
     }
 
-    if ($UpdateSoccerbase) {
+    if ($UpdateSoccerbase -or -not $SkipSoccerbaseRefresh) {
         Invoke-Native $python -X utf8 "extract_soccerbase_match_data.py" `
             --skip-errors `
             --incremental `

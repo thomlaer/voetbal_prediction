@@ -21,7 +21,7 @@ Default model parity:
 - Downloads/prepares the Transfermarkt `davidcariboo/player-scores` Kaggle data, because the current model uses player-form features and the raw files are too large for normal Git commits.
 - `model_profile=best_default` matches the current best `20260610` profile: stats/cards/player-form/squads/goalscorer features on, exact lineup features off.
 - `model_profile=full_with_lineups` is the information-heavy experiment: exact Soccerbase lineup features, lineup ratings, yearly SoFIFA ratings, squad market/SoFIFA ratings, stat-recency features, geo features, external Elo, and historical odds when present.
-- `update_soccerbase=false` is the workflow default to save GitHub Actions minutes. Normal rebuilds reuse the tracked Soccerbase stats/cards CSVs for training. When enabled manually, the Soccerbase extractor runs in incremental mode: it preserves existing CSV rows, skips future fixtures, skips already cached Soccerbase game ids, and only fetches missing completed matches from the recent lookback window. The full lineup CSV is not committed because it is too large for normal GitHub storage; the small `soccerbase_fetched_games.csv` cache is committed instead.
+- `update_soccerbase=true` is the workflow default because Soccerbase stats/cards are useful, but the extractor runs in incremental mode. It preserves existing CSV rows, skips future fixtures, skips already cached Soccerbase game ids, and only fetches missing completed matches from the recent lookback window. The full lineup CSV is not committed because it is too large for normal GitHub storage; the small `soccerbase_fetched_games.csv` cache is committed instead.
 
 Lineup note:
 

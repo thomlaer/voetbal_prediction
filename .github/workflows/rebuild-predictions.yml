@@ -28,7 +28,7 @@ on:
         description: "Refresh Soccerbase lineups/stats/cards during the run"
         required: false
         type: boolean
-        default: false
+        default: true
       deploy_to_vercel:
         description: "Deploy the dashboard to Vercel after rebuilding"
         required: false

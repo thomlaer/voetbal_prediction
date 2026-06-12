@@ -12,8 +12,8 @@ Recommended mode for the WK:
 1. Keep automatic cron disabled.
 2. Run the rebuild workflow manually after group stage, after round of 32, after round of 16, and when odds/injury data materially changes.
 3. Use `model_profile=best_default` unless we deliberately retest `full_with_lineups`.
-4. Keep `update_soccerbase=false` for normal quick updates; the model still uses the existing Soccerbase CSVs.
-5. Enable `update_soccerbase=true` only when you deliberately want to check Soccerbase for new lineups/stats/cards. This runs incrementally: future fixtures and cached game ids are skipped, and only recent completed missing matches are fetched.
+4. Keep `update_soccerbase=true` for normal updates; it runs incrementally and should only fetch recent completed missing matches.
+5. Turn `update_soccerbase=false` only when you need the fastest possible run and are sure no new Soccerbase data matters.
 6. Set `deploy_to_vercel=true` only when the new output should replace the live site.
 
 Required GitHub secrets:

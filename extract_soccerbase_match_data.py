@@ -973,7 +973,9 @@ def main() -> int:
     existing_cards = read_existing_csv(args.cards_output) if args.incremental else []
     existing_cache = read_existing_csv(args.fetched_games_cache) if args.incremental else []
     skip_game_ids = (
-        existing_soccerbase_game_ids([args.fetched_games_cache, args.lineups_output])
+        existing_soccerbase_game_ids(
+            [args.fetched_games_cache, args.lineups_output, args.stats_output, args.cards_output]
+        )
         if args.incremental
         else set()
     )
