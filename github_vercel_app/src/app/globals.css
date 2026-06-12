@@ -276,6 +276,18 @@ tr:last-child td {
   gap: 8px;
 }
 
+.inline-note {
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding: 10px 12px;
+}
+
 .match-row {
   display: grid;
   grid-template-columns: 44px minmax(170px, 1fr) 64px minmax(120px, 0.7fr) 90px;

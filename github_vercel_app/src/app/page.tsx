@@ -147,6 +147,59 @@ function resultLabel(row: Prediction) {
   return "-";
 }
 
+const STAGE_ORDER = [
+  "Group Stage",
+  "Round of 32",
+  "Round of 16",
+  "Quarterfinals",
+  "Semifinals",
+  "Third Place Playoff",
+  "Final",
+];
+
+const STAGE_LABELS: Record<string, string> = {
+  "Group Stage": "Poulefase",
+  "Round of 32": "1/16 finale",
+  "Round of 16": "Achtste finale",
+  Quarterfinals: "Kwartfinale",
+  Semifinals: "Halve finale",
+  "Third Place Playoff": "Troostfinale",
+  Final: "Finale",
+};
+
+function stageLabel(stage: string) {
+  return STAGE_LABELS[stage] || stage || "-";
+}
+
+function dateKey(value?: string) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return null;
+  return Number(`${match[1]}${match[2]}${match[3]}`);
+}
+
+function stageStartKeys(rows: Prediction[]) {
+  const starts = new Map<string, number>();
+  for (const row of rows) {
+    const key = dateKey(row.date);
+    if (key === null) continue;
+    const current = starts.get(row.stage);
+    if (current === undefined || key < current) {
+      starts.set(row.stage, key);
+    }
+  }
+  return starts;
+}
+
+function isStageLocked(stage: string, starts: Map<string, number>, snapshotKey: number | null) {
+  const start = starts.get(stage);
+  return snapshotKey !== null && start !== undefined && snapshotKey >= start;
+}
+
+function firstOpenStage(rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null) {
+  const stageSet = new Set(rows.map((row) => row.stage));
+  return STAGE_ORDER.find((stage) => stageSet.has(stage) && !isStageLocked(stage, starts, snapshotKey)) || "";
+}
+
 function grouped<T extends { group: string }>(items: T[]) {
   return items.reduce<Record<string, T[]>>((acc, item) => {
     const key = item.group || "-";
@@ -171,10 +224,20 @@ export default async function Home() {
 
   const playedMatches = data.predictions.filter(isPlayed);
   const upcomingPredictions = data.predictions.filter((row) => !isPlayed(row));
-  const groupStage = upcomingPredictions.filter((row) => row.stage === "Group Stage");
+  const starts = stageStartKeys(data.predictions);
+  const snapshotKey = dateKey(data.metadata.generated_at);
+  const lockedUpcoming = upcomingPredictions.filter((row) => isStageLocked(row.stage, starts, snapshotKey));
+  const fillablePredictions = upcomingPredictions.filter((row) => !isStageLocked(row.stage, starts, snapshotKey));
+  const currentFillStage = firstOpenStage(fillablePredictions, starts, snapshotKey);
+  const fillAdviceRows = currentFillStage
+    ? fillablePredictions.filter((row) => row.stage === currentFillStage)
+    : [];
   const knockouts = upcomingPredictions.filter((row) => row.stage !== "Group Stage");
   const groups = grouped(data.group_standings);
-  const scoreChanges = data.changes.filter((row) => row.score_old !== row.score_new).length;
+  const actionableChanges = data.changes.filter((row) =>
+    !isStageLocked(row.stage || row.stage_old || "", starts, snapshotKey)
+  );
+  const scoreChanges = actionableChanges.filter((row) => row.score_old !== row.score_new).length;
 
   return (
     <main className="page">
@@ -210,7 +273,7 @@ export default async function Home() {
           </div>
           <div className="metric">
             <div className="metric-label">Scorewijzigingen</div>
-            <div className="metric-value">{data.changes.length}</div>
+            <div className="metric-value">{actionableChanges.length}</div>
             <div className="metric-note">
               {scoreChanges} dezelfde wedstrijden - {playedMatches.length} gespeeld
             </div>
@@ -235,8 +298,8 @@ export default async function Home() {
             </div>
           </div>
           <div className="stack">
-            {data.changes.length ? (
-              data.changes.map((row) => {
+            {actionableChanges.length ? (
+              actionableChanges.map((row) => {
                 const newMatch = `${row.home_team_new} - ${row.away_team_new}`;
 
                 return (
@@ -265,7 +328,7 @@ export default async function Home() {
                 );
               })
             ) : (
-              <div className="change-card">Geen scorewijzigingen voor dezelfde wedstrijden.</div>
+              <div className="change-card">Geen scorewijzigingen voor open invulrondes.</div>
             )}
           </div>
         </section>
@@ -327,9 +390,18 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <h2 className="section-title">Scorito Invullen</h2>
-              <p className="section-subtitle">Alleen wedstrijden zonder bekende uitslag.</p>
+              <p className="section-subtitle">
+                {currentFillStage
+                  ? `${stageLabel(currentFillStage)} - alleen de ronde die nog niet vergrendeld is.`
+                  : "Geen open invulronde in deze dashboarddata."}
+              </p>
             </div>
           </div>
+          {lockedUpcoming.length ? (
+            <div className="inline-note">
+              {lockedUpcoming.length} toekomstige wedstrijden zijn al vergrendeld voor invullen en blijven buiten deze lijst.
+            </div>
+          ) : null}
           <div className="table-shell">
             <table>
               <thead>
@@ -343,14 +415,14 @@ export default async function Home() {
                 </tr>
               </thead>
               <tbody>
-                {groupStage.length ? (
-                  groupStage.map((row) => (
+                {fillAdviceRows.length ? (
+                  fillAdviceRows.map((row) => (
                     <tr key={`${row.stage}-${row.match_number}`}>
                       <td className="mono">{row.match_number}</td>
                       <td>
                         <strong>{row.home_team}</strong> - {row.away_team}
                         <div className="metric-note">
-                          Poule {row.group} - {row.date}
+                          {row.group ? `Poule ${row.group}` : stageLabel(row.stage)} - {row.date}
                         </div>
                       </td>
                       <td>
@@ -367,7 +439,7 @@ export default async function Home() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6}>Geen open groepsfasewedstrijden in deze dashboarddata.</td>
+                    <td colSpan={6}>Geen open wedstrijden voor de volgende invulronde.</td>
                   </tr>
                 )}
               </tbody>
