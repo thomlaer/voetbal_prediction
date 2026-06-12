@@ -541,10 +541,6 @@ export default async function Home() {
               </div>
             </div>
           </div>
-          <p className="footer">
-            Vercel toont alleen compacte output. Training, odds-scrape en uitslagen-update draaien via
-            de runner buiten Vercel, zodat de app snel en stabiel blijft.
-          </p>
         </section>
       </div>
     </main>
