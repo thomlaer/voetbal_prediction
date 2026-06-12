@@ -453,6 +453,30 @@ def load_knockout_rows(bracket_path: Path, schedule_path: Path) -> pd.DataFrame:
     return bracket
 
 
+def lock_actual_group_results(pool: pd.DataFrame) -> pd.DataFrame:
+    if "actual_available" not in pool.columns:
+        return pool
+    pool = pool.copy()
+    actual_mask = pool["actual_available"].fillna(False).astype(bool)
+    if not actual_mask.any():
+        return pool
+
+    for idx, row in pool[actual_mask].iterrows():
+        home_score = int(row["actual_home_score"])
+        away_score = int(row["actual_away_score"])
+        outcome = outcome_label(home_score, away_score)
+        pool.at[idx, "home_score"] = home_score
+        pool.at[idx, "away_score"] = away_score
+        pool.at[idx, "score"] = f"{home_score}-{away_score}"
+        pool.at[idx, "outcome"] = outcome
+        pool.at[idx, "predicted_winner"] = (
+            row["home_team"] if outcome == "home_win" else row["away_team"] if outcome == "away_win" else "Draw"
+        )
+        pool.at[idx, "recommended_rule"] = "actual_result_locked"
+        pool.at[idx, "confidence"] = "actual"
+    return pool
+
+
 def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
     group = load_group_rows(args.group_predictions)
     knockout = load_knockout_rows(args.bracket, args.schedule)
@@ -472,6 +496,12 @@ def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
         "expected_home_goals",
         "expected_away_goals",
         "source",
+        "actual_available",
+        "actual_home_score",
+        "actual_away_score",
+        "actual_score",
+        "actual_outcome",
+        "actual_winner",
     ]
     for col in base_cols:
         if col not in group.columns:
@@ -501,6 +531,7 @@ def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
         ["high", "medium"],
         default="low",
     )
+    output = lock_actual_group_results(output)
     return output
 
 
@@ -958,6 +989,12 @@ def clean_entry_sheet(pool: pd.DataFrame) -> pd.DataFrame:
         "prob_home_win",
         "prob_draw",
         "prob_away_win",
+        "actual_available",
+        "actual_home_score",
+        "actual_away_score",
+        "actual_score",
+        "actual_outcome",
+        "actual_winner",
     ]
     return pool[[col for col in columns if col in pool.columns]].copy()
 

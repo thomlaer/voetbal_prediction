@@ -17,6 +17,19 @@ type Prediction = {
   prob_home_win: number | null;
   prob_draw: number | null;
   prob_away_win: number | null;
+  actual_available?: boolean;
+  actual_home_score?: number | "";
+  actual_away_score?: number | "";
+  actual_score?: string;
+  actual_outcome?: string;
+  actual_winner?: string;
+  pre_match_score?: string;
+  pre_match_predicted_winner?: string;
+  pre_match_confidence?: string;
+  pre_match_model_favourite_prob?: number | "";
+  pre_match_source?: string;
+  prediction_exact?: boolean | "";
+  prediction_outcome_correct?: boolean | "";
 };
 
 type Change = {
@@ -116,6 +129,24 @@ function confidenceClass(confidence: string) {
   return "";
 }
 
+function isPlayed(row: Prediction) {
+  return row.actual_available === true || Boolean(row.actual_score);
+}
+
+function resultClass(row: Prediction) {
+  if (row.prediction_exact === true) return "green";
+  if (row.prediction_outcome_correct === true) return "orange";
+  if (isPlayed(row)) return "red";
+  return "";
+}
+
+function resultLabel(row: Prediction) {
+  if (row.prediction_exact === true) return "Exact";
+  if (row.prediction_outcome_correct === true) return "Toto goed";
+  if (isPlayed(row)) return "Mis";
+  return "-";
+}
+
 function grouped<T extends { group: string }>(items: T[]) {
   return items.reduce<Record<string, T[]>>((acc, item) => {
     const key = item.group || "-";
@@ -138,8 +169,10 @@ export default async function Home() {
     );
   }
 
-  const groupStage = data.predictions.filter((row) => row.stage === "Group Stage");
-  const knockouts = data.predictions.filter((row) => row.stage !== "Group Stage");
+  const playedMatches = data.predictions.filter(isPlayed);
+  const upcomingPredictions = data.predictions.filter((row) => !isPlayed(row));
+  const groupStage = upcomingPredictions.filter((row) => row.stage === "Group Stage");
+  const knockouts = upcomingPredictions.filter((row) => row.stage !== "Group Stage");
   const groups = grouped(data.group_standings);
   const scoreChanges = data.changes.filter((row) => row.score_old !== row.score_new).length;
 
@@ -153,6 +186,7 @@ export default async function Home() {
           </a>
           <nav className="nav" aria-label="Dashboard">
             <a href="#wijzigingen">Wijzigingen</a>
+            <a href="#gespeeld">Gespeeld</a>
             <a href="#invullen">Invullen</a>
             <a href="#groepen">Groepen</a>
             <a href="#knockout">Knockout</a>
@@ -177,7 +211,9 @@ export default async function Home() {
           <div className="metric">
             <div className="metric-label">Scorewijzigingen</div>
             <div className="metric-value">{data.changes.length}</div>
-            <div className="metric-note">{scoreChanges} dezelfde wedstrijden</div>
+            <div className="metric-note">
+              {scoreChanges} dezelfde wedstrijden - {playedMatches.length} gespeeld
+            </div>
           </div>
           <div className="metric">
             <div className="metric-label">Model</div>
@@ -234,11 +270,64 @@ export default async function Home() {
           </div>
         </section>
 
+        <section id="gespeeld" className="section">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Gespeelde Wedstrijden</h2>
+              <p className="section-subtitle">Voorspelling naast de echte uitslag zodra results.csv is bijgewerkt.</p>
+            </div>
+          </div>
+          <div className="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Wedstrijd</th>
+                  <th>Voorspelling</th>
+                  <th>Uitslag</th>
+                  <th>Resultaat</th>
+                </tr>
+              </thead>
+              <tbody>
+                {playedMatches.length ? (
+                  playedMatches.map((row) => (
+                    <tr key={`played-${row.stage}-${row.match_number}`}>
+                      <td className="mono">{row.match_number}</td>
+                      <td>
+                        <strong>{row.home_team}</strong> - {row.away_team}
+                        <div className="metric-note">
+                          {row.stage}
+                          {row.group ? ` - Poule ${row.group}` : ""} - {row.date}
+                        </div>
+                      </td>
+                      <td>
+                        <span className="score">{row.pre_match_score || row.score}</span>
+                        <div className="metric-note">{row.pre_match_predicted_winner || row.predicted_winner}</div>
+                      </td>
+                      <td>
+                        <span className="score actual-score">{row.actual_score || "-"}</span>
+                        <div className="metric-note">{row.actual_winner || "-"}</div>
+                      </td>
+                      <td>
+                        <span className={`pill ${resultClass(row)}`}>{resultLabel(row)}</span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5}>Nog geen WK-wedstrijden met uitslag in de dashboarddata.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <section id="invullen" className="section">
           <div className="section-header">
             <div>
               <h2 className="section-title">Scorito Invullen</h2>
-              <p className="section-subtitle">Groepsfase-scores met kansen en confidence.</p>
+              <p className="section-subtitle">Alleen wedstrijden zonder bekende uitslag.</p>
             </div>
           </div>
           <div className="table-shell">
@@ -254,27 +343,33 @@ export default async function Home() {
                 </tr>
               </thead>
               <tbody>
-                {groupStage.map((row) => (
-                  <tr key={`${row.stage}-${row.match_number}`}>
-                    <td className="mono">{row.match_number}</td>
-                    <td>
-                      <strong>{row.home_team}</strong> - {row.away_team}
-                      <div className="metric-note">
-                        Poule {row.group} - {row.date}
-                      </div>
-                    </td>
-                    <td>
-                      <span className="score">{row.score}</span>
-                    </td>
-                    <td>{row.predicted_winner}</td>
-                    <td className="mono">{pct(row.model_favourite_prob)}</td>
-                    <td>
-                      <span className={`pill ${confidenceClass(row.confidence)}`}>
-                        {row.confidence || "-"}
-                      </span>
-                    </td>
+                {groupStage.length ? (
+                  groupStage.map((row) => (
+                    <tr key={`${row.stage}-${row.match_number}`}>
+                      <td className="mono">{row.match_number}</td>
+                      <td>
+                        <strong>{row.home_team}</strong> - {row.away_team}
+                        <div className="metric-note">
+                          Poule {row.group} - {row.date}
+                        </div>
+                      </td>
+                      <td>
+                        <span className="score">{row.score}</span>
+                      </td>
+                      <td>{row.predicted_winner}</td>
+                      <td className="mono">{pct(row.model_favourite_prob)}</td>
+                      <td>
+                        <span className={`pill ${confidenceClass(row.confidence)}`}>
+                          {row.confidence || "-"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6}>Geen open groepsfasewedstrijden in deze dashboarddata.</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

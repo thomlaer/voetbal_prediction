@@ -8,6 +8,7 @@ import csv
 import json
 import re
 import shutil
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -108,6 +109,142 @@ def has_score_value(value: Any) -> bool:
     return True
 
 
+def normalize_key(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def outcome_label(home_goals: int, away_goals: int) -> str:
+    if home_goals > away_goals:
+        return "home_win"
+    if home_goals < away_goals:
+        return "away_win"
+    return "draw"
+
+
+def score_outcome(score: Any) -> str:
+    match = re.fullmatch(r"\s*(\d+)\s*-\s*(\d+)\s*", str(score or ""))
+    if not match:
+        return ""
+    return outcome_label(int(match.group(1)), int(match.group(2)))
+
+
+def load_worldcup_actuals(results_path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
+    actuals: dict[tuple[str, str, str], dict[str, Any]] = {}
+    if not results_path.exists():
+        return actuals
+    for row in read_csv(results_path):
+        if str(row.get("tournament", "")) != "FIFA World Cup":
+            continue
+        if not has_score_value(row.get("home_score")) or not has_score_value(row.get("away_score")):
+            continue
+        date = str(row.get("date", ""))[:10]
+        if not date:
+            continue
+        home_score = int(float(row.get("home_score", 0)))
+        away_score = int(float(row.get("away_score", 0)))
+        home_team = str(row.get("home_team", ""))
+        away_team = str(row.get("away_team", ""))
+        outcome = outcome_label(home_score, away_score)
+        reverse_outcome = outcome_label(away_score, home_score)
+        actuals[(date, normalize_key(home_team), normalize_key(away_team))] = {
+            "actual_available": True,
+            "actual_home_score": home_score,
+            "actual_away_score": away_score,
+            "actual_score": f"{home_score}-{away_score}",
+            "actual_outcome": outcome,
+            "actual_winner": home_team if outcome == "home_win" else away_team if outcome == "away_win" else "Draw",
+        }
+        actuals[(date, normalize_key(away_team), normalize_key(home_team))] = {
+            "actual_available": True,
+            "actual_home_score": away_score,
+            "actual_away_score": home_score,
+            "actual_score": f"{away_score}-{home_score}",
+            "actual_outcome": reverse_outcome,
+            "actual_winner": away_team if reverse_outcome == "home_win" else home_team if reverse_outcome == "away_win" else "Draw",
+        }
+    return actuals
+
+
+def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        str(row.get("match_number", "")),
+        normalize_key(row.get("home_team", "")),
+        normalize_key(row.get("away_team", "")),
+    )
+
+
+def attach_actual_results(
+    predictions: list[dict[str, Any]],
+    results_path: Path,
+    previous_dashboard: dict[str, Any],
+) -> list[dict[str, Any]]:
+    actuals = load_worldcup_actuals(results_path)
+    previous_rows = previous_dashboard.get("predictions", [])
+    previous_by_key = {
+        prediction_key(row): row
+        for row in previous_rows
+        if isinstance(row, dict) and str(row.get("match_number", ""))
+    }
+
+    enriched: list[dict[str, Any]] = []
+    for row in predictions:
+        output = dict(row)
+        date = str(output.get("date", ""))[:10]
+        actual = actuals.get(
+            (date, normalize_key(output.get("home_team", "")), normalize_key(output.get("away_team", "")))
+        )
+        if actual:
+            output.update(actual)
+        else:
+            output.update(
+                {
+                    "actual_available": False,
+                    "actual_home_score": "",
+                    "actual_away_score": "",
+                    "actual_score": "",
+                    "actual_outcome": "",
+                    "actual_winner": "",
+                }
+            )
+
+        previous = previous_by_key.get(prediction_key(output), {})
+        output["pre_match_score"] = output.get("score", "")
+        output["pre_match_predicted_winner"] = output.get("predicted_winner", "")
+        output["pre_match_confidence"] = output.get("confidence", "")
+        output["pre_match_model_favourite_prob"] = output.get("model_favourite_prob", "")
+        output["pre_match_source"] = "current_run"
+
+        if output["actual_available"] and previous:
+            output["pre_match_score"] = previous.get("pre_match_score") or previous.get("score", output["pre_match_score"])
+            output["pre_match_predicted_winner"] = (
+                previous.get("pre_match_predicted_winner")
+                or previous.get("predicted_winner", output["pre_match_predicted_winner"])
+            )
+            output["pre_match_confidence"] = previous.get("pre_match_confidence") or previous.get(
+                "confidence", output["pre_match_confidence"]
+            )
+            output["pre_match_model_favourite_prob"] = previous.get("pre_match_model_favourite_prob") or previous.get(
+                "model_favourite_prob", output["pre_match_model_favourite_prob"]
+            )
+            output["pre_match_source"] = previous.get("pre_match_source") or "previous_dashboard"
+
+        if output["actual_available"]:
+            predicted_score = output.get("pre_match_score", "")
+            predicted_outcome = score_outcome(predicted_score)
+            actual_outcome = str(output.get("actual_outcome", ""))
+            output["prediction_exact"] = str(predicted_score) == str(output.get("actual_score", ""))
+            output["prediction_outcome_correct"] = bool(predicted_outcome) and predicted_outcome == actual_outcome
+        else:
+            output["prediction_exact"] = ""
+            output["prediction_outcome_correct"] = ""
+        enriched.append(output)
+    return enriched
+
+
 def copy_if_exists(source: Path, destination: Path) -> str:
     if not source.exists():
         return ""
@@ -159,6 +296,19 @@ def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "prob_home_win",
         "prob_draw",
         "prob_away_win",
+        "actual_available",
+        "actual_home_score",
+        "actual_away_score",
+        "actual_score",
+        "actual_outcome",
+        "actual_winner",
+        "pre_match_score",
+        "pre_match_predicted_winner",
+        "pre_match_confidence",
+        "pre_match_model_favourite_prob",
+        "pre_match_source",
+        "prediction_exact",
+        "prediction_outcome_correct",
     ]
     return [{field: row.get(field, "") for field in fields} for row in rows]
 
@@ -260,6 +410,8 @@ def main() -> None:
             if has_score_value(row.get("home_score")) and has_score_value(row.get("away_score"))
         ]
         latest_match_date = max(dates) if dates else ""
+
+    predictions = attach_actual_results(predictions, results_path, previous_dashboard)
 
     compact_csv_source = run_dir / "scorito_scores_invullen_compact.csv"
 

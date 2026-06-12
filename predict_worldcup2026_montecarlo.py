@@ -24,6 +24,7 @@ from train_xgboost_worldcup import normalize_name
 DEFAULT_SCHEDULE = Path("data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv")
 DEFAULT_MODEL_PREDICTIONS = Path("outputs_worldcup2026_default/future_predictions_xgboost.csv")
 DEFAULT_RANKINGS = Path("fifa_ranking-2026-04-01.csv")
+DEFAULT_RESULTS = Path("data/results.csv")
 DEFAULT_OUTPUT_DIR = Path("outputs_worldcup2026_default")
 OUTCOMES = np.array(["away_win", "draw", "home_win"], dtype=object)
 
@@ -59,7 +60,93 @@ def load_latest_fifa_points(path: Path) -> dict[str, float]:
     return dict(zip(latest["team_key"], latest["total_points"]))
 
 
-def merge_schedule_predictions(schedule_path: Path, predictions_path: Path, odds_weight: float) -> pd.DataFrame:
+def outcome_from_score(home_goals: int, away_goals: int) -> str:
+    if home_goals > away_goals:
+        return "home_win"
+    if home_goals < away_goals:
+        return "away_win"
+    return "draw"
+
+
+def load_actual_results(path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
+    if not path.exists():
+        return {}
+    results = pd.read_csv(path)
+    required = {"date", "home_team", "away_team", "home_score", "away_score", "tournament"}
+    if not required.issubset(results.columns):
+        return {}
+    results = results[results["tournament"].eq("FIFA World Cup")].copy()
+    results["date"] = pd.to_datetime(results["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    results["home_score"] = pd.to_numeric(results["home_score"], errors="coerce")
+    results["away_score"] = pd.to_numeric(results["away_score"], errors="coerce")
+    results = results.dropna(subset=["date", "home_team", "away_team", "home_score", "away_score"])
+
+    lookup: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in results.itertuples(index=False):
+        home_score = int(row.home_score)
+        away_score = int(row.away_score)
+        outcome = outcome_from_score(home_score, away_score)
+        direct = {
+            "actual_available": True,
+            "actual_home_score": home_score,
+            "actual_away_score": away_score,
+            "actual_score": f"{home_score}-{away_score}",
+            "actual_outcome": outcome,
+            "actual_winner": row.home_team if outcome == "home_win" else row.away_team if outcome == "away_win" else "Draw",
+        }
+        reverse_outcome = outcome_from_score(away_score, home_score)
+        reverse = {
+            "actual_available": True,
+            "actual_home_score": away_score,
+            "actual_away_score": home_score,
+            "actual_score": f"{away_score}-{home_score}",
+            "actual_outcome": reverse_outcome,
+            "actual_winner": row.away_team if reverse_outcome == "home_win" else row.home_team if reverse_outcome == "away_win" else "Draw",
+        }
+        date_key = str(row.date)
+        lookup[(date_key, normalize_name(row.home_team), normalize_name(row.away_team))] = direct
+        lookup[(date_key, normalize_name(row.away_team), normalize_name(row.home_team))] = reverse
+    return lookup
+
+
+def apply_actual_results(fixtures: pd.DataFrame, results_path: Path) -> pd.DataFrame:
+    fixtures = fixtures.copy()
+    for column in ["actual_available", "actual_home_score", "actual_away_score", "actual_score", "actual_outcome", "actual_winner"]:
+        fixtures[column] = False if column == "actual_available" else np.nan
+
+    lookup = load_actual_results(results_path)
+    if not lookup:
+        return fixtures
+
+    for idx, row in fixtures.iterrows():
+        date_key = pd.to_datetime(row["date"], errors="coerce")
+        if pd.isna(date_key):
+            continue
+        key = (
+            date_key.strftime("%Y-%m-%d"),
+            normalize_name(row["home_team"]),
+            normalize_name(row["away_team"]),
+        )
+        actual = lookup.get(key)
+        if not actual:
+            continue
+        for column, value in actual.items():
+            fixtures.at[idx, column] = value
+        fixtures.at[idx, "expected_home_goals"] = actual["actual_home_score"]
+        fixtures.at[idx, "expected_away_goals"] = actual["actual_away_score"]
+        fixtures.at[idx, "sim_prob_home_win"] = 1.0 if actual["actual_outcome"] == "home_win" else 0.0
+        fixtures.at[idx, "sim_prob_draw"] = 1.0 if actual["actual_outcome"] == "draw" else 0.0
+        fixtures.at[idx, "sim_prob_away_win"] = 1.0 if actual["actual_outcome"] == "away_win" else 0.0
+        fixtures.at[idx, "sim_predicted_outcome"] = actual["actual_outcome"]
+    return fixtures
+
+
+def merge_schedule_predictions(
+    schedule_path: Path,
+    predictions_path: Path,
+    odds_weight: float,
+    results_path: Path,
+) -> pd.DataFrame:
     schedule = pd.read_csv(schedule_path)
     predictions = pd.read_csv(predictions_path)
     schedule["date"] = pd.to_datetime(schedule["date"], errors="coerce")
@@ -96,6 +183,7 @@ def merge_schedule_predictions(schedule_path: Path, predictions_path: Path, odds
 
     sim_probs = merged[["sim_prob_away_win", "sim_prob_draw", "sim_prob_home_win"]].to_numpy()
     merged["sim_predicted_outcome"] = OUTCOMES[sim_probs.argmax(axis=1)]
+    merged = apply_actual_results(merged, results_path)
     return merged
 
 
@@ -126,6 +214,9 @@ def score_from_outcome(
 
 
 def deterministic_score_for_outcome(row: pd.Series) -> tuple[str, str]:
+    if bool(row.get("actual_available", False)):
+        return str(row.get("actual_score", "")), "actual_result"
+
     pool_score = str(row.get("pool_predicted_score", ""))
     match = re.fullmatch(r"(\d+)-(\d+)", pool_score)
     if match:
@@ -318,15 +409,19 @@ def simulate_tournament(
         }
         tables = {group: init_table(team_set) for group, team_set in grouped_teams.items()}
         for row in group_fixtures.itertuples(index=False):
-            probs = np.array([row.sim_prob_away_win, row.sim_prob_draw, row.sim_prob_home_win], dtype=float)
-            probs = probs / probs.sum()
-            outcome_id = int(rng.choice([0, 1, 2], p=probs))
-            home_goals, away_goals = score_from_outcome(
-                rng,
-                row.expected_home_goals,
-                row.expected_away_goals,
-                outcome_id,
-            )
+            if bool(getattr(row, "actual_available", False)):
+                home_goals = int(getattr(row, "actual_home_score"))
+                away_goals = int(getattr(row, "actual_away_score"))
+            else:
+                probs = np.array([row.sim_prob_away_win, row.sim_prob_draw, row.sim_prob_home_win], dtype=float)
+                probs = probs / probs.sum()
+                outcome_id = int(rng.choice([0, 1, 2], p=probs))
+                home_goals, away_goals = score_from_outcome(
+                    rng,
+                    row.expected_home_goals,
+                    row.expected_away_goals,
+                    outcome_id,
+                )
             add_match(tables[row.group], row.home_team, row.away_team, home_goals, away_goals)
 
         group_order: dict[str, list[str]] = {}
@@ -433,13 +528,14 @@ def main() -> None:
     parser.add_argument("--schedule", type=Path, default=DEFAULT_SCHEDULE)
     parser.add_argument("--model-predictions", type=Path, default=DEFAULT_MODEL_PREDICTIONS)
     parser.add_argument("--rankings", type=Path, default=DEFAULT_RANKINGS)
+    parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--simulations", type=int, default=50000)
     parser.add_argument("--odds-weight", type=float, default=0.70)
     parser.add_argument("--seed", type=int, default=20260515)
     args = parser.parse_args()
 
-    fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight)
+    fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight, args.results)
     group_fixtures = fixtures[fixtures["stage"].eq("Group Stage")].copy()
     fifa_points = load_latest_fifa_points(args.rankings)
     strength = build_team_strength(group_fixtures, fifa_points)
@@ -471,6 +567,12 @@ def main() -> None:
             "pool_predicted_score",
             "expected_home_goals",
             "expected_away_goals",
+            "actual_available",
+            "actual_home_score",
+            "actual_away_score",
+            "actual_score",
+            "actual_outcome",
+            "actual_winner",
         ]
     ].copy()
     sim_scores = group_output.apply(deterministic_score_for_outcome, axis=1, result_type="expand")
@@ -487,6 +589,7 @@ def main() -> None:
         "simulations": int(args.simulations),
         "odds_weight_for_group_stage": float(args.odds_weight),
         "group_stage_rows": int(len(group_fixtures)),
+        "actual_group_results_locked": int(group_fixtures["actual_available"].fillna(False).sum()),
         "teams": int(probabilities["team"].nunique()),
         "knockout_note": (
             "Group stage uses model probabilities blended with current OddsPortal odds where available. "
