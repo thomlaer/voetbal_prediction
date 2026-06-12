@@ -239,6 +239,20 @@ tr:last-child td {
   color: var(--red);
 }
 
+.new-score,
+.pill.yellow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 3px 8px;
+}
+
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -286,6 +300,38 @@ tr:last-child td {
   font-weight: 700;
   line-height: 1.35;
   padding: 10px 12px;
+}
+
+.round-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.round-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.round-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px;
+}
+
+.round-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.compact-table {
+  border-width: 1px 0 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .match-row {
@@ -439,6 +485,14 @@ tr:last-child td {
   .score {
     min-width: 44px;
     padding: 5px 7px;
+  }
+
+  .round-header {
+    align-items: flex-start;
+  }
+
+  .compact-table table {
+    min-width: 760px;
   }
 
   th,

@@ -4,6 +4,7 @@ https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1488
 https://www.soccerbase.com/tournaments/tournament.sd?tourn_id=1764
 
 # Competition pages; the extractor expands the visible season selector.
+https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73
 https://www.soccerbase.com/tournaments/tournament.sd?comp_id=155
 https://www.soccerbase.com/tournaments/tournament.sd?comp_id=68
 https://www.soccerbase.com/tournaments/tournament.sd?comp_id=98

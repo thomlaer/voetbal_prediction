@@ -9,6 +9,15 @@ type Prediction = {
   home_team: string;
   away_team: string;
   score: string;
+  model_score?: string;
+  model_predicted_winner?: string;
+  filled_score?: string;
+  filled_predicted_winner?: string;
+  new_model_score?: string;
+  new_model_predicted_winner?: string;
+  round_locked?: boolean;
+  round_status?: string;
+  score_source?: string;
   predicted_winner: string;
   confidence: string;
   safe_score: string;
@@ -23,6 +32,7 @@ type Prediction = {
   actual_score?: string;
   actual_outcome?: string;
   actual_winner?: string;
+  actual_source?: string;
   pre_match_score?: string;
   pre_match_predicted_winner?: string;
   pre_match_confidence?: string;
@@ -200,6 +210,24 @@ function firstOpenStage(rows: Prediction[], starts: Map<string, number>, snapsho
   return STAGE_ORDER.find((stage) => stageSet.has(stage) && !isStageLocked(stage, starts, snapshotKey)) || "";
 }
 
+function stageRows(rows: Prediction[]) {
+  return STAGE_ORDER.map((stage) => ({
+    stage,
+    rows: rows.filter((row) => row.stage === stage),
+  })).filter((section) => section.rows.length);
+}
+
+function stageStatus(stage: string, rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null, currentFillStage: string) {
+  if (rows.length && rows.every(isPlayed)) return { label: "Gespeeld", className: "green" };
+  if (isStageLocked(stage, starts, snapshotKey)) return { label: "Vergrendeld", className: "orange" };
+  if (stage === currentFillStage) return { label: "Nu invullen", className: "green" };
+  return { label: "Later", className: "" };
+}
+
+function displayScore(row: Prediction) {
+  return row.filled_score || row.pre_match_score || row.score;
+}
+
 function grouped<T extends { group: string }>(items: T[]) {
   return items.reduce<Record<string, T[]>>((acc, item) => {
     const key = item.group || "-";
@@ -234,6 +262,7 @@ export default async function Home() {
     : [];
   const knockouts = upcomingPredictions.filter((row) => row.stage !== "Group Stage");
   const groups = grouped(data.group_standings);
+  const rounds = stageRows(data.predictions);
   const actionableChanges = data.changes.filter((row) =>
     !isStageLocked(row.stage || row.stage_old || "", starts, snapshotKey)
   );
@@ -250,6 +279,7 @@ export default async function Home() {
           <nav className="nav" aria-label="Dashboard">
             <a href="#wijzigingen">Wijzigingen</a>
             <a href="#gespeeld">Gespeeld</a>
+            <a href="#rondes">Rondes</a>
             <a href="#invullen">Invullen</a>
             <a href="#groepen">Groepen</a>
             <a href="#knockout">Knockout</a>
@@ -369,7 +399,10 @@ export default async function Home() {
                       </td>
                       <td>
                         <span className="score actual-score">{row.actual_score || "-"}</span>
-                        <div className="metric-note">{row.actual_winner || "-"}</div>
+                        <div className="metric-note">
+                          {row.actual_winner || "-"}
+                          {row.actual_source ? ` - ${row.actual_source}` : ""}
+                        </div>
                       </td>
                       <td>
                         <span className={`pill ${resultClass(row)}`}>{resultLabel(row)}</span>
@@ -383,6 +416,86 @@ export default async function Home() {
                 )}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section id="rondes" className="section">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Rondes</h2>
+              <p className="section-subtitle">
+                Gesloten rondes tonen de ingevulde score. Geel is alleen de nieuwe modelscore als die later afwijkt.
+              </p>
+            </div>
+          </div>
+          <div className="round-stack">
+            {rounds.map(({ stage, rows }) => {
+              const status = stageStatus(stage, rows, starts, snapshotKey, currentFillStage);
+              const changedRows = rows.filter((row) => row.new_model_score).length;
+
+              return (
+                <div className="round-card" key={stage}>
+                  <div className="round-header">
+                    <div>
+                      <h3>{stageLabel(stage)}</h3>
+                      <div className="metric-note">
+                        {rows.length} wedstrijden
+                        {changedRows ? ` - ${changedRows} nieuwe modelscore${changedRows === 1 ? "" : "s"}` : ""}
+                      </div>
+                    </div>
+                    <span className={`pill ${status.className}`}>{status.label}</span>
+                  </div>
+                  <div className="table-shell compact-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Wedstrijd</th>
+                          <th>Score</th>
+                          <th>Winnaar</th>
+                          <th>Kans</th>
+                          <th>Conf.</th>
+                          <th>Nieuw</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map((row) => (
+                          <tr key={`round-${stage}-${row.match_number}`}>
+                            <td className="mono">{row.match_number}</td>
+                            <td>
+                              <strong>{row.home_team}</strong> - {row.away_team}
+                              <div className="metric-note">
+                                {row.group ? `Poule ${row.group}` : stageLabel(row.stage)} - {row.date}
+                                {isPlayed(row) ? ` - uitslag ${row.actual_score}` : ""}
+                              </div>
+                            </td>
+                            <td>
+                              <span className="score">{displayScore(row)}</span>
+                            </td>
+                            <td>{row.filled_predicted_winner || row.predicted_winner}</td>
+                            <td className="mono">{pct(row.model_favourite_prob)}</td>
+                            <td>
+                              <span className={`pill ${confidenceClass(row.confidence)}`}>
+                                {row.confidence || "-"}
+                              </span>
+                            </td>
+                            <td>
+                              {row.new_model_score ? (
+                                <span className="new-score" title="Nieuwe score uit de laatste modelrun">
+                                  {row.new_model_score}
+                                </span>
+                              ) : (
+                                <span className="metric-note">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 

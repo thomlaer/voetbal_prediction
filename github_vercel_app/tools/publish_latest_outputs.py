@@ -16,6 +16,15 @@ from typing import Any
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_ROOT = APP_ROOT.parent
+STAGE_ORDER = [
+    "Group Stage",
+    "Round of 32",
+    "Round of 16",
+    "Quarterfinals",
+    "Semifinals",
+    "Third Place Playoff",
+    "Final",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -65,7 +74,7 @@ def newest_run(model_root: Path) -> Path:
     candidates = [
         p
         for p in model_root.glob("outputs_worldcup2026_cards_draw05_*")
-        if p.is_dir() and re.search(r"\d{8}$", p.name)
+        if p.is_dir()
     ]
     if not candidates:
         fallback = model_root / "outputs_worldcup2026_cards_draw05"
@@ -114,7 +123,45 @@ def normalize_key(value: Any) -> str:
     text = unicodedata.normalize("NFKD", text)
     text = "".join(ch for ch in text if not unicodedata.combining(ch))
     text = re.sub(r"[^a-z0-9]+", " ", text)
-    return re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
+    aliases = {
+        "usa": "united states",
+        "us": "united states",
+        "bosnia hz": "bosnia and herzegovina",
+        "czech rep": "czech republic",
+        "czechia": "czech republic",
+        "cote d ivoire": "ivory coast",
+        "cote divoire": "ivory coast",
+        "dr congo": "congo dr",
+        "korea republic": "south korea",
+        "korea rep": "south korea",
+        "turkiye": "turkey",
+    }
+    return aliases.get(text, text)
+
+
+def date_key(value: Any) -> int | None:
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", str(value or ""))
+    if not match:
+        return None
+    return int(f"{match.group(1)}{match.group(2)}{match.group(3)}")
+
+
+def stage_start_keys(rows: list[dict[str, Any]]) -> dict[str, int]:
+    starts: dict[str, int] = {}
+    for row in rows:
+        stage = str(row.get("stage", ""))
+        key = date_key(row.get("date"))
+        if not stage or key is None:
+            continue
+        if stage not in starts or key < starts[stage]:
+            starts[stage] = key
+    return starts
+
+
+def is_stage_locked(stage: Any, starts: dict[str, int], snapshot_key: int | None) -> bool:
+    stage_key = str(stage or "")
+    return snapshot_key is not None and stage_key in starts and snapshot_key >= starts[stage_key]
 
 
 def outcome_label(home_goals: int, away_goals: int) -> str:
@@ -157,6 +204,7 @@ def load_worldcup_actuals(results_path: Path) -> dict[tuple[str, str, str], dict
             "actual_score": f"{home_score}-{away_score}",
             "actual_outcome": outcome,
             "actual_winner": home_team if outcome == "home_win" else away_team if outcome == "away_win" else "Draw",
+            "actual_source": "results_csv",
         }
         actuals[(date, normalize_key(away_team), normalize_key(home_team))] = {
             "actual_available": True,
@@ -165,6 +213,49 @@ def load_worldcup_actuals(results_path: Path) -> dict[tuple[str, str, str], dict
             "actual_score": f"{away_score}-{home_score}",
             "actual_outcome": reverse_outcome,
             "actual_winner": away_team if reverse_outcome == "home_win" else home_team if reverse_outcome == "away_win" else "Draw",
+            "actual_source": "results_csv",
+        }
+    return actuals
+
+
+def load_soccerbase_actuals(stats_path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
+    actuals: dict[tuple[str, str, str], dict[str, Any]] = {}
+    if not stats_path.exists():
+        return actuals
+    for row in read_csv(stats_path):
+        if "world cup" not in str(row.get("competition", "")).lower():
+            continue
+        date = str(row.get("date", ""))[:10]
+        if not date.startswith("2026-"):
+            continue
+        if not has_score_value(row.get("home_score")) or not has_score_value(row.get("away_score")):
+            continue
+        home_team = str(row.get("home_team", ""))
+        away_team = str(row.get("away_team", ""))
+        try:
+            home_score = int(float(row.get("home_score", 0)))
+            away_score = int(float(row.get("away_score", 0)))
+        except (TypeError, ValueError):
+            continue
+        outcome = outcome_label(home_score, away_score)
+        reverse_outcome = outcome_label(away_score, home_score)
+        actuals[(date, normalize_key(home_team), normalize_key(away_team))] = {
+            "actual_available": True,
+            "actual_home_score": home_score,
+            "actual_away_score": away_score,
+            "actual_score": f"{home_score}-{away_score}",
+            "actual_outcome": outcome,
+            "actual_winner": home_team if outcome == "home_win" else away_team if outcome == "away_win" else "Draw",
+            "actual_source": "soccerbase",
+        }
+        actuals[(date, normalize_key(away_team), normalize_key(home_team))] = {
+            "actual_available": True,
+            "actual_home_score": away_score,
+            "actual_away_score": home_score,
+            "actual_score": f"{away_score}-{home_score}",
+            "actual_outcome": reverse_outcome,
+            "actual_winner": away_team if reverse_outcome == "home_win" else home_team if reverse_outcome == "away_win" else "Draw",
+            "actual_source": "soccerbase",
         }
     return actuals
 
@@ -180,25 +271,70 @@ def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
 def attach_actual_results(
     predictions: list[dict[str, Any]],
     results_path: Path,
+    soccerbase_stats_path: Path,
     previous_dashboard: dict[str, Any],
+    snapshot_key: int | None,
 ) -> list[dict[str, Any]]:
-    actuals = load_worldcup_actuals(results_path)
+    actuals = load_soccerbase_actuals(soccerbase_stats_path)
+    actuals.update(load_worldcup_actuals(results_path))
     previous_rows = previous_dashboard.get("predictions", [])
     previous_by_key = {
         prediction_key(row): row
         for row in previous_rows
         if isinstance(row, dict) and str(row.get("match_number", ""))
     }
+    starts = stage_start_keys(predictions)
 
     enriched: list[dict[str, Any]] = []
     for row in predictions:
         output = dict(row)
+        previous = previous_by_key.get(prediction_key(output), {})
+        model_score = output.get("score", "")
+        model_winner = output.get("predicted_winner", "")
+        model_confidence = output.get("confidence", "")
+        model_favourite_prob = output.get("model_favourite_prob", "")
+        locked = is_stage_locked(output.get("stage", ""), starts, snapshot_key)
+
+        output["model_score"] = model_score
+        output["model_predicted_winner"] = model_winner
+        output["filled_score"] = model_score
+        output["filled_predicted_winner"] = model_winner
+        output["new_model_score"] = ""
+        output["new_model_predicted_winner"] = ""
+        output["round_locked"] = locked
+        output["round_status"] = "locked" if locked else "open"
+        output["score_source"] = "current_run"
+
+        if locked and previous:
+            filled_score = (
+                previous.get("filled_score")
+                or previous.get("pre_match_score")
+                or previous.get("score")
+                or model_score
+            )
+            filled_winner = (
+                previous.get("filled_predicted_winner")
+                or previous.get("pre_match_predicted_winner")
+                or previous.get("predicted_winner")
+                or model_winner
+            )
+            output["filled_score"] = filled_score
+            output["filled_predicted_winner"] = filled_winner
+            output["score"] = filled_score
+            output["predicted_winner"] = filled_winner
+            output["score_source"] = previous.get("score_source") or "previous_dashboard"
+            if str(model_score) != str(filled_score):
+                output["new_model_score"] = model_score
+            if str(model_winner) != str(filled_winner):
+                output["new_model_predicted_winner"] = model_winner
+
         date = str(output.get("date", ""))[:10]
         actual = actuals.get(
             (date, normalize_key(output.get("home_team", "")), normalize_key(output.get("away_team", "")))
         )
         if actual:
             output.update(actual)
+            output["round_status"] = "played"
         else:
             output.update(
                 {
@@ -208,15 +344,18 @@ def attach_actual_results(
                     "actual_score": "",
                     "actual_outcome": "",
                     "actual_winner": "",
+                    "actual_source": "",
                 }
             )
 
-        previous = previous_by_key.get(prediction_key(output), {})
-        output["pre_match_score"] = output.get("score", "")
-        output["pre_match_predicted_winner"] = output.get("predicted_winner", "")
-        output["pre_match_confidence"] = output.get("confidence", "")
-        output["pre_match_model_favourite_prob"] = output.get("model_favourite_prob", "")
-        output["pre_match_source"] = "current_run"
+        output["pre_match_score"] = output.get("filled_score", output.get("score", ""))
+        output["pre_match_predicted_winner"] = output.get(
+            "filled_predicted_winner",
+            output.get("predicted_winner", ""),
+        )
+        output["pre_match_confidence"] = model_confidence
+        output["pre_match_model_favourite_prob"] = model_favourite_prob
+        output["pre_match_source"] = output.get("score_source", "current_run")
 
         if output["actual_available"] and previous:
             output["pre_match_score"] = previous.get("pre_match_score") or previous.get("score", output["pre_match_score"])
@@ -292,6 +431,15 @@ def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "safe_score",
         "upside_score",
         "recommended_rule",
+        "model_score",
+        "model_predicted_winner",
+        "filled_score",
+        "filled_predicted_winner",
+        "new_model_score",
+        "new_model_predicted_winner",
+        "round_locked",
+        "round_status",
+        "score_source",
         "model_favourite_prob",
         "prob_home_win",
         "prob_draw",
@@ -302,6 +450,7 @@ def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "actual_score",
         "actual_outcome",
         "actual_winner",
+        "actual_source",
         "pre_match_score",
         "pre_match_predicted_winner",
         "pre_match_confidence",
@@ -374,9 +523,11 @@ def main() -> None:
     public_files = APP_ROOT / "public" / "files"
     public_data.mkdir(parents=True, exist_ok=True)
     public_files.mkdir(parents=True, exist_ok=True)
+    generated_at = datetime.now()
+    snapshot_key = date_key(generated_at.strftime("%Y-%m-%d"))
 
     match = re.search(r"(\d{8})$", run_dir.name)
-    label = match.group(1) if match else datetime.now().strftime("%Y%m%d")
+    label = match.group(1) if match else generated_at.strftime("%Y%m%d")
 
     previous_dashboard = load_json(public_data / "dashboard.json")
     predictions = compact_predictions(read_csv(run_dir / "scorito_invuladvies.csv"))
@@ -411,7 +562,14 @@ def main() -> None:
         ]
         latest_match_date = max(dates) if dates else ""
 
-    predictions = attach_actual_results(predictions, results_path, previous_dashboard)
+    soccerbase_stats_path = model_root / "data" / "extracted" / "soccerbase_match_stats.csv"
+    predictions = attach_actual_results(
+        predictions,
+        results_path,
+        soccerbase_stats_path,
+        previous_dashboard,
+        snapshot_key,
+    )
 
     compact_csv_source = run_dir / "scorito_scores_invullen_compact.csv"
 
@@ -461,7 +619,7 @@ def main() -> None:
         ),
         file_status(
             "Soccerbase stats",
-            model_root / "data" / "extracted" / "soccerbase_match_stats.csv",
+            soccerbase_stats_path,
             "rolling shots/corners/possession/fouls source",
         ),
         file_status(
@@ -473,7 +631,7 @@ def main() -> None:
 
     dashboard = {
         "metadata": {
-            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "generated_at": generated_at.strftime("%Y-%m-%d %H:%M"),
             "source_run": run_dir.name,
             "model_accuracy": metrics.get("accuracy"),
             "exact_score_accuracy": metrics.get("score_exact_accuracy"),
