@@ -29,13 +29,27 @@ if [[ "${SKIP_ODDS:-0}" != "1" ]]; then
 fi
 
 if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
-  "$PYTHON" -X utf8 extract_soccerbase_match_data.py \
+  SOCCERBASE_ARGS=(
     --skip-errors \
     --incremental \
     --lineups-output data/extracted/soccerbase_lineups_used.csv \
     --stats-output data/extracted/soccerbase_match_stats.csv \
     --cards-output data/extracted/soccerbase_cards_events.csv \
     --report-output outputs/soccerbase_extraction_report.csv
+  )
+  if [[ -n "${SOCCERBASE_URLS:-}" ]]; then
+    IFS='|' read -r -a SOCCERBASE_URL_LIST <<< "$SOCCERBASE_URLS"
+    for url in "${SOCCERBASE_URL_LIST[@]}"; do
+      SOCCERBASE_ARGS+=(--url "$url")
+    done
+  fi
+  if [[ -n "${SOCCERBASE_LOOKBACK_DAYS:-}" ]]; then
+    SOCCERBASE_ARGS+=(--incremental-lookback-days "$SOCCERBASE_LOOKBACK_DAYS")
+  fi
+  if [[ -n "${SOCCERBASE_MAX_TOURNAMENTS:-}" ]]; then
+    SOCCERBASE_ARGS+=(--max-tournaments "$SOCCERBASE_MAX_TOURNAMENTS")
+  fi
+  "$PYTHON" -X utf8 extract_soccerbase_match_data.py "${SOCCERBASE_ARGS[@]}"
 fi
 
 MODEL_OUT="outputs_worldcup2026_cards_${LABEL}"

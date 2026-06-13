@@ -722,11 +722,22 @@ def existing_soccerbase_game_ids(paths: Iterable[str]) -> set[str]:
             reader = csv.DictReader(handle)
             if "soccerbase_game_id" not in (reader.fieldnames or []):
                 continue
+            fieldnames = set(reader.fieldnames or [])
+            if not {"home_score", "away_score"}.issubset(fieldnames):
+                # Lineups/cards and older cache rows do not prove that final
+                # post-match data was fetched. They must not block a refresh.
+                continue
             for row in reader:
+                if not str(row.get("home_score", "")).strip() or not str(row.get("away_score", "")).strip():
+                    continue
                 game_id = str(row.get("soccerbase_game_id", "")).strip()
                 if game_id:
                     game_ids.add(game_id)
     return game_ids
+
+
+def has_completed_score(row: dict[str, object]) -> bool:
+    return bool(str(row.get("home_score", "")).strip() and str(row.get("away_score", "")).strip())
 
 
 def parsed_match_date(match: MatchRow) -> date | None:
@@ -775,18 +786,21 @@ def merge_rows(
     existing: list[dict[str, object]],
     new_rows: list[dict[str, object]],
     key_fields: list[str],
+    replace_blank_score: bool = False,
 ) -> list[dict[str, object]]:
     output = list(existing)
-    seen = {
-        tuple(str(row.get(field, "")).strip() for field in key_fields)
-        for row in existing
-    }
+    seen = {}
+    for index, row in enumerate(existing):
+        seen[tuple(str(row.get(field, "")).strip() for field in key_fields)] = index
     for row in new_rows:
         key = tuple(str(row.get(field, "")).strip() for field in key_fields)
         if key in seen:
+            existing_index = seen[key]
+            if replace_blank_score and has_completed_score(row) and not has_completed_score(output[existing_index]):
+                output[existing_index] = row
             continue
         output.append(row)
-        seen.add(key)
+        seen[key] = len(output) - 1
     return output
 
 
@@ -990,7 +1004,7 @@ def main() -> int:
             lineups,
             ["soccerbase_game_id", "team", "player_id", "player_name", "squad_status"],
         )
-        stats = merge_rows(existing_stats, stats, ["soccerbase_game_id"])
+        stats = merge_rows(existing_stats, stats, ["soccerbase_game_id"], replace_blank_score=True)
         cards = merge_rows(
             existing_cards,
             cards,
