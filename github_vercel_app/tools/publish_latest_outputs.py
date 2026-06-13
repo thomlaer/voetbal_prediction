@@ -335,6 +335,8 @@ def attach_actual_results(
         if actual:
             output.update(actual)
             output["round_status"] = "played"
+            output["new_model_score"] = ""
+            output["new_model_predicted_winner"] = ""
         else:
             output.update(
                 {
@@ -570,6 +572,16 @@ def main() -> None:
         previous_dashboard,
         snapshot_key,
     )
+    played_match_numbers = {
+        str(row.get("match_number", "")).strip()
+        for row in predictions
+        if row.get("actual_available") or row.get("actual_score")
+    }
+    changes = [
+        row
+        for row in changes
+        if str(row.get("match_number", "")).strip() not in played_match_numbers
+    ]
 
     compact_csv_source = run_dir / "scorito_scores_invullen_compact.csv"
 

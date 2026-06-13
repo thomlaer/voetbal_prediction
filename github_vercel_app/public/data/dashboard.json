@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-06-13 11:45",
+    "generated_at": "2026-06-13 12:33",
     "source_run": "outputs_worldcup2026_cards_draw05_20260613_check",
     "model_accuracy": 0.616046640755136,
     "exact_score_accuracy": 0.138811771238201,
@@ -80,8 +80,8 @@
       "model_predicted_winner": "South Korea",
       "filled_score": "1-1",
       "filled_predicted_winner": "Draw",
-      "new_model_score": "2-1",
-      "new_model_predicted_winner": "South Korea",
+      "new_model_score": "",
+      "new_model_predicted_winner": "",
       "round_locked": true,
       "round_status": "played",
       "score_source": "current_run",
@@ -123,8 +123,8 @@
       "model_predicted_winner": "Draw",
       "filled_score": "2-0",
       "filled_predicted_winner": "Canada",
-      "new_model_score": "1-1",
-      "new_model_predicted_winner": "Draw",
+      "new_model_score": "",
+      "new_model_predicted_winner": "",
       "round_locked": true,
       "round_status": "played",
       "score_source": "current_run",
@@ -166,7 +166,7 @@
       "model_predicted_winner": "United States",
       "filled_score": "1-0",
       "filled_predicted_winner": "United States",
-      "new_model_score": "4-1",
+      "new_model_score": "",
       "new_model_predicted_winner": "",
       "round_locked": true,
       "round_status": "played",
@@ -4493,42 +4493,6 @@
   ],
   "changes": [
     {
-      "match_number": "2",
-      "stage": "Group Stage",
-      "home_team_old": "South Korea",
-      "away_team_old": "Czech Republic",
-      "score_old": "1-1",
-      "predicted_winner_old": "Draw",
-      "home_team_new": "South Korea",
-      "away_team_new": "Czech Republic",
-      "score_new": "2-1",
-      "predicted_winner_new": "South Korea"
-    },
-    {
-      "match_number": "3",
-      "stage": "Group Stage",
-      "home_team_old": "Canada",
-      "away_team_old": "Bosnia and Herzegovina",
-      "score_old": "2-0",
-      "predicted_winner_old": "Canada",
-      "home_team_new": "Canada",
-      "away_team_new": "Bosnia and Herzegovina",
-      "score_new": "1-1",
-      "predicted_winner_new": "Draw"
-    },
-    {
-      "match_number": "4",
-      "stage": "Group Stage",
-      "home_team_old": "United States",
-      "away_team_old": "Paraguay",
-      "score_old": "1-0",
-      "predicted_winner_old": "United States",
-      "home_team_new": "United States",
-      "away_team_new": "Paraguay",
-      "score_new": "4-1",
-      "predicted_winner_new": "United States"
-    },
-    {
       "match_number": "8",
       "stage": "Group Stage",
       "home_team_old": "Australia",
@@ -4575,18 +4539,6 @@
       "away_team_new": "Ivory Coast",
       "score_new": "0-2",
       "predicted_winner_new": "Ivory Coast"
-    },
-    {
-      "match_number": "73",
-      "stage": "Round of 32",
-      "home_team_old": "South Korea",
-      "away_team_old": "Canada",
-      "score_old": "1-2",
-      "predicted_winner_old": "Canada",
-      "home_team_new": "South Korea",
-      "away_team_new": "Canada",
-      "score_new": "2-1",
-      "predicted_winner_new": "South Korea"
     }
   ],
   "champions": [
