@@ -62,6 +62,8 @@ type Champion = {
   champion_prob: number;
   advance_final_prob: number;
   advance_sf_prob: number;
+  advance_qf_prob?: number;
+  advance_r16_prob?: number;
 };
 
 type GroupStanding = {
@@ -71,6 +73,9 @@ type GroupStanding = {
   gd: string;
   rank: string;
   qualified_by_pick: string;
+  advance_r16_prob?: number | "";
+  advance_qf_prob?: number | "";
+  champion_prob?: number | "";
 };
 
 type TopScorer = {
@@ -127,9 +132,11 @@ async function loadDashboard(): Promise<DashboardData | null> {
   }
 }
 
-function pct(value?: number | null, digits = 1) {
-  if (value === undefined || value === null || Number.isNaN(value)) return "-";
-  return `${(value * 100).toFixed(digits)}%`;
+function pct(value?: number | string | null, digits = 1) {
+  if (value === undefined || value === null || value === "") return "-";
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return "-";
+  return `${(numeric * 100).toFixed(digits)}%`;
 }
 
 function confidenceClass(confidence: string) {
@@ -448,8 +455,6 @@ export default async function Home() {
                           <th>Wedstrijd</th>
                           <th>Score</th>
                           <th>Winnaar</th>
-                          <th>Kans</th>
-                          <th>Conf.</th>
                           <th>Nieuw</th>
                         </tr>
                       </thead>
@@ -468,12 +473,6 @@ export default async function Home() {
                               <span className="score">{displayScore(row)}</span>
                             </td>
                             <td>{row.filled_predicted_winner || row.predicted_winner}</td>
-                            <td className="mono">{pct(row.model_favourite_prob)}</td>
-                            <td>
-                              <span className={`pill ${confidenceClass(row.confidence)}`}>
-                                {row.confidence || "-"}
-                              </span>
-                            </td>
                             <td>
                               {row.new_model_score ? (
                                 <span className="new-score" title="Nieuwe score uit de laatste modelrun">
@@ -509,6 +508,15 @@ export default async function Home() {
                   <span className="pill">{rows.length} teams</span>
                 </div>
                 <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Team</th>
+                      <th>Pts</th>
+                      <th>GD</th>
+                      <th>Door</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {rows
                       .sort((a, b) => Number(a.rank) - Number(b.rank))
@@ -518,6 +526,7 @@ export default async function Home() {
                           <td>{row.team}</td>
                           <td className="mono">{row.points}p</td>
                           <td className="mono">GD {row.gd}</td>
+                          <td className="mono">{pct(row.advance_r16_prob)}</td>
                         </tr>
                       ))}
                   </tbody>

@@ -29,6 +29,10 @@ const TEAM_ALIASES = new Map(
     Curacao: "Curaçao",
     "D.R. Congo": "DR Congo",
     USA: "United States",
+    "Winner UEFA Playoff A": "Bosnia and Herzegovina",
+    "Winner UEFA Playoff B": "Sweden",
+    "Winner UEFA Playoff C": "Turkey",
+    "Winner UEFA Playoff D": "Czech Republic",
   }),
 );
 

@@ -179,6 +179,31 @@ def score_outcome(score: Any) -> str:
     return outcome_label(int(match.group(1)), int(match.group(2)))
 
 
+def score_winner(score: Any, home_team: Any, away_team: Any) -> str:
+    parsed = parse_score(score)
+    if parsed is None:
+        return ""
+    home_goals, away_goals = parsed
+    outcome = outcome_label(home_goals, away_goals)
+    if outcome == "home_win":
+        return str(home_team or "")
+    if outcome == "away_win":
+        return str(away_team or "")
+    return "Draw"
+
+
+def parse_score(score: Any) -> tuple[int, int] | None:
+    match = re.fullmatch(r"\s*(\d+)\s*-\s*(\d+)\s*", str(score or ""))
+    if not match:
+        return None
+    return int(match.group(1)), int(match.group(2))
+
+
+def is_placeholder_team(value: Any) -> bool:
+    text = str(value or "").strip().lower()
+    return not text or text == "nan" or text.startswith("winner ") or text.startswith("group ")
+
+
 def load_worldcup_actuals(results_path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
     actuals: dict[tuple[str, str, str], dict[str, Any]] = {}
     if not results_path.exists():
@@ -268,12 +293,28 @@ def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
     )
 
 
+def load_locked_scores(path: Path) -> dict[str, dict[str, Any]]:
+    locked: dict[str, dict[str, Any]] = {}
+    for row in read_csv(path):
+        match_number = str(row.get("match_number", "")).strip()
+        score = str(row.get("score", "")).strip()
+        if not match_number or parse_score(score) is None:
+            continue
+        locked[match_number] = {
+            "score": score,
+            "predicted_winner": str(row.get("predicted_winner", "")).strip(),
+            "note": row.get("note", ""),
+        }
+    return locked
+
+
 def attach_actual_results(
     predictions: list[dict[str, Any]],
     results_path: Path,
     soccerbase_stats_path: Path,
     previous_dashboard: dict[str, Any],
     snapshot_key: int | None,
+    locked_scores: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     actuals = load_soccerbase_actuals(soccerbase_stats_path)
     actuals.update(load_worldcup_actuals(results_path))
@@ -283,11 +324,22 @@ def attach_actual_results(
         for row in previous_rows
         if isinstance(row, dict) and str(row.get("match_number", ""))
     }
+    previous_by_match = {
+        str(row.get("match_number", "")).strip(): row
+        for row in previous_rows
+        if isinstance(row, dict) and str(row.get("match_number", "")).strip()
+    }
     starts = stage_start_keys(predictions)
 
     enriched: list[dict[str, Any]] = []
     for row in predictions:
         output = dict(row)
+        previous_same_slot = previous_by_match.get(str(output.get("match_number", "")).strip(), {})
+        if previous_same_slot:
+            if is_placeholder_team(output.get("home_team")) and not is_placeholder_team(previous_same_slot.get("home_team")):
+                output["home_team"] = previous_same_slot.get("home_team", output.get("home_team"))
+            if is_placeholder_team(output.get("away_team")) and not is_placeholder_team(previous_same_slot.get("away_team")):
+                output["away_team"] = previous_same_slot.get("away_team", output.get("away_team"))
         previous = previous_by_key.get(prediction_key(output), {})
         model_score = output.get("score", "")
         model_winner = output.get("predicted_winner", "")
@@ -373,6 +425,23 @@ def attach_actual_results(
             )
             output["pre_match_source"] = previous.get("pre_match_source") or "previous_dashboard"
 
+        locked_score = locked_scores.get(str(output.get("match_number", "")).strip())
+        if locked_score:
+            manual_score = locked_score["score"]
+            manual_winner = locked_score.get("predicted_winner") or score_winner(
+                manual_score,
+                output.get("home_team", ""),
+                output.get("away_team", ""),
+            )
+            output["filled_score"] = manual_score
+            output["filled_predicted_winner"] = manual_winner
+            output["score"] = manual_score
+            output["predicted_winner"] = manual_winner
+            output["pre_match_score"] = manual_score
+            output["pre_match_predicted_winner"] = manual_winner
+            output["score_source"] = "manual_locked_score"
+            output["pre_match_source"] = "manual_locked_score"
+
         if output["actual_available"]:
             predicted_score = output.get("pre_match_score", "")
             predicted_outcome = score_outcome(predicted_score)
@@ -415,6 +484,82 @@ def write_csv(rows: list[dict[str, Any]], destination: Path) -> str:
         writer.writeheader()
         writer.writerows(rows)
     return "/" + destination.relative_to(public_root).as_posix()
+
+
+def build_group_standings(predictions: list[dict[str, Any]], champions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    champion_by_team = {normalize_key(row.get("team")): row for row in champions}
+    standings: dict[str, dict[str, dict[str, Any]]] = {}
+    for row in predictions:
+        if str(row.get("stage", "")) != "Group Stage":
+            continue
+        group = str(row.get("group", "") or "-")
+        home = str(row.get("home_team", "")).strip()
+        away = str(row.get("away_team", "")).strip()
+        if is_placeholder_team(home) or is_placeholder_team(away):
+            continue
+        score = row.get("actual_score") if row.get("actual_available") or row.get("actual_score") else row.get("filled_score") or row.get("score")
+        parsed = parse_score(score)
+        if parsed is None:
+            continue
+        home_goals, away_goals = parsed
+        group_rows = standings.setdefault(group, {})
+        for team in (home, away):
+            group_rows.setdefault(
+                team,
+                {
+                    "group": group,
+                    "team": team,
+                    "played": 0,
+                    "wins": 0,
+                    "draws": 0,
+                    "losses": 0,
+                    "gf": 0,
+                    "ga": 0,
+                    "gd": 0,
+                    "points": 0,
+                },
+            )
+        home_row = group_rows[home]
+        away_row = group_rows[away]
+        home_row["played"] += 1
+        away_row["played"] += 1
+        home_row["gf"] += home_goals
+        home_row["ga"] += away_goals
+        away_row["gf"] += away_goals
+        away_row["ga"] += home_goals
+        if home_goals > away_goals:
+            home_row["wins"] += 1
+            away_row["losses"] += 1
+            home_row["points"] += 3
+        elif home_goals < away_goals:
+            away_row["wins"] += 1
+            home_row["losses"] += 1
+            away_row["points"] += 3
+        else:
+            home_row["draws"] += 1
+            away_row["draws"] += 1
+            home_row["points"] += 1
+            away_row["points"] += 1
+
+    output: list[dict[str, Any]] = []
+    for group in sorted(standings):
+        rows = list(standings[group].values())
+        for row in rows:
+            row["gd"] = int(row["gf"]) - int(row["ga"])
+        rows.sort(key=lambda item: (-int(item["points"]), -int(item["gd"]), -int(item["gf"]), str(item["team"])))
+        for rank, row in enumerate(rows, 1):
+            team_probs = champion_by_team.get(normalize_key(row["team"]), {})
+            output.append(
+                {
+                    **row,
+                    "rank": rank,
+                    "qualified_by_pick": rank <= 2,
+                    "advance_r16_prob": team_probs.get("advance_r16_prob", ""),
+                    "advance_qf_prob": team_probs.get("advance_qf_prob", ""),
+                    "champion_prob": team_probs.get("champion_prob", ""),
+                }
+            )
+    return output
 
 
 def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -565,12 +710,14 @@ def main() -> None:
         latest_match_date = max(dates) if dates else ""
 
     soccerbase_stats_path = model_root / "data" / "extracted" / "soccerbase_match_stats.csv"
+    locked_scores = load_locked_scores(model_root / "data" / "extracted" / "scorito_locked_scores.csv")
     predictions = attach_actual_results(
         predictions,
         results_path,
         soccerbase_stats_path,
         previous_dashboard,
         snapshot_key,
+        locked_scores,
     )
     played_match_numbers = {
         str(row.get("match_number", "")).strip()
@@ -583,7 +730,8 @@ def main() -> None:
         if str(row.get("match_number", "")).strip() not in played_match_numbers
     ]
 
-    compact_csv_source = run_dir / "scorito_scores_invullen_compact.csv"
+    champions = read_csv(run_dir / "scorito_champion_picks.csv")
+    group_standings = build_group_standings(predictions, champions)
 
     downloads = {
         "compact_excel": copy_first_existing(
@@ -606,12 +754,7 @@ def main() -> None:
             run_dir / "WK2026_Voorspellingen.xlsx",
             public_files / "WK2026_Voorspellingen_latest.xlsx",
         ),
-        "compact_csv": copy_if_exists(
-            compact_csv_source,
-            public_files / "scorito_scores_invullen_compact_latest.csv",
-        )
-        if compact_csv_source.exists()
-        else write_csv(
+        "compact_csv": write_csv(
             predictions,
             public_files / "scorito_scores_invullen_compact_latest.csv",
         ),
@@ -657,8 +800,8 @@ def main() -> None:
         "downloads": downloads,
         "predictions": predictions,
         "changes": changes,
-        "champions": read_csv(run_dir / "scorito_champion_picks.csv"),
-        "group_standings": read_csv(run_dir / "scorito_group_standings.csv"),
+        "champions": champions,
+        "group_standings": group_standings,
         "top_scorers": read_csv(run_dir / "scorito_topscorer_picks.csv"),
         "group_top_scorers": read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv"),
         "sources": sources,
