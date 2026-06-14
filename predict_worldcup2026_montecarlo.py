@@ -111,8 +111,11 @@ def load_actual_results(path: Path) -> dict[tuple[str, str, str], dict[str, Any]
 
 def apply_actual_results(fixtures: pd.DataFrame, results_path: Path) -> pd.DataFrame:
     fixtures = fixtures.copy()
-    for column in ["actual_available", "actual_home_score", "actual_away_score", "actual_score", "actual_outcome", "actual_winner"]:
-        fixtures[column] = False if column == "actual_available" else np.nan
+    fixtures["actual_available"] = False
+    fixtures["actual_home_score"] = np.nan
+    fixtures["actual_away_score"] = np.nan
+    for column in ["actual_score", "actual_outcome", "actual_winner"]:
+        fixtures[column] = pd.Series([""] * len(fixtures), index=fixtures.index, dtype="object")
 
     lookup = load_actual_results(results_path)
     if not lookup:
