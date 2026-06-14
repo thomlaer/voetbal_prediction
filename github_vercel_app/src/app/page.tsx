@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { RebuildControl } from "./RebuildControl";
 
 type Prediction = {
   match_number: string;
@@ -281,6 +282,7 @@ export default async function Home() {
           </a>
           <nav className="nav" aria-label="Dashboard">
             <a href="#wijzigingen">Wijzigingen</a>
+            <a href="#update">Update</a>
             <a href="#gespeeld">Gespeeld</a>
             <a href="#rondes">Rondes</a>
             <a href="#groepen">Groepen</a>
@@ -320,6 +322,18 @@ export default async function Home() {
             <div className="metric-value">{pct(data.metadata.exact_score_accuracy)}</div>
             <div className="metric-note">historische testset</div>
           </div>
+        </section>
+
+        <section id="update" className="section">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Update Starten</h2>
+              <p className="section-subtitle">
+                Start dezelfde GitHub rebuild als via Actions, inclusief Soccerbase refresh en Vercel deploy.
+              </p>
+            </div>
+          </div>
+          <RebuildControl />
         </section>
 
         <section id="wijzigingen" className="section">

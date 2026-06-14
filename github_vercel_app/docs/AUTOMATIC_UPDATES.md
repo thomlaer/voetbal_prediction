@@ -2,7 +2,7 @@
 
 Current status:
 
-- The live Vercel site does not update by itself yet.
+- The live Vercel site can start a rebuild through the `Update Starten` panel after the Vercel secrets below are configured.
 - The dashboard is static. It changes only after a rebuild publishes new files into `github_vercel_app/public/data` and `github_vercel_app/public/files`, followed by a Vercel deploy.
 - The current live project is `github_vercel_app` on team `team_jh9eoFaaEJ7cf2PpE3kDcIT7`.
 - The current project id is `prj_QGNrk1fttELfP2oKVfE8BalQbm5v`.
@@ -23,6 +23,19 @@ VERCEL_TOKEN=your Vercel token
 VERCEL_ORG_ID=team_jh9eoFaaEJ7cf2PpE3kDcIT7
 VERCEL_PROJECT_ID=prj_QGNrk1fttELfP2oKVfE8BalQbm5v
 ```
+
+Required Vercel environment variables for the website update button:
+
+```text
+REBUILD_ACTION_CODE=your private dashboard code
+GITHUB_ACTIONS_TOKEN=GitHub fine-grained token with Actions write access for thomlaer/voetbal_prediction
+GITHUB_ACTIONS_REPO=thomlaer/voetbal_prediction
+GITHUB_ACTIONS_WORKFLOW=rebuild-predictions.yml
+GITHUB_ACTIONS_REF=main
+```
+
+The website button sends a GitHub `workflow_dispatch` request to `.github/workflows/rebuild-predictions.yml`.
+It does not expose `GITHUB_ACTIONS_TOKEN` to the browser.
 
 Workflows:
 
