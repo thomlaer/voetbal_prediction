@@ -29,6 +29,12 @@ if [[ "${SKIP_ODDS:-0}" != "1" ]]; then
 fi
 
 if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    SOCCERBASE_URLS="${SOCCERBASE_URLS:-https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73}"
+    SOCCERBASE_LOOKBACK_DAYS="${SOCCERBASE_LOOKBACK_DAYS:-7}"
+    SOCCERBASE_MAX_TOURNAMENTS="${SOCCERBASE_MAX_TOURNAMENTS:-1}"
+    SOCCERBASE_MAX_FETCH_GAMES="${SOCCERBASE_MAX_FETCH_GAMES:-40}"
+  fi
   SOCCERBASE_ARGS=(
     --skip-errors \
     --incremental \
@@ -49,6 +55,10 @@ if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   if [[ -n "${SOCCERBASE_MAX_TOURNAMENTS:-}" ]]; then
     SOCCERBASE_ARGS+=(--max-tournaments "$SOCCERBASE_MAX_TOURNAMENTS")
   fi
+  if [[ -n "${SOCCERBASE_MAX_FETCH_GAMES:-}" ]]; then
+    SOCCERBASE_ARGS+=(--max-fetch-games "$SOCCERBASE_MAX_FETCH_GAMES")
+  fi
+  echo "Soccerbase refresh args: ${SOCCERBASE_ARGS[*]}"
   "$PYTHON" -X utf8 extract_soccerbase_match_data.py "${SOCCERBASE_ARGS[@]}"
 fi
 

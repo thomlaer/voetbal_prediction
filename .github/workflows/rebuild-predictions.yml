@@ -79,6 +79,7 @@ jobs:
           SOCCERBASE_URLS: "https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73"
           SOCCERBASE_LOOKBACK_DAYS: "7"
           SOCCERBASE_MAX_TOURNAMENTS: "1"
+          SOCCERBASE_MAX_FETCH_GAMES: "40"
         run: bash github_vercel_app/scripts/rebuild_predictions.sh
 
       - name: Build Vercel app

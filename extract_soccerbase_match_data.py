@@ -95,6 +95,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-tournaments", type=int, default=0)
     parser.add_argument("--max-games", type=int, default=0)
     parser.add_argument(
+        "--max-fetch-games",
+        type=int,
+        default=0,
+        help="Cap the number of missing games fetched after incremental filtering. Use 0 for no cap.",
+    )
+    parser.add_argument(
         "--incremental",
         action="store_true",
         help="Preserve existing output CSV rows and only fetch Soccerbase game ids that are not present yet.",
@@ -908,6 +914,12 @@ def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> t
             skip_game_ids or set(),
             args.incremental_lookback_days,
         )
+        if args.max_fetch_games and len(matches) > args.max_fetch_games:
+            matches = sorted(
+                matches,
+                key=lambda match: (parsed_match_date(match) or date.min, match.soccerbase_game_id),
+                reverse=True,
+            )[: args.max_fetch_games]
         report_rows.append(
             {
                 "url": "",
