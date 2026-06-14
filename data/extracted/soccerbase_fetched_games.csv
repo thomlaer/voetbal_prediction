@@ -8741,3 +8741,7 @@ soccerbase_game_id,date,home_team,away_team,status
 957946,2026-05-30,Jamaica,Nigeria,lineup_fetched
 948898,2026-06-12,Canada,Bosnia-HZ.,lineup_fetched
 948899,2026-06-13,USA,Paraguay,lineup_fetched
+948900,2026-06-13,Qatar,Switzerland,lineup_fetched
+948902,2026-06-14,Haiti,Scotland,lineup_fetched
+948901,2026-06-13,Brazil,Morocco,lineup_fetched
+948903,2026-06-14,Australia,Turkey,lineup_fetched
