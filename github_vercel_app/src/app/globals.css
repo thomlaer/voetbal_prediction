@@ -136,6 +136,14 @@ a {
   line-height: 1.35;
 }
 
+.prob-note {
+  margin-top: 4px;
+  color: #24464d;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .section {
   margin-top: 18px;
   padding: 18px 0 0;

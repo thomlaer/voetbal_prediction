@@ -236,6 +236,16 @@ function displayScore(row: Prediction) {
   return row.filled_score || row.pre_match_score || row.score;
 }
 
+function hasOutcomeProbabilities(row: Prediction) {
+  return [row.prob_home_win, row.prob_draw, row.prob_away_win].some(
+    (value) => value !== undefined && value !== null,
+  );
+}
+
+function probabilityLine(row: Prediction) {
+  return `Thuis ${pct(row.prob_home_win)} · Gelijk ${pct(row.prob_draw)} · Uit ${pct(row.prob_away_win)}`;
+}
+
 function grouped<T extends { group: string }>(items: T[]) {
   return items.reduce<Record<string, T[]>>((acc, item) => {
     const key = item.group || "-";
@@ -329,7 +339,7 @@ export default async function Home() {
             <div>
               <h2 className="section-title">Update Starten</h2>
               <p className="section-subtitle">
-                Start dezelfde GitHub rebuild als via Actions, inclusief Soccerbase refresh en Vercel deploy.
+                Start een nieuwe modelrun zodra je nieuwe uitslagen wilt verwerken.
               </p>
             </div>
           </div>
@@ -482,6 +492,9 @@ export default async function Home() {
                                 {row.group ? `Poule ${row.group}` : stageLabel(row.stage)} - {row.date}
                                 {isPlayed(row) ? ` - uitslag ${row.actual_score}` : ""}
                               </div>
+                              {!isPlayed(row) && hasOutcomeProbabilities(row) ? (
+                                <div className="prob-note">{probabilityLine(row)}</div>
+                              ) : null}
                             </td>
                             <td>
                               <span className="score">{displayScore(row)}</span>
@@ -575,6 +588,7 @@ export default async function Home() {
                     <td>{row.stage}</td>
                     <td>
                       <strong>{row.home_team}</strong> - {row.away_team}
+                      {hasOutcomeProbabilities(row) ? <div className="prob-note">{probabilityLine(row)}</div> : null}
                     </td>
                     <td>
                       <span className="score">{row.score}</span>
