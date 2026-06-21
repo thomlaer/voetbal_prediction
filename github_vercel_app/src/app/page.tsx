@@ -258,8 +258,24 @@ function displayScore(row: Prediction) {
   return row.filled_score || row.pre_match_score || row.score;
 }
 
+function winnerFromScore(row: Prediction) {
+  const match = String(displayScore(row) || "").match(/^(\d+)-(\d+)$/);
+  if (!match) return "";
+  const homeGoals = Number(match[1]);
+  const awayGoals = Number(match[2]);
+  if (homeGoals > awayGoals) return row.home_team;
+  if (awayGoals > homeGoals) return row.away_team;
+  return "Draw";
+}
+
 function displayWinner(row: Prediction) {
-  return row.filled_predicted_winner || row.pre_match_predicted_winner || row.predicted_winner;
+  return (
+    winnerFromScore(row) ||
+    row.predicted_winner ||
+    row.model_predicted_winner ||
+    row.filled_predicted_winner ||
+    row.pre_match_predicted_winner
+  );
 }
 
 function matchupLabel(row: Prediction) {
@@ -545,7 +561,7 @@ export default async function Home() {
                             <td>
                               <span className="score">{displayScore(row)}</span>
                             </td>
-                            <td>{row.filled_predicted_winner || row.predicted_winner}</td>
+                            <td>{displayWinner(row)}</td>
                             <td>
                               {row.new_model_score ? (
                                 <span className="new-score" title="Nieuwe score uit de laatste modelrun">

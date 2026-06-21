@@ -16,6 +16,7 @@ from typing import Any
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_ROOT = APP_ROOT.parent
+DEFAULT_CARDS_PATH = DEFAULT_MODEL_ROOT / "data" / "extracted" / "soccerbase_cards_events.csv"
 STAGE_ORDER = [
     "Group Stage",
     "Round of 32",
@@ -252,6 +253,92 @@ def parse_score(score: Any) -> tuple[int, int] | None:
 def is_placeholder_team(value: Any) -> bool:
     text = str(value or "").strip().lower()
     return not text or text == "nan" or text.startswith("winner ") or text.startswith("group ")
+
+
+def head_to_head_stats(
+    teams: set[str],
+    matches: list[tuple[str, str, int, int]],
+) -> dict[str, dict[str, int]]:
+    stats = {
+        team: {"h2h_points": 0, "h2h_gd": 0, "h2h_gf": 0}
+        for team in teams
+    }
+    for home, away, home_goals, away_goals in matches:
+        if home not in teams or away not in teams:
+            continue
+        stats[home]["h2h_gf"] += home_goals
+        stats[away]["h2h_gf"] += away_goals
+        stats[home]["h2h_gd"] += home_goals - away_goals
+        stats[away]["h2h_gd"] += away_goals - home_goals
+        if home_goals > away_goals:
+            stats[home]["h2h_points"] += 3
+        elif away_goals > home_goals:
+            stats[away]["h2h_points"] += 3
+        else:
+            stats[home]["h2h_points"] += 1
+            stats[away]["h2h_points"] += 1
+    return stats
+
+
+def card_conduct_points(card_type: Any) -> int:
+    text = str(card_type or "").strip().lower()
+    if "red" in text:
+        return -4
+    if "yellow" in text:
+        return -1
+    return 0
+
+
+def load_fair_play_points(path: Path = DEFAULT_CARDS_PATH) -> dict[str, int]:
+    if not path.exists():
+        return {}
+    points: dict[str, int] = {}
+    for row in read_csv(path):
+        if not str(row.get("date", "")).startswith("2026-"):
+            continue
+        if "world cup" not in str(row.get("competition", "")).lower():
+            continue
+        if "group" not in str(row.get("stage", "")).lower():
+            continue
+        team_key = normalize_key(row.get("team", ""))
+        if not team_key:
+            continue
+        points[team_key] = points.get(team_key, 0) + card_conduct_points(row.get("card_type"))
+    return points
+
+
+def rank_group_rows(
+    rows: list[dict[str, Any]],
+    matches: list[tuple[str, str, int, int]],
+    fair_play_points: dict[str, int] | None = None,
+) -> list[dict[str, Any]]:
+    ranked: list[dict[str, Any]] = []
+    fair_play_points = fair_play_points or {}
+    point_buckets: dict[int, list[dict[str, Any]]] = {}
+    for row in rows:
+        point_buckets.setdefault(int(row["points"]), []).append(row)
+
+    for points in sorted(point_buckets, reverse=True):
+        tied = point_buckets[points]
+        if len(tied) == 1:
+            ranked.extend(tied)
+            continue
+
+        tied_teams = {str(row["team"]) for row in tied}
+        h2h = head_to_head_stats(tied_teams, matches)
+        tied.sort(
+            key=lambda item: (
+                -int(h2h[str(item["team"])]["h2h_points"]),
+                -int(h2h[str(item["team"])]["h2h_gd"]),
+                -int(h2h[str(item["team"])]["h2h_gf"]),
+                -int(item["gd"]),
+                -int(item["gf"]),
+                -int(fair_play_points.get(normalize_key(item["team"]), 0)),
+                str(item["team"]),
+            )
+        )
+        ranked.extend(tied)
+    return ranked
 
 
 def load_worldcup_actuals(results_path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
@@ -543,7 +630,9 @@ def write_csv(rows: list[dict[str, Any]], destination: Path) -> str:
 
 def build_group_standings(predictions: list[dict[str, Any]], champions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     champion_by_team = {normalize_key(row.get("team")): row for row in champions}
+    fair_play_points = load_fair_play_points()
     standings: dict[str, dict[str, dict[str, Any]]] = {}
+    matches_by_group: dict[str, list[tuple[str, str, int, int]]] = {}
     for row in predictions:
         if str(row.get("stage", "")) != "Group Stage":
             continue
@@ -557,6 +646,7 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         if parsed is None:
             continue
         home_goals, away_goals = parsed
+        matches_by_group.setdefault(group, []).append((home, away, home_goals, away_goals))
         group_rows = standings.setdefault(group, {})
         for team in (home, away):
             group_rows.setdefault(
@@ -601,7 +691,7 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         rows = list(standings[group].values())
         for row in rows:
             row["gd"] = int(row["gf"]) - int(row["ga"])
-        rows.sort(key=lambda item: (-int(item["points"]), -int(item["gd"]), -int(item["gf"]), str(item["team"])))
+        rows = rank_group_rows(rows, matches_by_group.get(group, []), fair_play_points)
         for rank, row in enumerate(rows, 1):
             team_probs = champion_by_team.get(normalize_key(row["team"]), {})
             output.append(

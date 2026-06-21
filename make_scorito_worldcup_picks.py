@@ -36,6 +36,7 @@ DEFAULT_SCHEDULE = Path("data/extracted/oddsportal_worldcup2026_fixture_odds_sch
 DEFAULT_SQUADS = Path("data/extracted/wikipedia_worldcup2026_squads_finalish.csv")
 DEFAULT_SOFIFA = Path("data/extracted/sofifa_yearly_player_ratings.csv")
 DEFAULT_GOALSCORERS = Path("data/goalscorers.csv")
+DEFAULT_CARDS = Path("data/extracted/soccerbase_cards_events.csv")
 
 
 OUTCOME_COLUMNS = ["prob_home_win", "prob_draw", "prob_away_win"]
@@ -112,6 +113,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--squads", type=Path, default=DEFAULT_SQUADS)
     parser.add_argument("--sofifa", type=Path, default=DEFAULT_SOFIFA)
     parser.add_argument("--goalscorers", type=Path, default=DEFAULT_GOALSCORERS)
+    parser.add_argument("--cards", type=Path, default=DEFAULT_CARDS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--max-goals", type=int, default=6)
     parser.add_argument("--close-margin", type=float, default=0.10)
@@ -297,6 +299,93 @@ def oriented_score(home_goals: int, away_goals: int, outcome: str) -> str:
 def score_parts(score: str) -> tuple[int, int]:
     home, away = str(score).split("-", 1)
     return int(home), int(away)
+
+
+def head_to_head_stats(
+    teams: set[str],
+    matches: list[tuple[str, str, int, int]],
+) -> dict[str, dict[str, int]]:
+    stats = {
+        team: {"h2h_points": 0, "h2h_gd": 0, "h2h_gf": 0}
+        for team in teams
+    }
+    for home, away, home_goals, away_goals in matches:
+        if home not in teams or away not in teams:
+            continue
+        stats[home]["h2h_gf"] += home_goals
+        stats[away]["h2h_gf"] += away_goals
+        stats[home]["h2h_gd"] += home_goals - away_goals
+        stats[away]["h2h_gd"] += away_goals - home_goals
+        if home_goals > away_goals:
+            stats[home]["h2h_points"] += 3
+        elif away_goals > home_goals:
+            stats[away]["h2h_points"] += 3
+        else:
+            stats[home]["h2h_points"] += 1
+            stats[away]["h2h_points"] += 1
+    return stats
+
+
+def card_conduct_points(card_type: Any) -> int:
+    text = str(card_type or "").strip().lower()
+    if "red" in text:
+        return -4
+    if "yellow" in text:
+        return -1
+    return 0
+
+
+def load_fair_play_points(path: Path) -> dict[str, int]:
+    if not path.exists():
+        return {}
+    cards = pd.read_csv(path)
+    required = {"date", "competition", "stage", "team", "card_type"}
+    if not required.issubset(cards.columns):
+        return {}
+    cards = cards[
+        cards["date"].astype(str).str.startswith("2026-")
+        & cards["competition"].astype(str).str.contains("world cup", case=False, na=False)
+        & cards["stage"].astype(str).str.contains("group", case=False, na=False)
+    ].copy()
+    if cards.empty:
+        return {}
+    cards["team_key"] = cards["team"].map(normalize_name)
+    cards["conduct_points"] = cards["card_type"].map(card_conduct_points)
+    return cards.groupby("team_key")["conduct_points"].sum().astype(int).to_dict()
+
+
+def rank_group_rows(
+    rows: list[dict[str, Any]],
+    matches: list[tuple[str, str, int, int]],
+    fair_play_points: dict[str, int] | None = None,
+) -> list[dict[str, Any]]:
+    ranked: list[dict[str, Any]] = []
+    fair_play_points = fair_play_points or {}
+    point_buckets: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        point_buckets[int(row["points"])].append(row)
+
+    for points in sorted(point_buckets, reverse=True):
+        tied = point_buckets[points]
+        if len(tied) == 1:
+            ranked.extend(tied)
+            continue
+
+        tied_teams = {str(row["team"]) for row in tied}
+        h2h = head_to_head_stats(tied_teams, matches)
+        tied.sort(
+            key=lambda row: (
+                -int(h2h[str(row["team"])]["h2h_points"]),
+                -int(h2h[str(row["team"])]["h2h_gd"]),
+                -int(h2h[str(row["team"])]["h2h_gf"]),
+                -int(row["gd"]),
+                -int(row["gf"]),
+                -int(fair_play_points.get(normalize_name(row["team"]), 0)),
+                str(row["team"]),
+            )
+        )
+        ranked.extend(tied)
+    return ranked
 
 
 def upside_score(row: pd.Series) -> tuple[str, str]:
@@ -535,11 +624,12 @@ def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
     return output
 
 
-def group_standings_from_picks(pool: pd.DataFrame) -> pd.DataFrame:
+def group_standings_from_picks(pool: pd.DataFrame, fair_play_points: dict[str, int] | None = None) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     group_matches = pool[pool["stage"].eq("Group Stage")].copy()
     for group, matches in group_matches.groupby("group"):
         table: dict[str, dict[str, Any]] = {}
+        match_results: list[tuple[str, str, int, int]] = []
         teams = sorted(set(matches["home_team"]).union(matches["away_team"]))
         for team in teams:
             table[team] = {
@@ -559,6 +649,7 @@ def group_standings_from_picks(pool: pd.DataFrame) -> pd.DataFrame:
             away = match.away_team
             hg = int(match.home_score)
             ag = int(match.away_score)
+            match_results.append((home, away, hg, ag))
             table[home]["played"] += 1
             table[away]["played"] += 1
             table[home]["gf"] += hg
@@ -580,7 +671,7 @@ def group_standings_from_picks(pool: pd.DataFrame) -> pd.DataFrame:
                 table[away]["points"] += 1
         for team_data in table.values():
             team_data["gd"] = team_data["gf"] - team_data["ga"]
-        ranked = sorted(table.values(), key=lambda r: (r["points"], r["gd"], r["gf"], r["wins"]), reverse=True)
+        ranked = rank_group_rows(list(table.values()), match_results, fair_play_points)
         for rank, row in enumerate(ranked, start=1):
             row["rank"] = rank
             row["qualified_by_pick"] = rank <= 2
@@ -1004,7 +1095,8 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     pool = build_pool_predictions(args)
-    group_tables = group_standings_from_picks(pool)
+    fair_play_points = load_fair_play_points(args.cards)
+    group_tables = group_standings_from_picks(pool, fair_play_points)
     team_probs = pd.read_csv(args.team_probabilities)
     champion = champion_picks(team_probs)
     spain_france = spain_france_check(team_probs)

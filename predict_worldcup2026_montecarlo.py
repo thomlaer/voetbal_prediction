@@ -25,6 +25,7 @@ DEFAULT_SCHEDULE = Path("data/extracted/oddsportal_worldcup2026_fixture_odds_sch
 DEFAULT_MODEL_PREDICTIONS = Path("outputs_worldcup2026_default/future_predictions_xgboost.csv")
 DEFAULT_RANKINGS = Path("fifa_ranking-2026-04-01.csv")
 DEFAULT_RESULTS = Path("data/results.csv")
+DEFAULT_CARDS = Path("data/extracted/soccerbase_cards_events.csv")
 DEFAULT_OUTPUT_DIR = Path("outputs_worldcup2026_default")
 OUTCOMES = np.array(["away_win", "draw", "home_win"], dtype=object)
 
@@ -142,6 +143,34 @@ def apply_actual_results(fixtures: pd.DataFrame, results_path: Path) -> pd.DataF
         fixtures.at[idx, "sim_prob_away_win"] = 1.0 if actual["actual_outcome"] == "away_win" else 0.0
         fixtures.at[idx, "sim_predicted_outcome"] = actual["actual_outcome"]
     return fixtures
+
+
+def card_conduct_points(card_type: Any) -> int:
+    text = str(card_type or "").strip().lower()
+    if "red" in text:
+        return -4
+    if "yellow" in text:
+        return -1
+    return 0
+
+
+def load_fair_play_points(path: Path) -> dict[str, int]:
+    if not path.exists():
+        return {}
+    cards = pd.read_csv(path)
+    required = {"date", "competition", "stage", "team", "card_type"}
+    if not required.issubset(cards.columns):
+        return {}
+    cards = cards[
+        cards["date"].astype(str).str.startswith("2026-")
+        & cards["competition"].astype(str).str.contains("world cup", case=False, na=False)
+        & cards["stage"].astype(str).str.contains("group", case=False, na=False)
+    ].copy()
+    if cards.empty:
+        return {}
+    cards["team_key"] = cards["team"].map(normalize_name)
+    cards["conduct_points"] = cards["card_type"].map(card_conduct_points)
+    return cards.groupby("team_key")["conduct_points"].sum().astype(int).to_dict()
 
 
 def merge_schedule_predictions(
@@ -279,18 +308,64 @@ def add_match(table: dict[str, dict[str, float]], home: str, away: str, home_goa
         table[away]["draws"] += 1
 
 
-def rank_group(table: dict[str, dict[str, float]], rng: np.random.Generator) -> list[str]:
-    return sorted(
-        table,
-        key=lambda team: (
-            table[team]["points"],
-            table[team]["gd"],
-            table[team]["gf"],
-            table[team]["wins"],
-            rng.random(),
-        ),
-        reverse=True,
-    )
+def head_to_head_stats(
+    teams: set[str],
+    matches: list[tuple[str, str, int, int]],
+) -> dict[str, dict[str, int]]:
+    stats = {
+        team: {"h2h_points": 0, "h2h_gd": 0, "h2h_gf": 0}
+        for team in teams
+    }
+    for home, away, home_goals, away_goals in matches:
+        if home not in teams or away not in teams:
+            continue
+        stats[home]["h2h_gf"] += home_goals
+        stats[away]["h2h_gf"] += away_goals
+        stats[home]["h2h_gd"] += home_goals - away_goals
+        stats[away]["h2h_gd"] += away_goals - home_goals
+        if home_goals > away_goals:
+            stats[home]["h2h_points"] += 3
+        elif away_goals > home_goals:
+            stats[away]["h2h_points"] += 3
+        else:
+            stats[home]["h2h_points"] += 1
+            stats[away]["h2h_points"] += 1
+    return stats
+
+
+def rank_group(
+    table: dict[str, dict[str, float]],
+    rng: np.random.Generator,
+    matches: list[tuple[str, str, int, int]] | None = None,
+    fair_play_points: dict[str, int] | None = None,
+) -> list[str]:
+    ranked: list[str] = []
+    fair_play_points = fair_play_points or {}
+    point_buckets: dict[int, list[str]] = {}
+    for team, stats in table.items():
+        point_buckets.setdefault(int(stats["points"]), []).append(team)
+
+    for points in sorted(point_buckets, reverse=True):
+        tied = point_buckets[points]
+        if len(tied) == 1:
+            ranked.extend(tied)
+            continue
+
+        h2h = head_to_head_stats(set(tied), matches or [])
+        tied.sort(
+            key=lambda team: (
+                h2h[team]["h2h_points"],
+                h2h[team]["h2h_gd"],
+                h2h[team]["h2h_gf"],
+                table[team]["gd"],
+                table[team]["gf"],
+                fair_play_points.get(normalize_name(team), 0),
+                rng.random(),
+            ),
+            reverse=True,
+        )
+        ranked.extend(tied)
+    return ranked
 
 
 def build_team_strength(
@@ -377,6 +452,7 @@ def simulate_tournament(
     strength: dict[str, float],
     simulations: int,
     seed: int,
+    fair_play_points: dict[str, int] | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     group_fixtures = fixtures[fixtures["stage"].eq("Group Stage")].sort_values("match_number")
@@ -414,6 +490,7 @@ def simulate_tournament(
             for group, group_rows in group_fixtures.groupby("group")
         }
         tables = {group: init_table(team_set) for group, team_set in grouped_teams.items()}
+        group_results = {group: [] for group in grouped_teams}
         for row in group_fixtures.itertuples(index=False):
             if bool(getattr(row, "actual_available", False)):
                 home_goals = int(getattr(row, "actual_home_score"))
@@ -429,11 +506,12 @@ def simulate_tournament(
                     outcome_id,
                 )
             add_match(tables[row.group], row.home_team, row.away_team, home_goals, away_goals)
+            group_results[row.group].append((row.home_team, row.away_team, home_goals, away_goals))
 
         group_order: dict[str, list[str]] = {}
         third_order: list[tuple[str, str, dict[str, float]]] = []
         for group, table in tables.items():
-            order = rank_group(table, rng)
+            order = rank_group(table, rng, group_results.get(group, []), fair_play_points)
             group_order[group] = order
             counts[order[0]]["group_winner"] += 1
             counts[order[1]]["group_runner_up"] += 1
@@ -535,6 +613,7 @@ def main() -> None:
     parser.add_argument("--model-predictions", type=Path, default=DEFAULT_MODEL_PREDICTIONS)
     parser.add_argument("--rankings", type=Path, default=DEFAULT_RANKINGS)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
+    parser.add_argument("--cards", type=Path, default=DEFAULT_CARDS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--simulations", type=int, default=50000)
     parser.add_argument("--odds-weight", type=float, default=0.70)
@@ -544,8 +623,15 @@ def main() -> None:
     fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight, args.results)
     group_fixtures = fixtures[fixtures["stage"].eq("Group Stage")].copy()
     fifa_points = load_latest_fifa_points(args.rankings)
+    fair_play_points = load_fair_play_points(args.cards)
     strength = build_team_strength(group_fixtures, fifa_points)
-    probabilities, champion_counts, final_pairs = simulate_tournament(fixtures, strength, args.simulations, args.seed)
+    probabilities, champion_counts, final_pairs = simulate_tournament(
+        fixtures,
+        strength,
+        args.simulations,
+        args.seed,
+        fair_play_points,
+    )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     group_output = group_fixtures[
