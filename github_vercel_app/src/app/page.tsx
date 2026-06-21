@@ -88,6 +88,17 @@ type TopScorer = {
   expected_scorito_points: number;
 };
 
+type RoundTopScorer = {
+  round_rank: string;
+  stage: string;
+  stage_label: string;
+  player: string;
+  team: string;
+  position: string;
+  expected_goals: number;
+  expected_scorito_points: number;
+};
+
 type SourceStatus = {
   name: string;
   status: string;
@@ -121,6 +132,7 @@ type DashboardData = {
   group_standings: GroupStanding[];
   top_scorers: TopScorer[];
   group_top_scorers: TopScorer[];
+  round_top_scorers?: RoundTopScorer[];
   sources: SourceStatus[];
 };
 
@@ -184,6 +196,16 @@ const STAGE_LABELS: Record<string, string> = {
   "Third Place Playoff": "Troostfinale",
   Final: "Finale",
 };
+
+const TOPSCORER_STAGE_ORDER = [
+  "Group Stage",
+  "Round of 32",
+  "Round of 16",
+  "Quarterfinals",
+  "Semifinals",
+  "Final/Third",
+  "Total",
+];
 
 function stageLabel(stage: string) {
   return STAGE_LABELS[stage] || stage || "-";
@@ -272,6 +294,14 @@ function grouped<T extends { group: string }>(items: T[]) {
   }, {});
 }
 
+function scorerRoundSections(rows: RoundTopScorer[]) {
+  return TOPSCORER_STAGE_ORDER.map((stage) => ({
+    stage,
+    label: rows.find((row) => row.stage === stage)?.stage_label || stageLabel(stage),
+    rows: rows.filter((row) => row.stage === stage),
+  })).filter((section) => section.rows.length);
+}
+
 export default async function Home() {
   const data = await loadDashboard();
 
@@ -291,9 +321,9 @@ export default async function Home() {
   const snapshotKey = dateKey(data.metadata.generated_at);
   const fillablePredictions = upcomingPredictions.filter((row) => !isStageLocked(row.stage, starts, snapshotKey));
   const currentFillStage = firstOpenStage(fillablePredictions, starts, snapshotKey);
-  const knockouts = upcomingPredictions.filter((row) => row.stage !== "Group Stage");
   const groups = grouped(data.group_standings);
   const rounds = stageRows(data.predictions);
+  const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
   const actionableChanges = data.changes.filter((row) =>
     !isStageLocked(row.stage || row.stage_old || "", starts, snapshotKey)
   );
@@ -313,7 +343,6 @@ export default async function Home() {
             <a href="#gespeeld">Gespeeld</a>
             <a href="#rondes">Rondes</a>
             <a href="#groepen">Groepen</a>
-            <a href="#knockout">Knockout</a>
             <a href="#kampioen">Kampioen</a>
             <a href="#model">Model</a>
           </nav>
@@ -580,44 +609,6 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="knockout" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Knockout</h2>
-              <p className="section-subtitle">Vanaf R32 opnieuw invullen zodra Scorito dat vraagt.</p>
-            </div>
-          </div>
-          <div className="table-shell">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Ronde</th>
-                  <th>Wedstrijd</th>
-                  <th>Score</th>
-                  <th>Winnaar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {knockouts.map((row) => (
-                  <tr key={`${row.stage}-${row.match_number}`}>
-                    <td className="mono">{row.match_number}</td>
-                    <td>{row.stage}</td>
-                    <td>
-                      {matchupLabel(row)}
-                      {hasOutcomeProbabilities(row) ? <div className="prob-note">{probabilityLine(row)}</div> : null}
-                    </td>
-                    <td>
-                      <span className="score">{row.score}</span>
-                    </td>
-                    <td>{row.predicted_winner}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
         <section id="kampioen" className="section">
           <div className="section-header">
             <div>
@@ -645,7 +636,7 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <h2 className="section-title">Topscorers</h2>
-              <p className="section-subtitle">Scorito-punten wegen positie zwaarder mee.</p>
+              <p className="section-subtitle">Totaal en per ronde, gewogen op verwachte goals en Scorito-punten.</p>
             </div>
           </div>
           <div className="table-shell">
@@ -676,6 +667,43 @@ export default async function Home() {
               </tbody>
             </table>
           </div>
+          {topScorerRounds.length ? (
+            <div className="round-scorer-grid">
+              {topScorerRounds.map((section) => (
+                <div className="team-card" key={section.stage}>
+                  <div className="team-card-top">
+                    <strong>{section.label}</strong>
+                    <span className="pill">top {section.rows.length}</span>
+                  </div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Speler</th>
+                        <th>Team</th>
+                        <th>xG</th>
+                        <th>Pts</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.rows.slice(0, 6).map((row) => (
+                        <tr key={`${section.stage}-${row.round_rank}-${row.player}`}>
+                          <td className="mono">{row.round_rank}</td>
+                          <td>
+                            <strong>{row.player}</strong>
+                            <div className="metric-note">{row.position || "-"}</div>
+                          </td>
+                          <td>{row.team}</td>
+                          <td className="mono">{Number(row.expected_goals || 0).toFixed(2)}</td>
+                          <td className="mono">{Number(row.expected_scorito_points || 0).toFixed(1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         <section id="model" className="section">

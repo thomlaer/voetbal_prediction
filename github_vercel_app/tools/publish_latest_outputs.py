@@ -140,6 +140,56 @@ def normalize_key(value: Any) -> str:
     return aliases.get(text, text)
 
 
+CANONICAL_TEAM_NAMES = {
+    "bosnia and herzegovina": "Bosnia and Herzegovina",
+    "congo dr": "DR Congo",
+    "curacao": "Curaçao",
+    "czech republic": "Czech Republic",
+    "ivory coast": "Ivory Coast",
+    "south korea": "South Korea",
+    "turkey": "Turkey",
+    "united states": "United States",
+}
+
+
+def canonical_team_name(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    return CANONICAL_TEAM_NAMES.get(normalize_key(text), text)
+
+
+def canonical_winner(value: Any, home_team: Any, away_team: Any) -> str:
+    text = str(value or "").strip()
+    if not text or text == "Draw":
+        return text
+    key = normalize_key(text)
+    home = canonical_team_name(home_team)
+    away = canonical_team_name(away_team)
+    if key == normalize_key(home):
+        return home
+    if key == normalize_key(away):
+        return away
+    return canonical_team_name(text)
+
+
+def canonicalize_prediction_row(row: dict[str, Any]) -> dict[str, Any]:
+    output = dict(row)
+    output["home_team"] = canonical_team_name(output.get("home_team", ""))
+    output["away_team"] = canonical_team_name(output.get("away_team", ""))
+    for field in (
+        "predicted_winner",
+        "model_predicted_winner",
+        "filled_predicted_winner",
+        "new_model_predicted_winner",
+        "actual_winner",
+        "pre_match_predicted_winner",
+    ):
+        if field in output:
+            output[field] = canonical_winner(output.get(field, ""), output["home_team"], output["away_team"])
+    return output
+
+
 def date_key(value: Any) -> int | None:
     match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", str(value or ""))
     if not match:
@@ -340,9 +390,12 @@ def attach_actual_results(
                 output["home_team"] = previous_same_slot.get("home_team", output.get("home_team"))
             if is_placeholder_team(output.get("away_team")) and not is_placeholder_team(previous_same_slot.get("away_team")):
                 output["away_team"] = previous_same_slot.get("away_team", output.get("away_team"))
+        output["home_team"] = canonical_team_name(output.get("home_team", ""))
+        output["away_team"] = canonical_team_name(output.get("away_team", ""))
         previous = previous_by_key.get(prediction_key(output), {})
         model_score = output.get("score", "")
-        model_winner = output.get("predicted_winner", "")
+        model_winner = canonical_winner(output.get("predicted_winner", ""), output["home_team"], output["away_team"])
+        output["predicted_winner"] = model_winner
         model_confidence = output.get("confidence", "")
         model_favourite_prob = output.get("model_favourite_prob", "")
         locked = is_stage_locked(output.get("stage", ""), starts, snapshot_key)
@@ -442,6 +495,8 @@ def attach_actual_results(
             output["score_source"] = "manual_locked_score"
             output["pre_match_source"] = "manual_locked_score"
 
+        output = canonicalize_prediction_row(output)
+
         if output["actual_available"]:
             predicted_score = output.get("pre_match_score", "")
             predicted_outcome = score_outcome(predicted_score)
@@ -493,8 +548,8 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         if str(row.get("stage", "")) != "Group Stage":
             continue
         group = str(row.get("group", "") or "-")
-        home = str(row.get("home_team", "")).strip()
-        away = str(row.get("away_team", "")).strip()
+        home = canonical_team_name(row.get("home_team", ""))
+        away = canonical_team_name(row.get("away_team", ""))
         if is_placeholder_team(home) or is_placeholder_team(away):
             continue
         score = row.get("actual_score") if row.get("actual_available") or row.get("actual_score") else row.get("filled_score") or row.get("score")
@@ -560,6 +615,78 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
                 }
             )
     return output
+
+
+def build_round_top_scorers(
+    top_scorers: list[dict[str, Any]],
+    group_top_scorers: list[dict[str, Any]],
+    champions: list[dict[str, Any]],
+    limit_per_stage: int = 8,
+) -> list[dict[str, Any]]:
+    champion_by_team = {normalize_key(row.get("team")): row for row in champions}
+    stages = [
+        ("Group Stage", "Groepsfase", "expected_group_stage_goals", "expected_group_stage_scorito_points"),
+        ("Round of 32", "1/16 finale", "r32_goals", "r32_scorito_points"),
+        ("Round of 16", "Achtste finale", "r16_goals", "r16_scorito_points"),
+        ("Quarterfinals", "Kwartfinale", "qf_goals", "qf_scorito_points"),
+        ("Semifinals", "Halve finale", "sf_goals", "sf_scorito_points"),
+        ("Final/Third", "Finale/troost", "final_goals", "final_scorito_points"),
+        ("Total", "Totaal", "expected_goals", "expected_scorito_points"),
+    ]
+    source_rows = top_scorers or group_top_scorers
+    output: list[dict[str, Any]] = []
+
+    for row in source_rows:
+        team = canonical_team_name(row.get("team", ""))
+        team_probs = champion_by_team.get(normalize_key(team), {})
+        points_per_goal = float(row.get("scorito_points_per_goal") or 0.0)
+        if points_per_goal <= 0:
+            points_per_goal = 8.0 if str(row.get("position", "")).upper().startswith("FW") else 16.0
+
+        group_goals = float(row.get("expected_group_stage_goals") or 0.0)
+        group_rate = group_goals / 3.0 if group_goals > 0 else float(row.get("expected_goals") or 0.0) / 5.0
+        knockout_rate = 0.82 * max(group_rate, 0.0)
+        expected_matches = float(row.get("team_expected_matches") or 3.0)
+        advance_r16 = float(team_probs.get("advance_r16_prob") or 0.0)
+        advance_qf = float(team_probs.get("advance_qf_prob") or 0.0)
+        advance_sf = float(team_probs.get("advance_sf_prob") or 0.0)
+        advance_final = float(team_probs.get("advance_final_prob") or 0.0)
+        advance_r32 = max(0.0, min(1.0, expected_matches - 3.0 - advance_r16 - advance_qf - 2.0 * advance_sf))
+
+        stage_values = {
+            "expected_group_stage_goals": group_goals,
+            "expected_group_stage_scorito_points": float(row.get("expected_group_stage_scorito_points") or 0.0),
+            "r32_goals": knockout_rate * advance_r32,
+            "r16_goals": knockout_rate * advance_r16,
+            "qf_goals": knockout_rate * advance_qf,
+            "sf_goals": knockout_rate * advance_sf,
+            "final_goals": knockout_rate * advance_final,
+            "expected_goals": float(row.get("expected_goals") or 0.0),
+            "expected_scorito_points": float(row.get("expected_scorito_points") or 0.0),
+        }
+        for goals_key in ("r32_goals", "r16_goals", "qf_goals", "sf_goals", "final_goals"):
+            stage_values[goals_key.replace("_goals", "_scorito_points")] = stage_values[goals_key] * points_per_goal
+
+        for stage, label, goals_key, points_key in stages:
+            output.append(
+                {
+                    "stage": stage,
+                    "stage_label": label,
+                    "team": team,
+                    "player": row.get("player", ""),
+                    "position": row.get("position", ""),
+                    "expected_goals": stage_values.get(goals_key, 0.0),
+                    "expected_scorito_points": stage_values.get(points_key, 0.0),
+                }
+            )
+
+    ranked: list[dict[str, Any]] = []
+    for stage, label, _goals_key, _points_key in stages:
+        rows = [row for row in output if row["stage"] == stage]
+        rows.sort(key=lambda item: (float(item["expected_scorito_points"]), float(item["expected_goals"])), reverse=True)
+        for rank, row in enumerate(rows[:limit_per_stage], 1):
+            ranked.append({"round_rank": rank, **row})
+    return ranked
 
 
 def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -730,8 +857,12 @@ def main() -> None:
         if str(row.get("match_number", "")).strip() not in played_match_numbers
     ]
 
+    predictions = [canonicalize_prediction_row(row) for row in predictions]
     champions = read_csv(run_dir / "scorito_champion_picks.csv")
+    top_scorers = read_csv(run_dir / "scorito_topscorer_picks.csv")
+    group_top_scorers = read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv")
     group_standings = build_group_standings(predictions, champions)
+    round_top_scorers = build_round_top_scorers(top_scorers, group_top_scorers, champions)
 
     downloads = {
         "compact_excel": copy_first_existing(
@@ -802,8 +933,9 @@ def main() -> None:
         "changes": changes,
         "champions": champions,
         "group_standings": group_standings,
-        "top_scorers": read_csv(run_dir / "scorito_topscorer_picks.csv"),
-        "group_top_scorers": read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv"),
+        "top_scorers": top_scorers,
+        "group_top_scorers": group_top_scorers,
+        "round_top_scorers": round_top_scorers,
         "sources": sources,
     }
 

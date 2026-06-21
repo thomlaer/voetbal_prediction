@@ -267,6 +267,13 @@ tr:last-child td {
   gap: 12px;
 }
 
+.round-scorer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
 .team-card,
 .source-card,
 .change-card {
@@ -519,6 +526,7 @@ tr:last-child td {
   .summary-grid,
   .cards-grid,
   .source-grid,
+  .round-scorer-grid,
   .control-grid {
     grid-template-columns: 1fr;
   }

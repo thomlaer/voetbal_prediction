@@ -27,6 +27,8 @@ const TEAM_ALIASES = new Map(
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
     "Czech Rep": "Czech Republic",
     Curacao: "Curaçao",
+    "Cote d'Ivoire": "Ivory Coast",
+    "Côte d'Ivoire": "Ivory Coast",
     "D.R. Congo": "DR Congo",
     USA: "United States",
     "Winner UEFA Playoff A": "Bosnia and Herzegovina",
