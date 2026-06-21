@@ -82,6 +82,7 @@ TEAM_ALIASES = {
     "cote divoire": "ivory coast",
     "cote d'ivoire": "ivory coast",
     "cabo verde": "cape verde",
+    "bosnia herzegovina": "bosnia and herzegovina",
     "czechia": "czech republic",
     "cape verde islands": "cape verde",
     "dr congo": "congo dr",

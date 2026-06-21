@@ -51,6 +51,9 @@ try {
             --report "outputs\oddsportal_worldcup2026_fixture_odds_report.csv"
     }
 
+    Invoke-Native $python -X utf8 "github_vercel_app\tools\update_espn_worldcup_results.py" `
+        --output "data\extracted\espn_worldcup2026_results.csv"
+
     if ($UpdateSoccerbase -or -not $SkipSoccerbaseRefresh) {
         Invoke-Native $python -X utf8 "extract_soccerbase_match_data.py" `
             --skip-errors `

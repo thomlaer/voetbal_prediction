@@ -9,7 +9,7 @@ import json
 import re
 import shutil
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +17,7 @@ from typing import Any
 APP_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_ROOT = APP_ROOT.parent
 DEFAULT_CARDS_PATH = DEFAULT_MODEL_ROOT / "data" / "extracted" / "soccerbase_cards_events.csv"
+DEFAULT_ESPN_RESULTS_PATH = DEFAULT_MODEL_ROOT / "data" / "extracted" / "espn_worldcup2026_results.csv"
 STAGE_ORDER = [
     "Group Stage",
     "Round of 32",
@@ -128,6 +129,7 @@ def normalize_key(value: Any) -> str:
     aliases = {
         "usa": "united states",
         "us": "united states",
+        "bosnia herzegovina": "bosnia and herzegovina",
         "bosnia hz": "bosnia and herzegovina",
         "czech rep": "czech republic",
         "czechia": "czech republic",
@@ -422,6 +424,58 @@ def load_soccerbase_actuals(stats_path: Path) -> dict[tuple[str, str, str], dict
     return actuals
 
 
+def load_espn_actuals(results_path: Path = DEFAULT_ESPN_RESULTS_PATH) -> dict[tuple[str, str, str], dict[str, Any]]:
+    actuals: dict[tuple[str, str, str], dict[str, Any]] = {}
+    if not results_path.exists():
+        return actuals
+    for row in read_csv(results_path):
+        if str(row.get("completed", "")).lower() not in {"true", "1"}:
+            continue
+        date = str(row.get("date", ""))[:10]
+        if not date.startswith("2026-"):
+            continue
+        if not has_score_value(row.get("home_score")) or not has_score_value(row.get("away_score")):
+            continue
+        home_team = str(row.get("home_team", ""))
+        away_team = str(row.get("away_team", ""))
+        try:
+            home_score = int(float(row.get("home_score", 0)))
+            away_score = int(float(row.get("away_score", 0)))
+        except (TypeError, ValueError):
+            continue
+        outcome = outcome_label(home_score, away_score)
+        reverse_outcome = outcome_label(away_score, home_score)
+        direct = {
+            "actual_available": True,
+            "actual_home_score": home_score,
+            "actual_away_score": away_score,
+            "actual_score": f"{home_score}-{away_score}",
+            "actual_outcome": outcome,
+            "actual_winner": home_team if outcome == "home_win" else away_team if outcome == "away_win" else "Draw",
+            "actual_source": "espn",
+            "actual_online_verified": True,
+        }
+        reverse = {
+            "actual_available": True,
+            "actual_home_score": away_score,
+            "actual_away_score": home_score,
+            "actual_score": f"{away_score}-{home_score}",
+            "actual_outcome": reverse_outcome,
+            "actual_winner": away_team if reverse_outcome == "home_win" else home_team if reverse_outcome == "away_win" else "Draw",
+            "actual_source": "espn",
+            "actual_online_verified": True,
+        }
+        date_keys = [date]
+        try:
+            date_keys.append((datetime.strptime(date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d"))
+        except ValueError:
+            pass
+        for date_key in date_keys:
+            actuals[(date_key, normalize_key(home_team), normalize_key(away_team))] = direct
+            actuals[(date_key, normalize_key(away_team), normalize_key(home_team))] = reverse
+    return actuals
+
+
 def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
     return (
         str(row.get("match_number", "")),
@@ -455,6 +509,7 @@ def attach_actual_results(
 ) -> list[dict[str, Any]]:
     actuals = load_soccerbase_actuals(soccerbase_stats_path)
     actuals.update(load_worldcup_actuals(results_path))
+    actuals.update(load_espn_actuals())
     previous_rows = previous_dashboard.get("predictions", [])
     previous_by_key = {
         prediction_key(row): row
@@ -539,6 +594,7 @@ def attach_actual_results(
                     "actual_outcome": "",
                     "actual_winner": "",
                     "actual_source": "",
+                    "actual_online_verified": False,
                 }
             )
 
@@ -643,10 +699,12 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         if is_placeholder_team(home) or is_placeholder_team(away):
             continue
         is_actual = bool(row.get("actual_available") or row.get("actual_score"))
-        group_status = status_by_group.setdefault(group, {"total": 0, "actual": 0})
+        group_status = status_by_group.setdefault(group, {"total": 0, "actual": 0, "online": 0})
         group_status["total"] += 1
         if is_actual:
             group_status["actual"] += 1
+            if row.get("actual_online_verified") or "espn" in str(row.get("actual_source", "")).lower():
+                group_status["online"] += 1
         score = row.get("actual_score") if is_actual else row.get("filled_score") or row.get("score")
         parsed = parse_score(score)
         if parsed is None:
@@ -698,10 +756,12 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         for row in rows:
             row["gd"] = int(row["gf"]) - int(row["ga"])
         rows = rank_group_rows(rows, matches_by_group.get(group, []), fair_play_points)
-        group_status = status_by_group.get(group, {"total": 0, "actual": 0})
+        group_status = status_by_group.get(group, {"total": 0, "actual": 0, "online": 0})
         group_total = int(group_status.get("total", 0))
         group_actual = int(group_status.get("actual", 0))
+        group_online = int(group_status.get("online", 0))
         group_complete = group_total > 0 and group_actual == group_total
+        group_online_verified = group_total > 0 and group_online == group_total
         standing_source = "actual_results" if group_complete else "mixed_actual_projection" if group_actual else "projection"
         for rank, row in enumerate(rows, 1):
             team_probs = champion_by_team.get(normalize_key(row["team"]), {})
@@ -712,7 +772,9 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
                     "qualified_by_pick": rank <= 2,
                     "group_matches_total": group_total,
                     "group_matches_actual": group_actual,
+                    "group_matches_online_verified": group_online,
                     "group_complete": group_complete,
+                    "group_online_verified": group_online_verified,
                     "standing_source": standing_source,
                     "rank_confirmed": group_complete,
                     "qualified_confirmed": group_complete and rank <= 2,
@@ -1000,6 +1062,11 @@ def main() -> None:
 
     sources = [
         file_status("International results", results_path, "martj42 international_results"),
+        file_status(
+            "ESPN online results",
+            DEFAULT_ESPN_RESULTS_PATH,
+            "online completed-match check from ESPN scoreboard",
+        ),
         file_status(
             "OddsPortal WK odds",
             model_root / "data" / "extracted" / "oddsportal_worldcup2026_fixture_odds_schedule.csv",

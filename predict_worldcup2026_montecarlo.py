@@ -26,6 +26,7 @@ DEFAULT_MODEL_PREDICTIONS = Path("outputs_worldcup2026_default/future_prediction
 DEFAULT_RANKINGS = Path("fifa_ranking-2026-04-01.csv")
 DEFAULT_RESULTS = Path("data/results.csv")
 DEFAULT_CARDS = Path("data/extracted/soccerbase_cards_events.csv")
+DEFAULT_ESPN_RESULTS = Path("data/extracted/espn_worldcup2026_results.csv")
 DEFAULT_OUTPUT_DIR = Path("outputs_worldcup2026_default")
 OUTCOMES = np.array(["away_win", "draw", "home_win"], dtype=object)
 
@@ -110,7 +111,52 @@ def load_actual_results(path: Path) -> dict[tuple[str, str, str], dict[str, Any]
     return lookup
 
 
-def apply_actual_results(fixtures: pd.DataFrame, results_path: Path) -> pd.DataFrame:
+def load_espn_actual_results(path: Path) -> dict[tuple[str, str, str], dict[str, Any]]:
+    if not path.exists():
+        return {}
+    results = pd.read_csv(path)
+    required = {"date", "home_team", "away_team", "home_score", "away_score", "completed"}
+    if not required.issubset(results.columns):
+        return {}
+    results = results[results["completed"].astype(str).str.lower().isin(["true", "1"])].copy()
+    results["date"] = pd.to_datetime(results["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    results["home_score"] = pd.to_numeric(results["home_score"], errors="coerce")
+    results["away_score"] = pd.to_numeric(results["away_score"], errors="coerce")
+    results = results.dropna(subset=["date", "home_team", "away_team", "home_score", "away_score"])
+
+    lookup: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for row in results.itertuples(index=False):
+        home_score = int(row.home_score)
+        away_score = int(row.away_score)
+        outcome = outcome_from_score(home_score, away_score)
+        direct = {
+            "actual_available": True,
+            "actual_home_score": home_score,
+            "actual_away_score": away_score,
+            "actual_score": f"{home_score}-{away_score}",
+            "actual_outcome": outcome,
+            "actual_winner": row.home_team if outcome == "home_win" else row.away_team if outcome == "away_win" else "Draw",
+        }
+        reverse_outcome = outcome_from_score(away_score, home_score)
+        reverse = {
+            "actual_available": True,
+            "actual_home_score": away_score,
+            "actual_away_score": home_score,
+            "actual_score": f"{away_score}-{home_score}",
+            "actual_outcome": reverse_outcome,
+            "actual_winner": row.away_team if reverse_outcome == "home_win" else row.home_team if reverse_outcome == "away_win" else "Draw",
+        }
+        date_keys = [str(row.date)]
+        parsed_date = pd.to_datetime(row.date, errors="coerce")
+        if pd.notna(parsed_date):
+            date_keys.append((parsed_date - pd.Timedelta(days=1)).strftime("%Y-%m-%d"))
+        for date_key in date_keys:
+            lookup[(date_key, normalize_name(row.home_team), normalize_name(row.away_team))] = direct
+            lookup[(date_key, normalize_name(row.away_team), normalize_name(row.home_team))] = reverse
+    return lookup
+
+
+def apply_actual_results(fixtures: pd.DataFrame, results_path: Path, espn_results_path: Path) -> pd.DataFrame:
     fixtures = fixtures.copy()
     fixtures["actual_available"] = False
     fixtures["actual_home_score"] = np.nan
@@ -119,6 +165,7 @@ def apply_actual_results(fixtures: pd.DataFrame, results_path: Path) -> pd.DataF
         fixtures[column] = pd.Series([""] * len(fixtures), index=fixtures.index, dtype="object")
 
     lookup = load_actual_results(results_path)
+    lookup.update(load_espn_actual_results(espn_results_path))
     if not lookup:
         return fixtures
 
@@ -178,6 +225,7 @@ def merge_schedule_predictions(
     predictions_path: Path,
     odds_weight: float,
     results_path: Path,
+    espn_results_path: Path = DEFAULT_ESPN_RESULTS,
 ) -> pd.DataFrame:
     schedule = pd.read_csv(schedule_path)
     predictions = pd.read_csv(predictions_path)
@@ -218,7 +266,7 @@ def merge_schedule_predictions(
 
     sim_probs = merged[["sim_prob_away_win", "sim_prob_draw", "sim_prob_home_win"]].to_numpy()
     merged["sim_predicted_outcome"] = OUTCOMES[sim_probs.argmax(axis=1)]
-    merged = apply_actual_results(merged, results_path)
+    merged = apply_actual_results(merged, results_path, espn_results_path)
     return merged
 
 
@@ -614,13 +662,20 @@ def main() -> None:
     parser.add_argument("--rankings", type=Path, default=DEFAULT_RANKINGS)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
     parser.add_argument("--cards", type=Path, default=DEFAULT_CARDS)
+    parser.add_argument("--espn-results", type=Path, default=DEFAULT_ESPN_RESULTS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--simulations", type=int, default=50000)
     parser.add_argument("--odds-weight", type=float, default=0.70)
     parser.add_argument("--seed", type=int, default=20260515)
     args = parser.parse_args()
 
-    fixtures = merge_schedule_predictions(args.schedule, args.model_predictions, args.odds_weight, args.results)
+    fixtures = merge_schedule_predictions(
+        args.schedule,
+        args.model_predictions,
+        args.odds_weight,
+        args.results,
+        args.espn_results,
+    )
     group_fixtures = fixtures[fixtures["stage"].eq("Group Stage")].copy()
     fifa_points = load_latest_fifa_points(args.rankings)
     fair_play_points = load_fair_play_points(args.cards)

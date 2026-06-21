@@ -76,7 +76,9 @@ type GroupStanding = {
   qualified_by_pick: string;
   group_matches_total?: number | string;
   group_matches_actual?: number | string;
+  group_matches_online_verified?: number | string;
   group_complete?: boolean | string;
+  group_online_verified?: boolean | string;
   standing_source?: string;
   rank_confirmed?: boolean | string;
   qualified_confirmed?: boolean | string;
@@ -331,14 +333,20 @@ function scorerRoundSections(rows: RoundTopScorer[]) {
 function groupStatus(rows: GroupStanding[]) {
   const total = Number(rows[0]?.group_matches_total || 0);
   const actual = Number(rows[0]?.group_matches_actual || 0);
+  const online = Number(rows[0]?.group_matches_online_verified || 0);
   const complete = rows.some((row) => truthy(row.group_complete));
+  const onlineVerified = rows.some((row) => truthy(row.group_online_verified));
+  const suffix = total > 0 ? ` · ${online}/${total} online` : "";
+  if (onlineVerified) {
+    return { label: "Online bevestigd", note: `${actual}/${total} echte uitslagen${suffix}`, className: "green" };
+  }
   if (complete) {
-    return { label: "Bevestigd", note: `${actual}/${total} echte uitslagen`, className: "green" };
+    return { label: "Bevestigd", note: `${actual}/${total} echte uitslagen${suffix}`, className: "green" };
   }
   if (actual > 0 && total > 0) {
-    return { label: "Live check", note: `${actual}/${total} echte uitslagen`, className: "orange" };
+    return { label: "Live check", note: `${actual}/${total} echte uitslagen${suffix}`, className: "orange" };
   }
-  return { label: "Projectie", note: "nog geen volledige echte poule", className: "" };
+  return { label: "Projectie", note: `nog geen volledige echte poule${suffix}`, className: "" };
 }
 
 export default async function Home() {

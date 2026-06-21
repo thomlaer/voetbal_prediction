@@ -28,6 +28,11 @@ if [[ "${SKIP_ODDS:-0}" != "1" ]]; then
     --report outputs/oddsportal_worldcup2026_fixture_odds_report.csv
 fi
 
+if [[ "${SKIP_ESPN:-0}" != "1" ]]; then
+  "$PYTHON" -X utf8 github_vercel_app/tools/update_espn_worldcup_results.py \
+    --output data/extracted/espn_worldcup2026_results.csv
+fi
+
 if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
     SOCCERBASE_URLS="${SOCCERBASE_URLS:-https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73}"
