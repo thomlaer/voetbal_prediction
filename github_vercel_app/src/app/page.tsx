@@ -236,6 +236,23 @@ function displayScore(row: Prediction) {
   return row.filled_score || row.pre_match_score || row.score;
 }
 
+function displayWinner(row: Prediction) {
+  return row.filled_predicted_winner || row.pre_match_predicted_winner || row.predicted_winner;
+}
+
+function matchupLabel(row: Prediction) {
+  const winner = displayWinner(row);
+  const homeIsWinner = winner === row.home_team;
+  const awayIsWinner = winner === row.away_team;
+
+  return (
+    <>
+      {homeIsWinner ? <strong>{row.home_team}</strong> : row.home_team} -{" "}
+      {awayIsWinner ? <strong>{row.away_team}</strong> : row.away_team}
+    </>
+  );
+}
+
 function hasOutcomeProbabilities(row: Prediction) {
   return [row.prob_home_win, row.prob_draw, row.prob_away_win].some(
     (value) => value !== undefined && value !== null,
@@ -413,7 +430,7 @@ export default async function Home() {
                     <tr key={`played-${row.stage}-${row.match_number}`}>
                       <td className="mono">{row.match_number}</td>
                       <td>
-                        <strong>{row.home_team}</strong> - {row.away_team}
+                        {matchupLabel(row)}
                         <div className="metric-note">
                           {row.stage}
                           {row.group ? ` - Poule ${row.group}` : ""} - {row.date}
@@ -487,7 +504,7 @@ export default async function Home() {
                           <tr key={`round-${stage}-${row.match_number}`}>
                             <td className="mono">{row.match_number}</td>
                             <td>
-                              <strong>{row.home_team}</strong> - {row.away_team}
+                              {matchupLabel(row)}
                               <div className="metric-note">
                                 {row.group ? `Poule ${row.group}` : stageLabel(row.stage)} - {row.date}
                                 {isPlayed(row) ? ` - uitslag ${row.actual_score}` : ""}
@@ -587,7 +604,7 @@ export default async function Home() {
                     <td className="mono">{row.match_number}</td>
                     <td>{row.stage}</td>
                     <td>
-                      <strong>{row.home_team}</strong> - {row.away_team}
+                      {matchupLabel(row)}
                       {hasOutcomeProbabilities(row) ? <div className="prob-note">{probabilityLine(row)}</div> : null}
                     </td>
                     <td>
