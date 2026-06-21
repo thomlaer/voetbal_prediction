@@ -74,6 +74,12 @@ type GroupStanding = {
   gd: string;
   rank: string;
   qualified_by_pick: string;
+  group_matches_total?: number | string;
+  group_matches_actual?: number | string;
+  group_complete?: boolean | string;
+  standing_source?: string;
+  rank_confirmed?: boolean | string;
+  qualified_confirmed?: boolean | string;
   advance_r16_prob?: number | "";
   advance_qf_prob?: number | "";
   champion_prob?: number | "";
@@ -150,6 +156,10 @@ function pct(value?: number | string | null, digits = 1) {
   const numeric = Number(value);
   if (Number.isNaN(numeric)) return "-";
   return `${(numeric * 100).toFixed(digits)}%`;
+}
+
+function truthy(value?: boolean | string) {
+  return value === true || value === "true";
 }
 
 function confidenceClass(confidence: string) {
@@ -316,6 +326,19 @@ function scorerRoundSections(rows: RoundTopScorer[]) {
     label: rows.find((row) => row.stage === stage)?.stage_label || stageLabel(stage),
     rows: rows.filter((row) => row.stage === stage),
   })).filter((section) => section.rows.length);
+}
+
+function groupStatus(rows: GroupStanding[]) {
+  const total = Number(rows[0]?.group_matches_total || 0);
+  const actual = Number(rows[0]?.group_matches_actual || 0);
+  const complete = rows.some((row) => truthy(row.group_complete));
+  if (complete) {
+    return { label: "Bevestigd", note: `${actual}/${total} echte uitslagen`, className: "green" };
+  }
+  if (actual > 0 && total > 0) {
+    return { label: "Live check", note: `${actual}/${total} echte uitslagen`, className: "orange" };
+  }
+  return { label: "Projectie", note: "nog geen volledige echte poule", className: "" };
 }
 
 export default async function Home() {
@@ -590,38 +613,55 @@ export default async function Home() {
             </div>
           </div>
           <div className="cards-grid">
-            {Object.entries(groups).map(([group, rows]) => (
-              <div className="team-card" key={group}>
-                <div className="team-card-top">
-                  <strong>Poule {group}</strong>
-                  <span className="pill">{rows.length} teams</span>
+            {Object.entries(groups).map(([group, rows]) => {
+              const status = groupStatus(rows);
+
+              return (
+                <div className={`team-card ${status.className === "green" ? "confirmed-card" : ""}`} key={group}>
+                  <div className="team-card-top">
+                    <strong>Poule {group}</strong>
+                    <span className={`pill ${status.className}`}>{status.label}</span>
+                  </div>
+                  <div className="metric-note">{status.note}</div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Team</th>
+                        <th>Pts</th>
+                        <th>GD</th>
+                        <th>Door</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows
+                        .sort((a, b) => Number(a.rank) - Number(b.rank))
+                        .map((row) => {
+                          const confirmedQualified = truthy(row.qualified_confirmed);
+
+                          return (
+                            <tr
+                              className={confirmedQualified ? "confirmed-qualified-row" : ""}
+                              key={`${group}-${row.team}`}
+                            >
+                              <td className="mono">{row.rank}</td>
+                              <td>
+                                {confirmedQualified ? <strong>{row.team}</strong> : row.team}
+                                {truthy(row.rank_confirmed) ? <div className="metric-note">plek vast</div> : null}
+                              </td>
+                              <td className="mono">{row.points}p</td>
+                              <td className="mono">GD {row.gd}</td>
+                              <td className="mono">
+                                {confirmedQualified ? <span className="pill green">zeker</span> : pct(row.advance_r16_prob)}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
                 </div>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Team</th>
-                      <th>Pts</th>
-                      <th>GD</th>
-                      <th>Door</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows
-                      .sort((a, b) => Number(a.rank) - Number(b.rank))
-                      .map((row) => (
-                        <tr key={`${group}-${row.team}`}>
-                          <td className="mono">{row.rank}</td>
-                          <td>{row.team}</td>
-                          <td className="mono">{row.points}p</td>
-                          <td className="mono">GD {row.gd}</td>
-                          <td className="mono">{pct(row.advance_r16_prob)}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

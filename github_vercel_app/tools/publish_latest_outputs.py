@@ -633,6 +633,7 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
     fair_play_points = load_fair_play_points()
     standings: dict[str, dict[str, dict[str, Any]]] = {}
     matches_by_group: dict[str, list[tuple[str, str, int, int]]] = {}
+    status_by_group: dict[str, dict[str, int]] = {}
     for row in predictions:
         if str(row.get("stage", "")) != "Group Stage":
             continue
@@ -641,7 +642,12 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         away = canonical_team_name(row.get("away_team", ""))
         if is_placeholder_team(home) or is_placeholder_team(away):
             continue
-        score = row.get("actual_score") if row.get("actual_available") or row.get("actual_score") else row.get("filled_score") or row.get("score")
+        is_actual = bool(row.get("actual_available") or row.get("actual_score"))
+        group_status = status_by_group.setdefault(group, {"total": 0, "actual": 0})
+        group_status["total"] += 1
+        if is_actual:
+            group_status["actual"] += 1
+        score = row.get("actual_score") if is_actual else row.get("filled_score") or row.get("score")
         parsed = parse_score(score)
         if parsed is None:
             continue
@@ -692,6 +698,11 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
         for row in rows:
             row["gd"] = int(row["gf"]) - int(row["ga"])
         rows = rank_group_rows(rows, matches_by_group.get(group, []), fair_play_points)
+        group_status = status_by_group.get(group, {"total": 0, "actual": 0})
+        group_total = int(group_status.get("total", 0))
+        group_actual = int(group_status.get("actual", 0))
+        group_complete = group_total > 0 and group_actual == group_total
+        standing_source = "actual_results" if group_complete else "mixed_actual_projection" if group_actual else "projection"
         for rank, row in enumerate(rows, 1):
             team_probs = champion_by_team.get(normalize_key(row["team"]), {})
             output.append(
@@ -699,6 +710,12 @@ def build_group_standings(predictions: list[dict[str, Any]], champions: list[dic
                     **row,
                     "rank": rank,
                     "qualified_by_pick": rank <= 2,
+                    "group_matches_total": group_total,
+                    "group_matches_actual": group_actual,
+                    "group_complete": group_complete,
+                    "standing_source": standing_source,
+                    "rank_confirmed": group_complete,
+                    "qualified_confirmed": group_complete and rank <= 2,
                     "advance_r16_prob": team_probs.get("advance_r16_prob", ""),
                     "advance_qf_prob": team_probs.get("advance_qf_prob", ""),
                     "champion_prob": team_probs.get("champion_prob", ""),

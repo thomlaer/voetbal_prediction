@@ -283,11 +283,20 @@ tr:last-child td {
   padding: 13px;
 }
 
+.team-card.confirmed-card {
+  border-color: #86efac;
+  background: #fbfefc;
+}
+
 .team-card-top {
   display: flex;
   gap: 10px;
   align-items: center;
   justify-content: space-between;
+}
+
+.confirmed-qualified-row td {
+  background: #f0fdf4;
 }
 
 .team-name {
