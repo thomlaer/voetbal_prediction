@@ -624,6 +624,10 @@ tr:last-child td {
   gap: 12px;
 }
 
+.live-grid.single {
+  grid-template-columns: 1fr;
+}
+
 .live-card,
 .live-group {
   border: 1px solid var(--line);
@@ -666,6 +670,15 @@ tr:last-child td {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.live-standings-details {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.small-title {
+  font-size: 16px;
 }
 
 .live-group table {

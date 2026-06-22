@@ -42,6 +42,10 @@ type EspnLiveData = {
   message?: string;
 };
 
+type EspnLivePanelProps = {
+  defaultStandingsOpen?: boolean;
+};
+
 function formatDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value || "-";
@@ -58,10 +62,14 @@ function score(match: EspnMatch) {
   return `${match.homeScore}-${match.awayScore}`;
 }
 
-export function EspnLivePanel() {
+function groupLabel(value: string) {
+  return value.replace(/^Group\s+/i, "Poule ");
+}
+
+export function EspnLivePanel({ defaultStandingsOpen = false }: EspnLivePanelProps) {
   const [data, setData] = useState<EspnLiveData | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("ESPN direct uitlezen zonder modelrun.");
+  const [message, setMessage] = useState("ESPN live check zonder modelrun.");
 
   async function loadLiveData() {
     setStatus("loading");
@@ -90,12 +98,16 @@ export function EspnLivePanel() {
     void loadLiveData();
   }, []);
 
-  const completedMatches = useMemo(
-    () => (data?.matches || []).filter((match) => match.completed).slice(0, 10),
-    [data],
-  );
   const liveMatches = useMemo(
     () => (data?.matches || []).filter((match) => match.inProgress).slice(0, 6),
+    [data],
+  );
+  const standings = useMemo(
+    () =>
+      (data?.standings || []).map((group) => ({
+        ...group,
+        teams: [...group.teams].sort((a, b) => a.rank - b.rank),
+      })),
     [data],
   );
 
@@ -103,10 +115,8 @@ export function EspnLivePanel() {
     <div className="live-panel">
       <div className="live-panel-head">
         <div>
-          <strong>ESPN Live Check</strong>
-          <div className="metric-note">
-            Uitslagen en poulestanden zoals ESPN ze nu toont. Dit overschrijft geen vaste Scorito-score.
-          </div>
+          <strong>ESPN live</strong>
+          <div className="metric-note">Live wedstrijd en actuele poulestanden als snelle check.</div>
         </div>
         <button className="secondary-button" disabled={status === "loading"} onClick={loadLiveData} type="button">
           {status === "loading" ? "Verversen..." : "Ververs ESPN"}
@@ -118,33 +128,7 @@ export function EspnLivePanel() {
         {data?.fetchedAt ? ` Laatst gelezen: ${formatDate(data.fetchedAt)}.` : ""}
       </div>
 
-      <div className="live-grid">
-        <div className="live-card">
-          <div className="team-card-top">
-            <strong>Laatste uitslagen</strong>
-            <span className="pill">{completedMatches.length}</span>
-          </div>
-          <div className="live-list">
-            {completedMatches.length ? (
-              completedMatches.map((match) => (
-                <div className="live-match" key={match.id || `${match.homeTeam}-${match.awayTeam}-${match.date}`}>
-                  <div className="live-match-main">
-                    <strong>
-                      {match.homeTeam} - {match.awayTeam}
-                    </strong>
-                    <span className="metric-note">
-                      {formatDate(match.date)} - {match.status || match.statusDetail || "ESPN"}
-                    </span>
-                  </div>
-                  <span className="score actual-score">{score(match)}</span>
-                </div>
-              ))
-            ) : (
-              <div className="metric-note">Nog geen afgeronde ESPN-wedstrijden gevonden.</div>
-            )}
-          </div>
-        </div>
-
+      <div className="live-grid single">
         <div className="live-card">
           <div className="team-card-top">
             <strong>Nu live</strong>
@@ -170,43 +154,60 @@ export function EspnLivePanel() {
         </div>
       </div>
 
-      <div className="live-standings-grid">
-        {(data?.standings || []).map((group) => (
-          <div className="live-group" key={group.group}>
-            <div className="team-card-top">
-              <strong>{group.group}</strong>
-              <span className="pill">ESPN</span>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Team</th>
-                  <th>W-D-L</th>
-                  <th>GD</th>
-                  <th>Pts</th>
-                </tr>
-              </thead>
-              <tbody>
-                {group.teams.map((team) => (
-                  <tr key={`${group.group}-${team.team}`}>
-                    <td className="mono">{team.rank}</td>
-                    <td>
-                      {team.advanced ? <strong>{team.team}</strong> : team.team}
-                      {team.advanced ? <div className="metric-note">door volgens ESPN</div> : null}
-                    </td>
-                    <td className="mono">
-                      {team.wins}-{team.draws}-{team.losses}
-                    </td>
-                    <td className="mono">{team.goalDifference > 0 ? `+${team.goalDifference}` : team.goalDifference}</td>
-                    <td className="mono">{team.points}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <details className="section-details live-standings-details" open={defaultStandingsOpen}>
+        <summary className="section-header collapse-summary">
+          <div>
+            <h3 className="section-title small-title">Huidige ESPN-poulestanden</h3>
+            <p className="section-subtitle">
+              Controlelaag voor de poulefase. De voorspelde groepsstanden hierboven blijven leidend voor je ingevulde scores.
+            </p>
           </div>
-        ))}
-      </div>
+          <span className="collapse-actions">
+            <span className="pill">ESPN</span>
+            <span className="collapse-caret" aria-hidden="true" />
+          </span>
+        </summary>
+
+        <div className="live-standings-grid">
+          {standings.map((group) => (
+            <div className="live-group" key={group.group}>
+              <div className="team-card-top">
+                <strong>{groupLabel(group.group)}</strong>
+                <span className="pill">live</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Team</th>
+                    <th>W-D-L</th>
+                    <th>GD</th>
+                    <th>Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.teams.map((team) => (
+                    <tr key={`${group.group}-${team.team}`}>
+                      <td className="mono">{team.rank}</td>
+                      <td>
+                        {team.advanced ? <strong>{team.team}</strong> : team.team}
+                        {team.advanced ? <div className="metric-note">door volgens ESPN</div> : null}
+                      </td>
+                      <td className="mono">
+                        {team.wins}-{team.draws}-{team.losses}
+                      </td>
+                      <td className="mono">
+                        {team.goalDifference > 0 ? `+${team.goalDifference}` : team.goalDifference}
+                      </td>
+                      <td className="mono">{team.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+      </details>
     </div>
   );
 }

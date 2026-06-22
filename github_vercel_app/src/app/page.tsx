@@ -218,7 +218,6 @@ const TOPSCORER_STAGE_ORDER = [
   "Quarterfinals",
   "Semifinals",
   "Final/Third",
-  "Total",
 ];
 
 function stageLabel(stage: string) {
@@ -441,7 +440,6 @@ export default async function Home() {
             <a href="#rondes">Rondes</a>
             <a href="#groepen">Groepen</a>
             <a href="#kampioen">Kampioen</a>
-            <a href="#model">Model</a>
           </nav>
           {data.downloads.probabilities_excel ? (
             <a className="download-link" href={data.downloads.probabilities_excel}>
@@ -487,7 +485,6 @@ export default async function Home() {
             </div>
           </div>
           <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
-          <EspnLivePanel />
         </section>
 
         <section id="wijzigingen" className="section">
@@ -673,6 +670,7 @@ export default async function Home() {
               );
             })}
           </div>
+          <EspnLivePanel />
         </section>
 
         <section id="kampioen" className="section">
@@ -702,7 +700,7 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <h2 className="section-title">Topscorers</h2>
-              <p className="section-subtitle">Totaal en per ronde, gewogen op verwachte goals en Scorito-punten.</p>
+              <p className="section-subtitle">Totaal bovenaan. Daarna per ronde, gewogen op xG en Scorito-punten.</p>
             </div>
           </div>
           <div className="table-shell">
@@ -772,43 +770,6 @@ export default async function Home() {
           ) : null}
         </section>
 
-        <section id="model" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Modelinformatie</h2>
-              <p className="section-subtitle">Compacte controle zonder ruwe bronlijst.</p>
-            </div>
-          </div>
-          <div className="source-grid">
-            <div className="source-card">
-              <strong>Data</strong>
-              <div className="metric-note">
-                {data.metadata.row_count?.toLocaleString("nl-NL") ?? "-"} uitslagen - laatste match{" "}
-                {data.metadata.latest_match_date || "-"}
-              </div>
-            </div>
-            <div className="source-card">
-              <strong>Features</strong>
-              <div className="metric-note">{data.metadata.features ?? "-"} modelvariabelen</div>
-            </div>
-            <div className="source-card">
-              <strong>Soccerbase</strong>
-              <div className="metric-note">
-                stats {data.metadata.stat_features_enabled ? "aan" : "uit"} - cards{" "}
-                {data.metadata.card_features_enabled ? "aan" : "uit"} - lineups{" "}
-                {data.metadata.lineup_features_enabled ? "aan" : "uit"}
-              </div>
-            </div>
-            <div className="source-card">
-              <strong>Downloads</strong>
-              <div className="metric-note">
-                <a href={data.downloads.probabilities_excel || "#"}>kansen Excel</a> -{" "}
-                <a href={data.downloads.full_excel || "#"}>volledige Excel</a> -{" "}
-                <a href={data.downloads.compact_csv || "#"}>CSV</a>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
   );
