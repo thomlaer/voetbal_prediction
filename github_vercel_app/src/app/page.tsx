@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { EspnLivePanel } from "./EspnLivePanel";
+import { PlayedMatchesPanel, type PlayedMatchRow } from "./PlayedMatchesPanel";
 import { RebuildControl } from "./RebuildControl";
 
 type Prediction = {
@@ -365,6 +366,31 @@ function groupStatus(rows: GroupStanding[]) {
   return { label: "Projectie", note: `nog geen volledige echte poule${suffix}`, className: "" };
 }
 
+function playedPanelRow(row: Prediction): PlayedMatchRow {
+  const predictedScore = row.pre_match_score || row.score || "";
+  const actualScore = row.actual_score || "";
+
+  return {
+    match_number: String(row.match_number),
+    date: row.date,
+    stage: row.stage,
+    group: row.group,
+    home_team: row.home_team,
+    away_team: row.away_team,
+    predicted_score: predictedScore,
+    predicted_winner: row.pre_match_predicted_winner || winnerFromScore(row) || row.predicted_winner || "",
+    actual_score: actualScore,
+    actual_winner: row.actual_winner || "",
+    actual_source: row.actual_source || "dashboard",
+    backup_actual_score: actualScore,
+    backup_mismatch: false,
+    prediction_exact: row.prediction_exact === true,
+    prediction_outcome_correct: row.prediction_outcome_correct === true,
+    result_class: resultClass(row),
+    result_label: resultLabel(row),
+  };
+}
+
 export default async function Home() {
   const data = await loadDashboard();
 
@@ -379,6 +405,7 @@ export default async function Home() {
   }
 
   const playedMatches = data.predictions.filter(isPlayed);
+  const playedPanelRows = playedMatches.map(playedPanelRow);
   const starts = stageStartKeys(data.predictions);
   const snapshotKey = dateKey(data.metadata.generated_at);
   const rounds = stageRows(data.predictions);
@@ -507,64 +534,7 @@ export default async function Home() {
         </section>
 
         <section id="gespeeld" className="section">
-          <details className="section-details" open={playedMatches.length > 0 && playedMatches.length <= 8}>
-            <summary className="section-header collapse-summary">
-              <div>
-                <h2 className="section-title">Gespeelde Wedstrijden</h2>
-                <p className="section-subtitle">
-                  {playedMatches.length} gespeeld. Voorspelling naast de echte uitslag zodra results.csv is bijgewerkt.
-                </p>
-              </div>
-              <span className="collapse-caret" aria-hidden="true" />
-            </summary>
-          <div className="table-shell">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Wedstrijd</th>
-                  <th>Voorspelling</th>
-                  <th>Uitslag</th>
-                  <th>Resultaat</th>
-                </tr>
-              </thead>
-              <tbody>
-                {playedMatches.length ? (
-                  playedMatches.map((row) => (
-                    <tr key={`played-${row.stage}-${row.match_number}`}>
-                      <td className="mono">{row.match_number}</td>
-                      <td>
-                        {matchupLabel(row)}
-                        <div className="metric-note">
-                          {row.stage}
-                          {row.group ? ` - Poule ${row.group}` : ""} - {row.date}
-                        </div>
-                      </td>
-                      <td>
-                        <span className="score">{row.pre_match_score || row.score}</span>
-                        <div className="metric-note">{row.pre_match_predicted_winner || row.predicted_winner}</div>
-                      </td>
-                      <td>
-                        <span className="score actual-score">{row.actual_score || "-"}</span>
-                        <div className="metric-note">
-                          {row.actual_winner || "-"}
-                          {row.actual_source ? ` - ${row.actual_source}` : ""}
-                        </div>
-                      </td>
-                      <td>
-                        <span className={`pill ${resultClass(row)}`}>{resultLabel(row)}</span>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5}>Nog geen WK-wedstrijden met uitslag in de dashboarddata.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          </details>
+          <PlayedMatchesPanel initialRows={playedPanelRows} />
         </section>
 
         <section id="rondes" className="section">
