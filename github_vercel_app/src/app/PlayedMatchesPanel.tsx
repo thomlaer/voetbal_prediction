@@ -107,7 +107,7 @@ export function PlayedMatchesPanel({ initialRows }: PlayedMatchesPanelProps) {
   );
 
   return (
-    <details className="section-details" open={rows.length > 0 && rows.length <= 8}>
+    <details className="section-details" open>
       <summary className="section-header collapse-summary">
         <div>
           <h2 className="section-title">Gespeelde Wedstrijden</h2>
