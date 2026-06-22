@@ -248,11 +248,6 @@ function isStageLocked(stage: string, starts: Map<string, number>, snapshotKey: 
   return snapshotKey !== null && start !== undefined && snapshotKey >= start;
 }
 
-function firstOpenStage(rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null) {
-  const stageSet = new Set(rows.map((row) => row.stage));
-  return STAGE_ORDER.find((stage) => stageSet.has(stage) && !isStageLocked(stage, starts, snapshotKey)) || "";
-}
-
 function stageRows(rows: Prediction[]) {
   return STAGE_ORDER.map((stage) => ({
     stage,
@@ -260,9 +255,29 @@ function stageRows(rows: Prediction[]) {
   })).filter((section) => section.rows.length);
 }
 
+function isRoundManuallyLocked(rows: Prediction[]) {
+  return rows.length > 0 && rows.every((row) => row.round_locked || isPlayed(row));
+}
+
+function isStageClosed(stage: string, rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null) {
+  return isStageLocked(stage, starts, snapshotKey) || isRoundManuallyLocked(rows);
+}
+
+function firstOpenStage(sections: { stage: string; rows: Prediction[] }[], starts: Map<string, number>, snapshotKey: number | null) {
+  return sections.find((section) => !isStageClosed(section.stage, section.rows, starts, snapshotKey))?.stage || "";
+}
+
+function stageShouldOpen(stage: string, currentFillStage: string) {
+  if (!currentFillStage) return false;
+  const stageIndex = STAGE_ORDER.indexOf(stage);
+  const currentIndex = STAGE_ORDER.indexOf(currentFillStage);
+  if (stageIndex === -1 || currentIndex === -1) return true;
+  return stageIndex >= currentIndex;
+}
+
 function stageStatus(stage: string, rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null, currentFillStage: string) {
   if (rows.length && rows.every(isPlayed)) return { label: "Gespeeld", className: "green" };
-  if (isStageLocked(stage, starts, snapshotKey)) return { label: "Vergrendeld", className: "orange" };
+  if (isStageClosed(stage, rows, starts, snapshotKey)) return { label: "Vergrendeld", className: "orange" };
   if (stage === currentFillStage) return { label: "Nu invullen", className: "green" };
   return { label: "Later", className: "" };
 }
@@ -364,13 +379,12 @@ export default async function Home() {
   }
 
   const playedMatches = data.predictions.filter(isPlayed);
-  const upcomingPredictions = data.predictions.filter((row) => !isPlayed(row));
   const starts = stageStartKeys(data.predictions);
   const snapshotKey = dateKey(data.metadata.generated_at);
-  const fillablePredictions = upcomingPredictions.filter((row) => !isStageLocked(row.stage, starts, snapshotKey));
-  const currentFillStage = firstOpenStage(fillablePredictions, starts, snapshotKey);
-  const groups = grouped(data.group_standings);
   const rounds = stageRows(data.predictions);
+  const stageMap = new Map(rounds.map((section) => [section.stage, section.rows]));
+  const currentFillStage = firstOpenStage(rounds, starts, snapshotKey);
+  const groups = grouped(data.group_standings);
   const lockStages = rounds.map(({ stage, rows }) => ({
     stage,
     label: stageLabel(stage),
@@ -379,9 +393,10 @@ export default async function Home() {
     playedRows: rows.filter(isPlayed).length,
   }));
   const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
-  const actionableChanges = data.changes.filter((row) =>
-    !isStageLocked(row.stage || row.stage_old || "", starts, snapshotKey)
-  );
+  const actionableChanges = data.changes.filter((row) => {
+    const stage = row.stage || row.stage_old || "";
+    return !isStageClosed(stage, stageMap.get(stage) || [], starts, snapshotKey);
+  });
   const scoreChanges = actionableChanges.filter((row) => row.score_old !== row.score_new).length;
 
   return (
@@ -492,12 +507,16 @@ export default async function Home() {
         </section>
 
         <section id="gespeeld" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Gespeelde Wedstrijden</h2>
-              <p className="section-subtitle">Voorspelling naast de echte uitslag zodra results.csv is bijgewerkt.</p>
-            </div>
-          </div>
+          <details className="section-details" open={playedMatches.length > 0 && playedMatches.length <= 8}>
+            <summary className="section-header collapse-summary">
+              <div>
+                <h2 className="section-title">Gespeelde Wedstrijden</h2>
+                <p className="section-subtitle">
+                  {playedMatches.length} gespeeld. Voorspelling naast de echte uitslag zodra results.csv is bijgewerkt.
+                </p>
+              </div>
+              <span className="collapse-caret" aria-hidden="true" />
+            </summary>
           <div className="table-shell">
             <table>
               <thead>
@@ -545,6 +564,7 @@ export default async function Home() {
               </tbody>
             </table>
           </div>
+          </details>
         </section>
 
         <section id="rondes" className="section">
@@ -562,8 +582,8 @@ export default async function Home() {
               const changedRows = rows.filter((row) => row.new_model_score).length;
 
               return (
-                <div className="round-card" key={stage}>
-                  <div className="round-header">
+                <details className="round-card" key={stage} open={stageShouldOpen(stage, currentFillStage)}>
+                  <summary className="round-header collapse-summary">
                     <div>
                       <h3>{stageLabel(stage)}</h3>
                       <div className="metric-note">
@@ -571,8 +591,11 @@ export default async function Home() {
                         {changedRows ? ` - ${changedRows} nieuwe modelscore${changedRows === 1 ? "" : "s"}` : ""}
                       </div>
                     </div>
-                    <span className={`pill ${status.className}`}>{status.label}</span>
-                  </div>
+                    <span className="collapse-actions">
+                      <span className={`pill ${status.className}`}>{status.label}</span>
+                      <span className="collapse-caret" aria-hidden="true" />
+                    </span>
+                  </summary>
                   <div className="table-shell compact-table">
                     <table>
                       <thead>
@@ -616,7 +639,7 @@ export default async function Home() {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </details>
               );
             })}
           </div>
