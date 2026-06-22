@@ -629,10 +629,14 @@ def attach_actual_results(
                 output.get("home_team", ""),
                 output.get("away_team", ""),
             )
+            output["new_model_score"] = model_score if str(model_score) != str(manual_score) else ""
+            output["new_model_predicted_winner"] = model_winner if str(model_winner) != str(manual_winner) else ""
             output["filled_score"] = manual_score
             output["filled_predicted_winner"] = manual_winner
             output["score"] = manual_score
             output["predicted_winner"] = manual_winner
+            output["round_locked"] = True
+            output["round_status"] = "locked"
             output["pre_match_score"] = manual_score
             output["pre_match_predicted_winner"] = manual_winner
             output["score_source"] = "manual_locked_score"

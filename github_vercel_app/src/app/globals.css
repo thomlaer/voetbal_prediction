@@ -334,11 +334,20 @@ tr:last-child td {
   padding: 13px;
 }
 
+.control-stack {
+  display: grid;
+  gap: 10px;
+}
+
 .control-grid {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) auto auto auto;
   gap: 10px;
   align-items: end;
+}
+
+.control-grid.lock-grid {
+  grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.6fr) auto;
 }
 
 .control-field {
@@ -350,7 +359,8 @@ tr:last-child td {
   text-transform: uppercase;
 }
 
-.control-field input {
+.control-field input,
+.control-field select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -537,6 +547,10 @@ tr:last-child td {
   .source-grid,
   .round-scorer-grid,
   .control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .control-grid.lock-grid {
     grid-template-columns: 1fr;
   }
 

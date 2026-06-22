@@ -8,13 +8,32 @@ type Status = {
   actionsUrl?: string;
 };
 
-export function RebuildControl() {
+export type LockStage = {
+  stage: string;
+  label: string;
+  rows: number;
+  lockedRows: number;
+  playedRows: number;
+};
+
+type RebuildControlProps = {
+  lockStages?: LockStage[];
+  defaultLockStage?: string;
+};
+
+export function RebuildControl({ lockStages = [], defaultLockStage = "" }: RebuildControlProps) {
   const [code, setCode] = useState("");
+  const [lockCode, setLockCode] = useState("");
+  const [lockStage, setLockStage] = useState(defaultLockStage || lockStages[0]?.stage || "");
   const [updateSoccerbase, setUpdateSoccerbase] = useState(true);
   const [deployToVercel, setDeployToVercel] = useState(true);
   const [status, setStatus] = useState<Status>({
     kind: "idle",
     message: "Start alleen een update na een ronde of als uitslagen/odds echt veranderd zijn.",
+  });
+  const [lockStatus, setLockStatus] = useState<Status>({
+    kind: "idle",
+    message: "Zet een ronde pas vast nadat je die scores echt hebt ingevuld.",
   });
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -60,55 +79,146 @@ export function RebuildControl() {
     }
   }
 
+  async function lockRound(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLockStatus({ kind: "loading", message: "Ronde vastzetten en rebuild starten..." });
+
+    try {
+      const response = await fetch("/api/lock-round", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: lockCode,
+          stage: lockStage,
+          updateSoccerbase: false,
+          deployToVercel: true,
+        }),
+      });
+      const data = (await response.json()) as {
+        ok?: boolean;
+        message?: string;
+        actionsUrl?: string;
+      };
+
+      if (!response.ok || !data.ok) {
+        setLockStatus({
+          kind: "error",
+          message: data.message || "Ronde vastzetten is mislukt.",
+        });
+        return;
+      }
+
+      setLockStatus({
+        kind: "success",
+        message: data.message || "Ronde vastgezet.",
+        actionsUrl: data.actionsUrl,
+      });
+      setLockCode("");
+    } catch {
+      setLockStatus({ kind: "error", message: "Geen verbinding met de lock-route." });
+    }
+  }
+
   return (
-    <form className="control-panel" onSubmit={submit}>
-      <div className="control-grid">
-        <label className="control-field">
-          <span>Code</span>
-          <input
-            autoComplete="one-time-code"
-            inputMode="numeric"
-            onChange={(event) => setCode(event.target.value)}
-            placeholder="Update-code"
-            type="password"
-            value={code}
-          />
-        </label>
+    <div className="control-stack">
+      <form className="control-panel" onSubmit={submit}>
+        <div className="control-grid">
+          <label className="control-field">
+            <span>Code</span>
+            <input
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              onChange={(event) => setCode(event.target.value)}
+              placeholder="Update-code"
+              type="password"
+              value={code}
+            />
+          </label>
 
-        <label className="check-row">
-          <input
-            checked={updateSoccerbase}
-            onChange={(event) => setUpdateSoccerbase(event.target.checked)}
-            type="checkbox"
-          />
-          Soccerbase verversen
-        </label>
+          <label className="check-row">
+            <input
+              checked={updateSoccerbase}
+              onChange={(event) => setUpdateSoccerbase(event.target.checked)}
+              type="checkbox"
+            />
+            Soccerbase verversen
+          </label>
 
-        <label className="check-row">
-          <input
-            checked={deployToVercel}
-            onChange={(event) => setDeployToVercel(event.target.checked)}
-            type="checkbox"
-          />
-          Daarna live zetten
-        </label>
+          <label className="check-row">
+            <input
+              checked={deployToVercel}
+              onChange={(event) => setDeployToVercel(event.target.checked)}
+              type="checkbox"
+            />
+            Daarna live zetten
+          </label>
 
-        <button className="primary-button" disabled={status.kind === "loading" || !code.trim()} type="submit">
-          {status.kind === "loading" ? "Bezig..." : "Run update"}
-        </button>
-      </div>
+          <button className="primary-button" disabled={status.kind === "loading" || !code.trim()} type="submit">
+            {status.kind === "loading" ? "Bezig..." : "Run update"}
+          </button>
+        </div>
 
-      <div className={`status-line ${status.kind === "error" ? "red" : status.kind === "success" ? "green" : ""}`}>
-        {status.message}
-        {status.actionsUrl ? (
-          <>
-            {" "}
-            <a href={status.actionsUrl} rel="noreferrer" target="_blank">
-              Bekijk GitHub Actions
-            </a>
-          </>
-        ) : null}
-      </div>
-    </form>
+        <div className={`status-line ${status.kind === "error" ? "red" : status.kind === "success" ? "green" : ""}`}>
+          {status.message}
+          {status.actionsUrl ? (
+            <>
+              {" "}
+              <a href={status.actionsUrl} rel="noreferrer" target="_blank">
+                Bekijk GitHub Actions
+              </a>
+            </>
+          ) : null}
+        </div>
+      </form>
+
+      <form className="control-panel" onSubmit={lockRound}>
+        <div className="control-grid lock-grid">
+          <label className="control-field">
+            <span>Ronde vastzetten</span>
+            <select onChange={(event) => setLockStage(event.target.value)} value={lockStage}>
+              {lockStages.map((stage) => (
+                <option key={stage.stage} value={stage.stage}>
+                  {stage.label} ({stage.rows - stage.playedRows} open, {stage.lockedRows} vast)
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="control-field">
+            <span>Code</span>
+            <input
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              onChange={(event) => setLockCode(event.target.value)}
+              placeholder="Update-code"
+              type="password"
+              value={lockCode}
+            />
+          </label>
+
+          <button
+            className="primary-button"
+            disabled={lockStatus.kind === "loading" || !lockCode.trim() || !lockStage}
+            type="submit"
+          >
+            {lockStatus.kind === "loading" ? "Bezig..." : "Zet ronde vast"}
+          </button>
+        </div>
+
+        <div
+          className={`status-line ${lockStatus.kind === "error" ? "red" : lockStatus.kind === "success" ? "green" : ""}`}
+        >
+          {lockStatus.message}
+          {lockStatus.actionsUrl ? (
+            <>
+              {" "}
+              <a href={lockStatus.actionsUrl} rel="noreferrer" target="_blank">
+                Bekijk GitHub Actions
+              </a>
+            </>
+          ) : null}
+        </div>
+      </form>
+    </div>
   );
 }

@@ -370,6 +370,13 @@ export default async function Home() {
   const currentFillStage = firstOpenStage(fillablePredictions, starts, snapshotKey);
   const groups = grouped(data.group_standings);
   const rounds = stageRows(data.predictions);
+  const lockStages = rounds.map(({ stage, rows }) => ({
+    stage,
+    label: stageLabel(stage),
+    rows: rows.length,
+    lockedRows: rows.filter((row) => row.round_locked).length,
+    playedRows: rows.filter(isPlayed).length,
+  }));
   const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
   const actionableChanges = data.changes.filter((row) =>
     !isStageLocked(row.stage || row.stage_old || "", starts, snapshotKey)
@@ -436,7 +443,7 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <RebuildControl />
+          <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
         </section>
 
         <section id="wijzigingen" className="section">
