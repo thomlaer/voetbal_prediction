@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { EspnLivePanel } from "./EspnLivePanel";
 import { RebuildControl } from "./RebuildControl";
 
 type Prediction = {
@@ -444,6 +445,7 @@ export default async function Home() {
             </div>
           </div>
           <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
+          <EspnLivePanel />
         </section>
 
         <section id="wijzigingen" className="section">
