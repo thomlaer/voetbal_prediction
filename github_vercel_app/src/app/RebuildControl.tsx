@@ -178,7 +178,7 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
             <select onChange={(event) => setLockStage(event.target.value)} value={lockStage}>
               {lockStages.map((stage) => (
                 <option key={stage.stage} value={stage.stage}>
-                  {stage.label} ({stage.rows - stage.playedRows} open, {stage.lockedRows} vast)
+                  {stage.label} ({stage.rows - stage.playedRows} nog te spelen, {stage.lockedRows} vast)
                 </option>
               ))}
             </select>
