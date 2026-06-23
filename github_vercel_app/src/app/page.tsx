@@ -186,7 +186,7 @@ function resultClass(row: Prediction) {
 
 function resultLabel(row: Prediction) {
   if (row.prediction_exact === true) return "Exact";
-  if (row.prediction_outcome_correct === true) return "Toto goed";
+  if (row.prediction_outcome_correct === true) return "Winnaar goed";
   if (isPlayed(row)) return "Mis";
   return "-";
 }
@@ -299,10 +299,10 @@ function winnerFromScore(row: Prediction) {
 function displayWinner(row: Prediction) {
   return (
     winnerFromScore(row) ||
-    row.predicted_winner ||
-    row.model_predicted_winner ||
     row.filled_predicted_winner ||
-    row.pre_match_predicted_winner
+    row.pre_match_predicted_winner ||
+    row.predicted_winner ||
+    row.model_predicted_winner
   );
 }
 
@@ -366,7 +366,7 @@ function groupStatus(rows: GroupStanding[]) {
 }
 
 function playedPanelRow(row: Prediction): PlayedMatchRow {
-  const predictedScore = row.pre_match_score || row.score || "";
+  const predictedScore = row.filled_score || row.pre_match_score || row.score || "";
   const actualScore = row.actual_score || "";
 
   return {
@@ -377,7 +377,12 @@ function playedPanelRow(row: Prediction): PlayedMatchRow {
     home_team: row.home_team,
     away_team: row.away_team,
     predicted_score: predictedScore,
-    predicted_winner: row.pre_match_predicted_winner || winnerFromScore(row) || row.predicted_winner || "",
+    predicted_winner:
+      row.filled_predicted_winner ||
+      row.pre_match_predicted_winner ||
+      winnerFromScore(row) ||
+      row.predicted_winner ||
+      "",
     actual_score: actualScore,
     actual_winner: row.actual_winner || "",
     actual_source: row.actual_source || "dashboard",
@@ -435,11 +440,11 @@ export default async function Home() {
           </a>
           <nav className="nav" aria-label="Dashboard">
             <a href="#wijzigingen">Wijzigingen</a>
-            <a href="#update">Update</a>
             <a href="#gespeeld">Gespeeld</a>
             <a href="#rondes">Rondes</a>
             <a href="#groepen">Groepen</a>
             <a href="#kampioen">Kampioen</a>
+            <a href="#update">Beheer</a>
           </nav>
           {data.downloads.probabilities_excel ? (
             <a className="download-link" href={data.downloads.probabilities_excel}>
@@ -473,18 +478,6 @@ export default async function Home() {
             <div className="metric-value">{pct(data.metadata.exact_score_accuracy)}</div>
             <div className="metric-note">historische testset</div>
           </div>
-        </section>
-
-        <section id="update" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Update Starten</h2>
-              <p className="section-subtitle">
-                Start een nieuwe modelrun zodra je nieuwe uitslagen wilt verwerken.
-              </p>
-            </div>
-          </div>
-          <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
         </section>
 
         <section id="wijzigingen" className="section">
@@ -768,6 +761,22 @@ export default async function Home() {
               ))}
             </div>
           ) : null}
+        </section>
+
+        <section id="update" className="section admin-section">
+          <details className="section-details admin-details">
+            <summary className="section-header collapse-summary">
+              <div>
+                <h2 className="section-title">Beheer</h2>
+                <p className="section-subtitle">Update starten of een invulronde vastzetten.</p>
+              </div>
+              <span className="collapse-actions">
+                <span className="pill">code nodig</span>
+                <span className="collapse-caret" aria-hidden="true" />
+              </span>
+            </summary>
+            <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
+          </details>
         </section>
 
       </div>

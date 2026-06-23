@@ -4423,7 +4423,7 @@
       "date": "2026-07-14",
       "stage": "Semifinals",
       "group": "",
-      "home_team": "Germany",
+      "home_team": "Brazil",
       "away_team": "Spain",
       "score": "0-1",
       "home_score": 0,
@@ -4460,7 +4460,8 @@
       "pre_match_source": "current_run",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
-      "actual_online_verified": false
+      "actual_online_verified": false,
+      "bracket_repaired": true
     },
     {
       "match_number": 102,
@@ -4511,20 +4512,20 @@
       "date": "2026-07-18",
       "stage": "Third Place Playoff",
       "group": "",
-      "home_team": "Germany",
-      "away_team": "France",
+      "home_team": "Brazil",
+      "away_team": "Argentina",
       "score": "0-1",
       "home_score": 0,
       "away_score": 1,
-      "predicted_winner": "France",
+      "predicted_winner": "Argentina",
       "confidence": "medium",
       "safe_score": "0-1",
       "upside_score": "0-1",
       "recommended_rule": "safe_expected_points",
       "model_score": "0-1",
-      "model_predicted_winner": "France",
+      "model_predicted_winner": "Argentina",
       "filled_score": "0-1",
-      "filled_predicted_winner": "France",
+      "filled_predicted_winner": "Argentina",
       "new_model_score": "",
       "new_model_predicted_winner": "",
       "round_locked": false,
@@ -4542,13 +4543,14 @@
       "actual_winner": "",
       "actual_source": "",
       "pre_match_score": "0-1",
-      "pre_match_predicted_winner": "France",
+      "pre_match_predicted_winner": "Argentina",
       "pre_match_confidence": "medium",
       "pre_match_model_favourite_prob": 0.694,
       "pre_match_source": "current_run",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
-      "actual_online_verified": false
+      "actual_online_verified": false,
+      "bracket_repaired": true
     },
     {
       "match_number": 104,
@@ -4556,7 +4558,7 @@
       "stage": "Final",
       "group": "",
       "home_team": "Spain",
-      "away_team": "Argentina",
+      "away_team": "France",
       "score": "1-0",
       "home_score": 1,
       "away_score": 0,
@@ -4592,7 +4594,8 @@
       "pre_match_source": "current_run",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
-      "actual_online_verified": false
+      "actual_online_verified": false,
+      "bracket_repaired": true
     }
   ],
   "changes": [

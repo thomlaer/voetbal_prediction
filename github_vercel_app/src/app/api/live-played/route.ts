@@ -14,6 +14,8 @@ type Prediction = {
   home_team: string;
   away_team: string;
   score: string;
+  filled_score?: string;
+  filled_predicted_winner?: string;
   pre_match_score?: string;
   pre_match_predicted_winner?: string;
   predicted_winner?: string;
@@ -95,11 +97,17 @@ function winnerFromScore(row: Prediction, score: string) {
 }
 
 function predictedScore(row: Prediction) {
-  return row.pre_match_score || row.score || "";
+  return row.filled_score || row.pre_match_score || row.score || "";
 }
 
 function predictedWinner(row: Prediction) {
-  return winnerFromScore(row, predictedScore(row)) || row.pre_match_predicted_winner || row.predicted_winner || "";
+  return (
+    winnerFromScore(row, predictedScore(row)) ||
+    row.filled_predicted_winner ||
+    row.pre_match_predicted_winner ||
+    row.predicted_winner ||
+    ""
+  );
 }
 
 function actualScoreFromEspn(match: EspnMatch) {
@@ -142,7 +150,7 @@ function resultClass(exact: boolean, outcomeCorrect: boolean, hasActual: boolean
 
 function resultLabel(exact: boolean, outcomeCorrect: boolean, hasActual: boolean) {
   if (exact) return "Exact";
-  if (outcomeCorrect) return "Toto goed";
+  if (outcomeCorrect) return "Winnaar goed";
   if (hasActual) return "Mis";
   return "-";
 }

@@ -376,6 +376,36 @@ tr:last-child td {
   padding: 13px;
 }
 
+.admin-section {
+  margin-top: 28px;
+  padding-bottom: 18px;
+}
+
+.admin-details {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.admin-details .control-stack {
+  gap: 8px;
+}
+
+.admin-details .control-panel {
+  box-shadow: none;
+  padding: 10px;
+}
+
+.admin-details .control-field input,
+.admin-details .control-field select {
+  font-size: 13px;
+  padding: 8px 9px;
+}
+
+.admin-details .primary-button {
+  min-height: 36px;
+  padding: 8px 11px;
+}
+
 .control-stack {
   display: grid;
   gap: 10px;

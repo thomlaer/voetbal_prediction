@@ -257,6 +257,129 @@ def is_placeholder_team(value: Any) -> bool:
     return not text or text == "nan" or text.startswith("winner ") or text.startswith("group ")
 
 
+KNOCKOUT_WINNER_LINKS = {
+    89: (73, 75),
+    90: (74, 77),
+    91: (76, 78),
+    92: (79, 80),
+    93: (83, 84),
+    94: (81, 82),
+    95: (86, 88),
+    96: (85, 87),
+    97: (89, 90),
+    98: (93, 94),
+    99: (91, 92),
+    100: (95, 96),
+    101: (97, 98),
+    102: (99, 100),
+    104: (101, 102),
+}
+
+KNOCKOUT_LOSER_LINKS = {
+    103: (101, 102),
+}
+
+
+def participant_winner(row: dict[str, Any]) -> str:
+    home = canonical_team_name(row.get("home_team", ""))
+    away = canonical_team_name(row.get("away_team", ""))
+    if row.get("actual_available") and row.get("actual_score"):
+        winner = score_winner(row.get("actual_score"), home, away)
+        if winner:
+            return winner
+
+    for score_field in ("filled_score", "pre_match_score", "score", "model_score"):
+        winner = score_winner(row.get(score_field), home, away)
+        if winner:
+            if winner == "Draw":
+                break
+            return winner
+
+    for winner_field in (
+        "actual_winner",
+        "filled_predicted_winner",
+        "pre_match_predicted_winner",
+        "predicted_winner",
+        "model_predicted_winner",
+    ):
+        winner = canonical_winner(row.get(winner_field, ""), home, away)
+        if normalize_key(winner) in {normalize_key(home), normalize_key(away)}:
+            return winner
+    return home
+
+
+def participant_loser(row: dict[str, Any]) -> str:
+    home = canonical_team_name(row.get("home_team", ""))
+    away = canonical_team_name(row.get("away_team", ""))
+    winner = participant_winner(row)
+    if normalize_key(winner) == normalize_key(home):
+        return away
+    if normalize_key(winner) == normalize_key(away):
+        return home
+    return away
+
+
+def normalize_row_winners(row: dict[str, Any]) -> None:
+    for score_field, winner_field in (
+        ("score", "predicted_winner"),
+        ("model_score", "model_predicted_winner"),
+        ("filled_score", "filled_predicted_winner"),
+        ("pre_match_score", "pre_match_predicted_winner"),
+        ("new_model_score", "new_model_predicted_winner"),
+    ):
+        if score_field not in row:
+            continue
+        winner = score_winner(row.get(score_field), row.get("home_team", ""), row.get("away_team", ""))
+        if winner:
+            row[winner_field] = winner
+
+
+def repair_knockout_bracket(predictions: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Propagate displayed knockout winners through later displayed rounds.
+
+    The scorer/model outputs are generated in multiple steps. If a later score
+    layer changes a knockout winner, dependent rows must be refreshed too;
+    otherwise a team can lose one row and still appear in the next round.
+    """
+    rows_by_match = {
+        int(row.get("match_number")): row
+        for row in predictions
+        if str(row.get("match_number", "")).isdigit()
+    }
+
+    for match_number, (home_source, away_source) in KNOCKOUT_WINNER_LINKS.items():
+        row = rows_by_match.get(match_number)
+        home_row = rows_by_match.get(home_source)
+        away_row = rows_by_match.get(away_source)
+        if not row or not home_row or not away_row:
+            continue
+
+        home_team = participant_winner(home_row)
+        away_team = participant_winner(away_row)
+        if row.get("home_team") != home_team or row.get("away_team") != away_team:
+            row["home_team"] = home_team
+            row["away_team"] = away_team
+            row["bracket_repaired"] = True
+        normalize_row_winners(row)
+
+    for match_number, (home_source, away_source) in KNOCKOUT_LOSER_LINKS.items():
+        row = rows_by_match.get(match_number)
+        home_row = rows_by_match.get(home_source)
+        away_row = rows_by_match.get(away_source)
+        if not row or not home_row or not away_row:
+            continue
+
+        home_team = participant_loser(home_row)
+        away_team = participant_loser(away_row)
+        if row.get("home_team") != home_team or row.get("away_team") != away_team:
+            row["home_team"] = home_team
+            row["away_team"] = away_team
+            row["bracket_repaired"] = True
+        normalize_row_winners(row)
+
+    return [canonicalize_prediction_row(row) for row in predictions]
+
+
 def head_to_head_stats(
     teams: set[str],
     matches: list[tuple[str, str, int, int]],
@@ -1030,7 +1153,7 @@ def main() -> None:
         if str(row.get("match_number", "")).strip() not in played_match_numbers
     ]
 
-    predictions = [canonicalize_prediction_row(row) for row in predictions]
+    predictions = repair_knockout_bracket(predictions)
     champions = read_csv(run_dir / "scorito_champion_picks.csv")
     top_scorers = read_csv(run_dir / "scorito_topscorer_picks.csv")
     group_top_scorers = read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv")

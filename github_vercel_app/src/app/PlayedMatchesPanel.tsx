@@ -112,7 +112,7 @@ export function PlayedMatchesPanel({ initialRows }: PlayedMatchesPanelProps) {
         <div>
           <h2 className="section-title">Gespeelde Wedstrijden</h2>
           <p className="section-subtitle">
-            {rows.length} gespeeld - {summary.exact} exact - {summary.outcome} toto goed.
+            {rows.length} gespeeld - {summary.exact} exact - {summary.outcome} winnaar goed.
           </p>
         </div>
         <span className="collapse-actions">
