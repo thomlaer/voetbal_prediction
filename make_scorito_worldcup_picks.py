@@ -532,9 +532,6 @@ def load_knockout_rows(bracket_path: Path, schedule_path: Path) -> pd.DataFrame:
         [0.55, 0.75],
         default=1.02,
     )
-    late_stage = bracket["stage"].isin(["Quarterfinals", "Semifinals", "Third Place Playoff", "Final"])
-    winner_xg = np.where(late_stage, winner_xg * 0.92, winner_xg)
-    loser_xg = np.where(late_stage, loser_xg * 0.92, loser_xg)
     bracket["expected_home_goals"] = np.where(home_is_winner, winner_xg, loser_xg)
     bracket["expected_away_goals"] = np.where(home_is_winner, loser_xg, winner_xg)
     bracket["group"] = ""
