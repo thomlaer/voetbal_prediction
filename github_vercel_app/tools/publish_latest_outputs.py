@@ -765,6 +765,10 @@ def attach_actual_results(
             output["score_source"] = "manual_locked_score"
             output["pre_match_source"] = "manual_locked_score"
 
+        if output.get("actual_available") or output.get("actual_score"):
+            output["new_model_score"] = ""
+            output["new_model_predicted_winner"] = ""
+
         output = canonicalize_prediction_row(output)
 
         if output["actual_available"]:
