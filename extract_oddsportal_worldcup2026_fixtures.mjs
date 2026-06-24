@@ -30,6 +30,7 @@ const DECRYPTION_SALT_TEXT = "5b9a8f2c3e6d1a4b7c8e9d0f1a2b3c4d";
 const TEAM_ALIASES = new Map(
   Object.entries({
     "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Bosnia-Herzegovina": "Bosnia and Herzegovina",
     "Czech Rep": "Czech Republic",
     Curacao: "Curaçao",
     "Cote d'Ivoire": "Ivory Coast",
@@ -659,9 +660,6 @@ function hydrateFixturesWithEspn(fixtures, espnFixtures) {
       .map((row) => [`${row.home_slot}|${row.away_slot}`, row]),
   );
   return fixtures.map((fixture) => {
-    if (String(fixture.stage || "").toLowerCase().includes("group")) {
-      return fixture;
-    }
     const espn = espnByMatchNumber.get(String(fixture.match_number)) || espnBySlotPair.get(fixtureSlotPair(fixture));
     if (!espn) {
       return fixture;

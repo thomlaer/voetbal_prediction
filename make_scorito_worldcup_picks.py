@@ -1371,20 +1371,64 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
     return ranking
 
 
-def build_stage_topscorer_ranking(topscorers: pd.DataFrame, team_probs: pd.DataFrame) -> pd.DataFrame:
+TOPSCORER_STAGE_DEFS = [
+    ("Group Stage", "Groepsfase", "expected_group_gf"),
+    ("Round of 32", "1/16 finale", "advance_r32_prob"),
+    ("Round of 16", "Achtste finale", "advance_r16_prob"),
+    ("Quarterfinals", "Kwartfinale", "advance_qf_prob"),
+    ("Semifinals", "Halve finale", "advance_sf_prob"),
+    ("Final/Third", "Finale/troost", "advance_sf_prob"),
+]
+
+
+def topscorer_stage_from_match_stage(stage: Any) -> str:
+    text = str(stage or "")
+    if text in {"Final", "Third Place Playoff"}:
+        return "Final/Third"
+    return text
+
+
+def stage_team_goal_expectations(pool: pd.DataFrame) -> dict[str, dict[str, float]]:
+    """Expected team goals by displayed topscorer round.
+
+    This uses the current predicted bracket rows instead of broad advancement
+    probabilities, so round-specific scorer lists stay aligned with the actual
+    teams shown in the dashboard for 1/16, quarters, semis and final/troost.
+    """
+    output: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    if pool.empty:
+        return {}
+    for row in pool.itertuples(index=False):
+        stage = topscorer_stage_from_match_stage(getattr(row, "stage", ""))
+        if stage not in {stage_name for stage_name, _label, _source in TOPSCORER_STAGE_DEFS}:
+            continue
+        actual_available = bool(getattr(row, "actual_available", False))
+        if actual_available:
+            home_goals = numeric(getattr(row, "actual_home_score", np.nan), numeric(getattr(row, "home_score", 0.0)))
+            away_goals = numeric(getattr(row, "actual_away_score", np.nan), numeric(getattr(row, "away_score", 0.0)))
+        else:
+            home_goals = numeric(getattr(row, "expected_home_goals", np.nan), numeric(getattr(row, "home_score", 0.0)))
+            away_goals = numeric(getattr(row, "expected_away_goals", np.nan), numeric(getattr(row, "away_score", 0.0)))
+        home_key = topscorer_team_key(getattr(row, "home_team", ""))
+        away_key = topscorer_team_key(getattr(row, "away_team", ""))
+        if home_key:
+            output[stage][home_key] += max(home_goals, 0.0)
+        if away_key:
+            output[stage][away_key] += max(away_goals, 0.0)
+    return {stage: dict(values) for stage, values in output.items()}
+
+
+def build_stage_topscorer_ranking(
+    topscorers: pd.DataFrame,
+    team_probs: pd.DataFrame,
+    pool: pd.DataFrame | None = None,
+) -> pd.DataFrame:
     if topscorers.empty:
         return pd.DataFrame()
 
     team_probs = expected_matches_and_goals(team_probs)
     team_lookup = {topscorer_team_key(row["team"]): row for _, row in team_probs.iterrows()}
-    stages = [
-        ("Group Stage", "Groepsfase", "expected_group_gf"),
-        ("Round of 32", "1/16 finale", "advance_r32_prob"),
-        ("Round of 16", "Achtste finale", "advance_r16_prob"),
-        ("Quarterfinals", "Kwartfinale", "advance_qf_prob"),
-        ("Semifinals", "Halve finale", "advance_sf_prob"),
-        ("Final/Third", "Finale/troost", "advance_sf_prob"),
-    ]
+    stage_goal_map = stage_team_goal_expectations(pool) if pool is not None else {}
     rows: list[dict[str, Any]] = []
     for player in topscorers.itertuples(index=False):
         team_key = topscorer_team_key(getattr(player, "team", ""))
@@ -1395,8 +1439,10 @@ def build_stage_topscorer_ranking(topscorers: pd.DataFrame, team_probs: pd.DataF
         group_rate = max(group_gf / 3.0, 0.0)
         goal_share = max(numeric(getattr(player, "goal_share", 0.0)), 0.0)
         star_power = max(numeric(getattr(player, "star_scorer_power", 1.0), 1.0), 0.0)
-        for stage, label, source_col in stages:
-            if stage == "Group Stage":
+        for stage, label, source_col in TOPSCORER_STAGE_DEFS:
+            if stage in stage_goal_map:
+                team_stage_goals = numeric(stage_goal_map[stage].get(team_key, 0.0), 0.0)
+            elif stage == "Group Stage":
                 team_stage_goals = group_gf
             else:
                 # Knockout matches are tighter than group matches, so use the
@@ -1440,7 +1486,7 @@ def build_stage_topscorer_ranking(topscorers: pd.DataFrame, team_probs: pd.DataF
         ascending=[True, False, False, False],
     )
     output["stage_rank"] = output.groupby("stage").cumcount() + 1
-    stage_order = {stage: idx for idx, (stage, _label, _source) in enumerate(stages)}
+    stage_order = {stage: idx for idx, (stage, _label, _source) in enumerate(TOPSCORER_STAGE_DEFS)}
     output["stage_order"] = output["stage"].map(stage_order)
     output = output.sort_values(["stage_order", "stage_rank"]).reset_index(drop=True)
     return output
@@ -1586,7 +1632,7 @@ def main() -> None:
     champion = champion_picks(team_probs)
     spain_france = spain_france_check(team_probs)
     topscorers_all = build_topscorer_ranking(args, team_probs)
-    stage_topscorers = build_stage_topscorer_ranking(topscorers_all, team_probs)
+    stage_topscorers = build_stage_topscorer_ranking(topscorers_all, team_probs, pool)
     topscorers = topscorers_all.head(args.top_n)
     groupstage_topscorers = (
         topscorers_all.sort_values("recommended_group_stage_topscorer_score", ascending=False)
