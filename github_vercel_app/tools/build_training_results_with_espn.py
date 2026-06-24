@@ -177,7 +177,7 @@ def merge_results(base: pd.DataFrame, espn: pd.DataFrame, date_window_days: int)
     stats = {
         "espn_completed": 0,
         "filled_missing_scores": 0,
-        "overwritten_conflicts": 0,
+        "kept_base_conflicts": 0,
         "skipped_existing": 0,
         "appended_unmatched": 0,
         "skipped_invalid": 0,
@@ -219,9 +219,7 @@ def merge_results(base: pd.DataFrame, espn: pd.DataFrame, date_window_days: int)
             if str(current["home_score"]).strip() == target_home_score and str(current["away_score"]).strip() == target_away_score:
                 stats["skipped_existing"] += 1
             else:
-                merged.at[idx, "home_score"] = target_home_score
-                merged.at[idx, "away_score"] = target_away_score
-                stats["overwritten_conflicts"] += 1
+                stats["kept_base_conflicts"] += 1
             continue
 
         merged.at[idx, "home_score"] = target_home_score
@@ -245,7 +243,7 @@ def main() -> None:
         f"base_rows={len(base):,}, output_rows={len(merged):,}, "
         f"espn_completed={stats['espn_completed']:,}, "
         f"filled={stats['filled_missing_scores']:,}, "
-        f"overwritten={stats['overwritten_conflicts']:,}, "
+        f"kept_base_conflicts={stats['kept_base_conflicts']:,}, "
         f"existing={stats['skipped_existing']:,}, "
         f"appended={stats['appended_unmatched']:,}, "
         f"invalid={stats['skipped_invalid']:,}, "
