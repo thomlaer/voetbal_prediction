@@ -985,6 +985,41 @@ def build_round_top_scorers(
     return ranked
 
 
+def normalize_stage_top_scorers(rows: list[dict[str, Any]], limit_per_stage: int = 8) -> list[dict[str, Any]]:
+    if not rows:
+        return []
+    stage_order = {stage: idx for idx, stage in enumerate(STAGE_ORDER + ["Final/Third"])}
+    grouped_rows: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        stage = str(row.get("stage", ""))
+        if not stage:
+            continue
+        grouped_rows.setdefault(stage, []).append(row)
+
+    output: list[dict[str, Any]] = []
+    for stage, stage_rows in grouped_rows.items():
+        stage_rows.sort(
+            key=lambda item: (
+                float(item.get("recommended_stage_topscorer_score") or 0.0),
+                float(item.get("expected_scorito_points") or 0.0),
+                float(item.get("expected_goals") or 0.0),
+            ),
+            reverse=True,
+        )
+        for rank, row in enumerate(stage_rows[:limit_per_stage], 1):
+            output.append(
+                {
+                    **row,
+                    "round_rank": row.get("stage_rank") or rank,
+                    "stage_rank": row.get("stage_rank") or rank,
+                    "stage_label": row.get("stage_label") or stage,
+                    "stage_order": row.get("stage_order", stage_order.get(stage, 999)),
+                }
+            )
+    output.sort(key=lambda row: (int(row.get("stage_order") or 999), int(row.get("round_rank") or 999)))
+    return output
+
+
 def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     fields = [
         "match_number",
@@ -1157,8 +1192,13 @@ def main() -> None:
     champions = read_csv(run_dir / "scorito_champion_picks.csv")
     top_scorers = read_csv(run_dir / "scorito_topscorer_picks.csv")
     group_top_scorers = read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv")
+    stage_top_scorers = read_csv(run_dir / "scorito_stage_topscorer_picks.csv")
     group_standings = build_group_standings(predictions, champions)
-    round_top_scorers = build_round_top_scorers(top_scorers, group_top_scorers, champions)
+    round_top_scorers = (
+        normalize_stage_top_scorers(stage_top_scorers)
+        if stage_top_scorers
+        else build_round_top_scorers(top_scorers, group_top_scorers, champions)
+    )
 
     downloads = {
         "compact_excel": copy_first_existing(
@@ -1214,6 +1254,11 @@ def main() -> None:
             model_root / "data" / "extracted" / "soccerbase_cards_events.csv",
             "rolling cards/referee source",
         ),
+        file_status(
+            "Manual player adjustments",
+            model_root / "data" / "extracted" / "manual_player_adjustments.csv",
+            "optional injuries, suspensions, penalty takers and player notes",
+        ),
     ]
 
     dashboard = {
@@ -1236,6 +1281,7 @@ def main() -> None:
         "group_standings": group_standings,
         "top_scorers": top_scorers,
         "group_top_scorers": group_top_scorers,
+        "stage_top_scorers": stage_top_scorers,
         "round_top_scorers": round_top_scorers,
         "sources": sources,
     }

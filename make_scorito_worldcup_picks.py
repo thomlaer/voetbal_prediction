@@ -37,6 +37,9 @@ DEFAULT_SQUADS = Path("data/extracted/wikipedia_worldcup2026_squads_finalish.csv
 DEFAULT_SOFIFA = Path("data/extracted/sofifa_yearly_player_ratings.csv")
 DEFAULT_GOALSCORERS = Path("data/goalscorers.csv")
 DEFAULT_CARDS = Path("data/extracted/soccerbase_cards_events.csv")
+DEFAULT_LINEUPS = Path("data/extracted/soccerbase_lineups_used.csv")
+DEFAULT_ESPN_RESULTS = Path("data/extracted/espn_worldcup2026_results.csv")
+DEFAULT_PLAYER_ADJUSTMENTS = Path("data/extracted/manual_player_adjustments.csv")
 
 
 OUTCOME_COLUMNS = ["prob_home_win", "prob_draw", "prob_away_win"]
@@ -56,8 +59,24 @@ TOPSCORER_COLUMNS = [
     "team_expected_goals",
     "team_champion_prob",
     "raw_scorer_weight",
+    "adjusted_scorer_weight",
     "team_weight_sum",
     "goal_share",
+    "current_tournament_goals",
+    "current_tournament_penalty_goals",
+    "current_tournament_apps",
+    "current_tournament_starts",
+    "current_tournament_sub_apps",
+    "lineup_team_matches",
+    "live_form_multiplier",
+    "availability_factor",
+    "player_context_match_score",
+    "manual_status",
+    "manual_penalty_taker",
+    "manual_goal_share_multiplier",
+    "manual_player_multiplier",
+    "manual_adjustment_match_score",
+    "manual_note",
     "expected_group_stage_goals",
     "expected_goals",
     "prob_4plus_goals",
@@ -102,6 +121,12 @@ ROBUST_HYBRID_SCORE_PARAMS = {
     "close_second_winner_draw_max": 0.30,
     "close_second_winner_open_total_xg": 2.25,
 }
+TOPSCORER_INTL_MULT = 0.80
+TOPSCORER_STAR_BLEND = 0.45
+TOPSCORER_PAST_GOAL_BONUS = 1.35
+TOPSCORER_PAST_START_BONUS = 0.05
+TOPSCORER_PAST_APP_BONUS = 0.03
+TOPSCORER_PENALTY_GOAL_BONUS = 0.70
 
 
 def parse_args() -> argparse.Namespace:
@@ -114,6 +139,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sofifa", type=Path, default=DEFAULT_SOFIFA)
     parser.add_argument("--goalscorers", type=Path, default=DEFAULT_GOALSCORERS)
     parser.add_argument("--cards", type=Path, default=DEFAULT_CARDS)
+    parser.add_argument("--lineups", type=Path, default=DEFAULT_LINEUPS)
+    parser.add_argument("--espn-results", type=Path, default=DEFAULT_ESPN_RESULTS)
+    parser.add_argument("--player-adjustments", type=Path, default=DEFAULT_PLAYER_ADJUSTMENTS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--max-goals", type=int, default=6)
     parser.add_argument("--close-margin", type=float, default=0.10)
@@ -824,6 +852,17 @@ def numeric(value: Any, default: float = 0.0) -> float:
         return default
 
 
+def parse_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    text = str(value).strip().lower()
+    if text in {"", "nan", "none", "null"}:
+        return False
+    return text in {"true", "1", "yes", "y"}
+
+
 def position_weight(position: Any, player_positions: Any) -> float:
     squad_pos = str(position or "").upper()
     fifa_pos = str(player_positions or "").upper()
@@ -853,6 +892,340 @@ def scorito_points_per_goal(position: Any) -> int:
     return 0
 
 
+def scorito_stage_points_per_goal(position: Any, stage: str) -> int:
+    base = scorito_points_per_goal(position)
+    if base <= 0:
+        return 0
+    multipliers = {
+        "Group Stage": 1,
+        "Round of 32": 2,
+        "Round of 16": 3,
+        "Quarterfinals": 4,
+        "Semifinals": 5,
+        "Final/Third": 6,
+    }
+    return int(base * multipliers.get(stage, 1))
+
+
+def topscorer_team_key(value: Any) -> str:
+    key = normalize_name(value)
+    aliases = {
+        "bosnia hz": "bosnia and herzegovina",
+        "bosnia h z": "bosnia and herzegovina",
+        "czech rep": "czech republic",
+        "czechia": "czech republic",
+        "ivory coast": "ivory coast",
+        "cote d ivoire": "ivory coast",
+        "curacao": "curacao",
+        "usa": "united states",
+    }
+    return aliases.get(key, key)
+
+
+def worldcup_match_keys(schedule_path: Path, results_path: Path, year: int = 2026) -> set[tuple[str, str, str]]:
+    keys: set[tuple[str, str, str]] = set()
+    for path in (schedule_path, results_path):
+        if not path.exists():
+            continue
+        try:
+            frame = pd.read_csv(path, usecols=lambda col: col in {"date", "home_team", "away_team"})
+        except ValueError:
+            continue
+        if frame.empty:
+            continue
+        frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
+        frame = frame[frame["date"].dt.year.eq(year)]
+        for row in frame.itertuples(index=False):
+            date = row.date.strftime("%Y-%m-%d") if pd.notna(row.date) else ""
+            home = topscorer_team_key(row.home_team)
+            away = topscorer_team_key(row.away_team)
+            if date and home and away:
+                keys.add((date, home, away))
+    return keys
+
+
+def is_worldcup_match_row(row: pd.Series, keys: set[tuple[str, str, str]], year: int = 2026) -> bool:
+    date_value = pd.to_datetime(row.get("date"), errors="coerce")
+    if pd.isna(date_value) or int(date_value.year) != year:
+        return False
+    date = date_value.strftime("%Y-%m-%d")
+    home = topscorer_team_key(row.get("home_team"))
+    away = topscorer_team_key(row.get("away_team"))
+    return (date, home, away) in keys
+
+
+def empty_player_context() -> dict[str, float]:
+    return {
+        "current_tournament_goals": 0.0,
+        "current_tournament_penalty_goals": 0.0,
+        "current_tournament_apps": 0.0,
+        "current_tournament_starts": 0.0,
+        "current_tournament_sub_apps": 0.0,
+        "current_tournament_yellow_cards": 0.0,
+        "current_tournament_red_cards": 0.0,
+        "lineup_team_matches": 0.0,
+        "player_context_match_score": 0.0,
+    }
+
+
+def load_topscorer_player_context(args: argparse.Namespace, teams: set[str], year: int = 2026) -> dict[str, Any]:
+    match_keys = worldcup_match_keys(
+        getattr(args, "schedule", DEFAULT_SCHEDULE),
+        getattr(args, "espn_results", DEFAULT_ESPN_RESULTS),
+        year,
+    )
+    player_rows: dict[tuple[str, str], dict[str, float]] = defaultdict(empty_player_context)
+    team_lineup_matches: dict[str, set[Any]] = defaultdict(set)
+
+    goals_path = getattr(args, "goalscorers", DEFAULT_GOALSCORERS)
+    if goals_path.exists() and match_keys:
+        goals = pd.read_csv(goals_path)
+        goals["date"] = pd.to_datetime(goals["date"], errors="coerce")
+        goals = goals[goals.apply(lambda row: is_worldcup_match_row(row, match_keys, year), axis=1)].copy()
+        goals = goals[goals["own_goal"].astype(str).str.lower().isin({"false", "0", "nan", ""})]
+        for row in goals.itertuples(index=False):
+            team_key = topscorer_team_key(getattr(row, "team", ""))
+            if team_key not in teams:
+                continue
+            player_key = normalize_person_name(getattr(row, "scorer", ""))
+            if not player_key:
+                continue
+            record = player_rows[(team_key, player_key)]
+            record["current_tournament_goals"] += 1.0
+            if parse_bool(getattr(row, "penalty", False)):
+                record["current_tournament_penalty_goals"] += 1.0
+
+    lineups_path = getattr(args, "lineups", DEFAULT_LINEUPS)
+    if lineups_path.exists() and match_keys:
+        lineups = pd.read_csv(
+            lineups_path,
+            usecols=lambda col: col
+            in {
+                "date",
+                "competition",
+                "season",
+                "soccerbase_game_id",
+                "home_team",
+                "away_team",
+                "team",
+                "player_name",
+                "is_starter",
+                "is_sub_used",
+            },
+            low_memory=False,
+        )
+        lineups["date"] = pd.to_datetime(lineups["date"], errors="coerce")
+        lineups = lineups[
+            lineups["competition"].astype(str).str.contains("World Cup", case=False, na=False)
+            & lineups["date"].dt.year.eq(year)
+        ].copy()
+        lineups = lineups[lineups.apply(lambda row: is_worldcup_match_row(row, match_keys, year), axis=1)]
+        for row in lineups.itertuples(index=False):
+            team_key = topscorer_team_key(getattr(row, "team", ""))
+            if team_key not in teams:
+                continue
+            player_key = normalize_person_name(getattr(row, "player_name", ""))
+            if not player_key:
+                continue
+            match_id = getattr(row, "soccerbase_game_id", None)
+            team_lineup_matches[team_key].add(match_id if not pd.isna(match_id) else getattr(row, "date", ""))
+            record = player_rows[(team_key, player_key)]
+            is_starter = parse_bool(getattr(row, "is_starter", False))
+            is_sub_used = parse_bool(getattr(row, "is_sub_used", False))
+            if is_starter or is_sub_used:
+                record["current_tournament_apps"] += 1.0
+            if is_starter:
+                record["current_tournament_starts"] += 1.0
+            if is_sub_used:
+                record["current_tournament_sub_apps"] += 1.0
+
+    cards_path = getattr(args, "cards", DEFAULT_CARDS)
+    if cards_path.exists() and match_keys:
+        cards = pd.read_csv(
+            cards_path,
+            usecols=lambda col: col
+            in {"date", "competition", "home_team", "away_team", "team", "player_name", "card_type"},
+            low_memory=False,
+        )
+        cards["date"] = pd.to_datetime(cards["date"], errors="coerce")
+        cards = cards[
+            cards["competition"].astype(str).str.contains("World Cup", case=False, na=False)
+            & cards["date"].dt.year.eq(year)
+        ].copy()
+        cards = cards[cards.apply(lambda row: is_worldcup_match_row(row, match_keys, year), axis=1)]
+        for row in cards.itertuples(index=False):
+            team_key = topscorer_team_key(getattr(row, "team", ""))
+            if team_key not in teams:
+                continue
+            player_key = normalize_person_name(getattr(row, "player_name", ""))
+            if not player_key:
+                continue
+            record = player_rows[(team_key, player_key)]
+            card_type = str(getattr(row, "card_type", "")).lower()
+            if "red" in card_type:
+                record["current_tournament_red_cards"] += 1.0
+            elif "yellow" in card_type:
+                record["current_tournament_yellow_cards"] += 1.0
+
+    for (team_key, _player_key), record in player_rows.items():
+        record["lineup_team_matches"] = float(len(team_lineup_matches.get(team_key, set())))
+
+    by_team: dict[str, list[tuple[str, dict[str, float]]]] = defaultdict(list)
+    for (team_key, player_key), record in player_rows.items():
+        by_team[team_key].append((player_key, record))
+
+    return {
+        "exact": player_rows,
+        "by_team": by_team,
+        "team_lineup_matches": {team: float(len(matches)) for team, matches in team_lineup_matches.items()},
+    }
+
+
+def find_player_context(
+    team_key: str,
+    player_key: str,
+    context: dict[str, Any],
+) -> dict[str, float]:
+    exact = context.get("exact", {}).get((team_key, player_key))
+    if exact is not None:
+        output = dict(exact)
+        output["player_context_match_score"] = 1.0
+        return output
+
+    best_score = 0.0
+    best_record: dict[str, float] | None = None
+    for candidate_key, record in context.get("by_team", {}).get(team_key, []):
+        score = person_name_match_score(player_key, candidate_key)
+        if score > best_score:
+            best_score = score
+            best_record = record
+    if best_record is not None and best_score >= 0.74:
+        output = dict(best_record)
+        output["player_context_match_score"] = best_score
+        return output
+
+    output = empty_player_context()
+    output["lineup_team_matches"] = float(context.get("team_lineup_matches", {}).get(team_key, 0.0))
+    return output
+
+
+def player_live_form_multiplier(context_row: dict[str, float]) -> tuple[float, float]:
+    goals = float(context_row.get("current_tournament_goals", 0.0))
+    starts = float(context_row.get("current_tournament_starts", 0.0))
+    apps = float(context_row.get("current_tournament_apps", 0.0))
+    penalties = float(context_row.get("current_tournament_penalty_goals", 0.0))
+    red_cards = float(context_row.get("current_tournament_red_cards", 0.0))
+    lineup_matches = float(context_row.get("lineup_team_matches", 0.0))
+
+    form = (
+        1.0
+        + TOPSCORER_PAST_GOAL_BONUS * min(goals, 4.0)
+        + TOPSCORER_PAST_START_BONUS * math.sqrt(min(starts, 7.0))
+        + TOPSCORER_PAST_APP_BONUS * math.sqrt(min(apps, 7.0))
+        + TOPSCORER_PENALTY_GOAL_BONUS * min(penalties, 2.0)
+    )
+
+    availability = 1.0
+    if lineup_matches >= 2 and apps <= 0:
+        availability = 0.08
+    elif lineup_matches >= 1 and apps <= 0:
+        availability = 0.35
+    if red_cards > 0:
+        availability *= 0.70
+    return float(max(form, 0.05)), float(max(availability, 0.02))
+
+
+def empty_manual_adjustment() -> dict[str, Any]:
+    return {
+        "status": "",
+        "penalty_taker": "",
+        "goal_share_multiplier": 1.0,
+        "note": "",
+        "manual_adjustment_match_score": 0.0,
+    }
+
+
+def load_manual_player_adjustments(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {"exact": {}, "by_team": defaultdict(list)}
+    frame = pd.read_csv(path)
+    if frame.empty:
+        return {"exact": {}, "by_team": defaultdict(list)}
+    required = {"team", "player"}
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"Manual player adjustments missing columns: {sorted(missing)}")
+
+    exact: dict[tuple[str, str], dict[str, Any]] = {}
+    by_team: dict[str, list[tuple[str, dict[str, Any]]]] = defaultdict(list)
+    for row in frame.fillna("").to_dict("records"):
+        team_key = topscorer_team_key(row.get("team"))
+        player_key = normalize_person_name(row.get("player"))
+        if not team_key or not player_key:
+            continue
+        record = {
+            "status": str(row.get("status", "")).strip().lower(),
+            "penalty_taker": str(row.get("penalty_taker", "")).strip().lower(),
+            "goal_share_multiplier": numeric(row.get("goal_share_multiplier"), 1.0),
+            "note": str(row.get("note", "")).strip(),
+            "manual_adjustment_match_score": 1.0,
+        }
+        exact[(team_key, player_key)] = record
+        by_team[team_key].append((player_key, record))
+    return {"exact": exact, "by_team": by_team}
+
+
+def find_manual_adjustment(team_key: str, player_key: str, adjustments: dict[str, Any]) -> dict[str, Any]:
+    exact = adjustments.get("exact", {}).get((team_key, player_key))
+    if exact is not None:
+        return dict(exact)
+
+    best_score = 0.0
+    best_record: dict[str, Any] | None = None
+    for candidate_key, record in adjustments.get("by_team", {}).get(team_key, []):
+        score = person_name_match_score(player_key, candidate_key)
+        if score > best_score:
+            best_score = score
+            best_record = record
+    if best_record is not None and best_score >= 0.78:
+        output = dict(best_record)
+        output["manual_adjustment_match_score"] = best_score
+        return output
+    return empty_manual_adjustment()
+
+
+def manual_status_factor(status: Any) -> float:
+    text = str(status or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if text in {"out", "injured", "suspended", "not_available", "unavailable"}:
+        return 0.02
+    if text in {"doubtful", "questionable"}:
+        return 0.45
+    if text in {"bench_risk", "rotation_risk", "likely_bench"}:
+        return 0.60
+    if text in {"minor_knock", "limited"}:
+        return 0.75
+    return 1.0
+
+
+def manual_penalty_factor(value: Any) -> float:
+    text = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if text in {"yes", "y", "true", "1", "primary", "first", "main"}:
+        return 1.18
+    if text in {"likely", "probable"}:
+        return 1.14
+    if text in {"backup", "secondary", "maybe"}:
+        return 1.07
+    return 1.0
+
+
+def manual_player_multiplier(adjustment: dict[str, Any]) -> float:
+    status_factor = manual_status_factor(adjustment.get("status"))
+    penalty_factor = manual_penalty_factor(adjustment.get("penalty_taker"))
+    share_factor = numeric(adjustment.get("goal_share_multiplier"), 1.0)
+    share_factor = min(max(share_factor, 0.02), 3.0)
+    return float(status_factor * penalty_factor * share_factor)
+
+
 def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) -> pd.DataFrame:
     if not args.squads.exists():
         return pd.DataFrame(columns=TOPSCORER_COLUMNS)
@@ -869,12 +1242,21 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
     team_group_goal_map = dict(zip(team_probs["team"], team_probs["expected_group_gf"]))
     team_match_map = dict(zip(team_probs["team"], team_probs["expected_matches"]))
     champ_map = dict(zip(team_probs["team"], team_probs["champion_prob"]))
+    player_context = load_topscorer_player_context(
+        args,
+        {topscorer_team_key(team) for team in squads["team"].dropna().unique()},
+    )
+    manual_adjustments = load_manual_player_adjustments(
+        getattr(args, "player_adjustments", DEFAULT_PLAYER_ADJUSTMENTS)
+    )
 
     rows: list[dict[str, Any]] = []
     for _, player in squads.iterrows():
         player = player.copy()
         player["player"] = clean_player_name(player["player"])
         team = str(player["team"])
+        team_key = topscorer_team_key(team)
+        player_key = normalize_person_name(player["player"])
         matched = match_sofifa_player(player, sofifa_indexes)
         overall = numeric(matched.get("overall") if matched is not None else np.nan, 65.0)
         shooting = numeric(matched.get("shooting") if matched is not None else np.nan, overall)
@@ -893,15 +1275,22 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
             + 0.14 * (overall / 100.0)
             + 0.10 * (reactions / 100.0)
         )
-        scorer_weight = pos_w * attack_quality * (0.78 + 0.78 * intl_signal)
+        scorer_weight = pos_w * attack_quality * (0.78 + 0.78 * TOPSCORER_INTL_MULT * intl_signal)
         if goals >= 20:
             scorer_weight *= 1.10
         if caps >= 45 and pos_w >= 0.35:
             scorer_weight *= 1.05
+        context_row = find_player_context(team_key, player_key, player_context)
+        live_form_multiplier, availability_factor = player_live_form_multiplier(context_row)
+        manual_adjustment = find_manual_adjustment(team_key, player_key, manual_adjustments)
+        manual_multiplier = manual_player_multiplier(manual_adjustment)
+        adjusted_scorer_weight = scorer_weight * live_form_multiplier * availability_factor * manual_multiplier
         rows.append(
             {
                 "team": team,
+                "team_key": team_key,
                 "player": player["player"],
+                "player_key": player_key,
                 "position": player.get("position"),
                 "caps": caps,
                 "international_goals": goals,
@@ -914,15 +1303,33 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
                 "team_expected_goals": team_goal_map.get(team, 2.5),
                 "team_champion_prob": champ_map.get(team, 0.0),
                 "raw_scorer_weight": scorer_weight,
+                "adjusted_scorer_weight": adjusted_scorer_weight,
+                "current_tournament_goals": context_row["current_tournament_goals"],
+                "current_tournament_penalty_goals": context_row["current_tournament_penalty_goals"],
+                "current_tournament_apps": context_row["current_tournament_apps"],
+                "current_tournament_starts": context_row["current_tournament_starts"],
+                "current_tournament_sub_apps": context_row["current_tournament_sub_apps"],
+                "current_tournament_yellow_cards": context_row["current_tournament_yellow_cards"],
+                "current_tournament_red_cards": context_row["current_tournament_red_cards"],
+                "lineup_team_matches": context_row["lineup_team_matches"],
+                "live_form_multiplier": live_form_multiplier,
+                "availability_factor": availability_factor,
+                "player_context_match_score": context_row["player_context_match_score"],
+                "manual_status": manual_adjustment["status"],
+                "manual_penalty_taker": manual_adjustment["penalty_taker"],
+                "manual_goal_share_multiplier": numeric(manual_adjustment["goal_share_multiplier"], 1.0),
+                "manual_player_multiplier": manual_multiplier,
+                "manual_adjustment_match_score": manual_adjustment["manual_adjustment_match_score"],
+                "manual_note": manual_adjustment["note"],
             }
         )
     ranking = pd.DataFrame(rows)
     if ranking.empty:
         return pd.DataFrame(columns=TOPSCORER_COLUMNS)
-    ranking["team_weight_sum"] = ranking.groupby("team")["raw_scorer_weight"].transform("sum")
+    ranking["team_weight_sum"] = ranking.groupby("team_key")["adjusted_scorer_weight"].transform("sum")
     ranking["goal_share"] = np.where(
         ranking["team_weight_sum"].gt(0),
-        ranking["raw_scorer_weight"] / ranking["team_weight_sum"],
+        ranking["adjusted_scorer_weight"] / ranking["team_weight_sum"],
         0.0,
     )
     ranking["expected_group_stage_goals"] = ranking["team_expected_group_goals"] * ranking["goal_share"]
@@ -937,7 +1344,9 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
         + 0.24 * (ranking["international_goals"] / 70.0).clip(0.0, 1.15)
     )
     ranking["star_scorer_power"] = star_power
-    ranking["recommended_topscorer_score"] = ranking["topscorer_score"] * (0.72 + 0.28 * star_power)
+    ranking["recommended_topscorer_score"] = ranking["topscorer_score"] * (
+        1.0 - TOPSCORER_STAR_BLEND + TOPSCORER_STAR_BLEND * star_power
+    )
     ranking["golden_boot_rank"] = (
         ranking["recommended_topscorer_score"].rank(method="first", ascending=False).astype(int)
     )
@@ -947,15 +1356,94 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
     )
     ranking["expected_scorito_points"] = ranking["expected_goals"] * ranking["scorito_points_per_goal"]
     ranking["recommended_group_stage_topscorer_score"] = (
-        ranking["expected_group_stage_scorito_points"] * (0.72 + 0.28 * star_power)
+        ranking["expected_group_stage_scorito_points"] * (
+            1.0 - TOPSCORER_STAR_BLEND + TOPSCORER_STAR_BLEND * star_power
+        )
     )
-    ranking["recommended_scorito_topscorer_score"] = ranking["expected_scorito_points"] * (0.72 + 0.28 * star_power)
+    ranking["recommended_scorito_topscorer_score"] = ranking["expected_scorito_points"] * (
+        1.0 - TOPSCORER_STAR_BLEND + TOPSCORER_STAR_BLEND * star_power
+    )
     ranking["group_stage_rank"] = (
         ranking["recommended_group_stage_topscorer_score"].rank(method="first", ascending=False).astype(int)
     )
     ranking = ranking.sort_values("recommended_scorito_topscorer_score", ascending=False).reset_index(drop=True)
     ranking.insert(0, "rank", np.arange(1, len(ranking) + 1))
     return ranking
+
+
+def build_stage_topscorer_ranking(topscorers: pd.DataFrame, team_probs: pd.DataFrame) -> pd.DataFrame:
+    if topscorers.empty:
+        return pd.DataFrame()
+
+    team_probs = expected_matches_and_goals(team_probs)
+    team_lookup = {topscorer_team_key(row["team"]): row for _, row in team_probs.iterrows()}
+    stages = [
+        ("Group Stage", "Groepsfase", "expected_group_gf"),
+        ("Round of 32", "1/16 finale", "advance_r32_prob"),
+        ("Round of 16", "Achtste finale", "advance_r16_prob"),
+        ("Quarterfinals", "Kwartfinale", "advance_qf_prob"),
+        ("Semifinals", "Halve finale", "advance_sf_prob"),
+        ("Final/Third", "Finale/troost", "advance_sf_prob"),
+    ]
+    rows: list[dict[str, Any]] = []
+    for player in topscorers.itertuples(index=False):
+        team_key = topscorer_team_key(getattr(player, "team", ""))
+        team_row = team_lookup.get(team_key)
+        if team_row is None:
+            continue
+        group_gf = numeric(team_row.get("expected_group_gf"), numeric(getattr(player, "team_expected_group_goals", 0.0)))
+        group_rate = max(group_gf / 3.0, 0.0)
+        goal_share = max(numeric(getattr(player, "goal_share", 0.0)), 0.0)
+        star_power = max(numeric(getattr(player, "star_scorer_power", 1.0), 1.0), 0.0)
+        for stage, label, source_col in stages:
+            if stage == "Group Stage":
+                team_stage_goals = group_gf
+            else:
+                # Knockout matches are tighter than group matches, so use the
+                # same conservative 0.82 factor as the tournament total layer.
+                team_stage_goals = 0.82 * group_rate * numeric(team_row.get(source_col), 0.0)
+            expected_goals = team_stage_goals * goal_share
+            points_per_goal = scorito_stage_points_per_goal(getattr(player, "position", ""), stage)
+            expected_points = expected_goals * points_per_goal
+            rank_score = expected_points * (1.0 - TOPSCORER_STAR_BLEND + TOPSCORER_STAR_BLEND * star_power)
+            rows.append(
+                {
+                    "stage": stage,
+                    "stage_label": label,
+                    "team": getattr(player, "team", ""),
+                    "player": getattr(player, "player", ""),
+                    "position": getattr(player, "position", ""),
+                    "expected_goals": expected_goals,
+                    "points_per_goal": points_per_goal,
+                    "expected_scorito_points": expected_points,
+                    "recommended_stage_topscorer_score": rank_score,
+                    "goal_share": goal_share,
+                    "star_scorer_power": star_power,
+                    "current_tournament_goals": numeric(getattr(player, "current_tournament_goals", 0.0)),
+                    "current_tournament_starts": numeric(getattr(player, "current_tournament_starts", 0.0)),
+                    "current_tournament_apps": numeric(getattr(player, "current_tournament_apps", 0.0)),
+                    "live_form_multiplier": numeric(getattr(player, "live_form_multiplier", 1.0), 1.0),
+                    "availability_factor": numeric(getattr(player, "availability_factor", 1.0), 1.0),
+                    "manual_status": getattr(player, "manual_status", ""),
+                    "manual_penalty_taker": getattr(player, "manual_penalty_taker", ""),
+                    "manual_goal_share_multiplier": numeric(getattr(player, "manual_goal_share_multiplier", 1.0), 1.0),
+                    "manual_player_multiplier": numeric(getattr(player, "manual_player_multiplier", 1.0), 1.0),
+                    "manual_note": getattr(player, "manual_note", ""),
+                }
+            )
+
+    output = pd.DataFrame(rows)
+    if output.empty:
+        return output
+    output = output.sort_values(
+        ["stage", "recommended_stage_topscorer_score", "expected_scorito_points", "expected_goals"],
+        ascending=[True, False, False, False],
+    )
+    output["stage_rank"] = output.groupby("stage").cumcount() + 1
+    stage_order = {stage: idx for idx, (stage, _label, _source) in enumerate(stages)}
+    output["stage_order"] = output["stage"].map(stage_order)
+    output = output.sort_values(["stage_order", "stage_rank"]).reset_index(drop=True)
+    return output
 
 
 def champion_picks(team_probs: pd.DataFrame) -> pd.DataFrame:
@@ -1098,6 +1586,7 @@ def main() -> None:
     champion = champion_picks(team_probs)
     spain_france = spain_france_check(team_probs)
     topscorers_all = build_topscorer_ranking(args, team_probs)
+    stage_topscorers = build_stage_topscorer_ranking(topscorers_all, team_probs)
     topscorers = topscorers_all.head(args.top_n)
     groupstage_topscorers = (
         topscorers_all.sort_values("recommended_group_stage_topscorer_score", ascending=False)
@@ -1115,6 +1604,7 @@ def main() -> None:
     spain_france_out = args.output_dir / "scorito_spain_france_check.csv"
     topscorer_out = args.output_dir / "scorito_topscorer_picks.csv"
     groupstage_topscorer_out = args.output_dir / "scorito_groupstage_topscorer_picks.csv"
+    stage_topscorer_out = args.output_dir / "scorito_stage_topscorer_picks.csv"
 
     pool.to_csv(pool_out, index=False)
     clean_entry_sheet(pool).to_csv(entry_out, index=False)
@@ -1123,6 +1613,7 @@ def main() -> None:
     spain_france.to_csv(spain_france_out, index=False)
     topscorers.to_csv(topscorer_out, index=False)
     groupstage_topscorers.to_csv(groupstage_topscorer_out, index=False)
+    stage_topscorers.to_csv(stage_topscorer_out, index=False)
     write_summary(
         args.output_dir,
         pool,
@@ -1143,6 +1634,7 @@ def main() -> None:
     print(f"Wrote {champion_out}")
     print(f"Wrote {topscorer_out}")
     print(f"Wrote {groupstage_topscorer_out}")
+    print(f"Wrote {stage_topscorer_out}")
     print("\nChampion picks:")
     print(champion.head(8).to_string(index=False))
     if not topscorers.empty:
@@ -1175,6 +1667,20 @@ def main() -> None:
                 ]
             ].to_string(index=False)
         )
+    if not stage_topscorers.empty:
+        print("\nTop scorer picks by stage (top 3 each):")
+        show = stage_topscorers[stage_topscorers["stage_rank"].le(3)][
+            [
+                "stage_label",
+                "stage_rank",
+                "player",
+                "team",
+                "position",
+                "expected_goals",
+                "expected_scorito_points",
+            ]
+        ]
+        print(show.to_string(index=False))
     print("\nScore pick outcome counts:")
     print(pool["outcome"].value_counts().to_string())
 

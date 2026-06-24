@@ -96,10 +96,21 @@ type TopScorer = {
   position: string;
   expected_goals: number;
   expected_scorito_points: number;
+  current_tournament_goals?: number | "";
+  current_tournament_apps?: number | "";
+  current_tournament_starts?: number | "";
+  live_form_multiplier?: number | "";
+  availability_factor?: number | "";
+  manual_status?: string;
+  manual_penalty_taker?: string;
+  manual_goal_share_multiplier?: number | "";
+  manual_player_multiplier?: number | "";
+  manual_note?: string;
 };
 
 type RoundTopScorer = {
   round_rank: string;
+  stage_rank?: string;
   stage: string;
   stage_label: string;
   player: string;
@@ -107,6 +118,16 @@ type RoundTopScorer = {
   position: string;
   expected_goals: number;
   expected_scorito_points: number;
+  current_tournament_goals?: number | "";
+  current_tournament_apps?: number | "";
+  current_tournament_starts?: number | "";
+  live_form_multiplier?: number | "";
+  availability_factor?: number | "";
+  manual_status?: string;
+  manual_penalty_taker?: string;
+  manual_goal_share_multiplier?: number | "";
+  manual_player_multiplier?: number | "";
+  manual_note?: string;
 };
 
 type SourceStatus = {
@@ -142,6 +163,7 @@ type DashboardData = {
   group_standings: GroupStanding[];
   top_scorers: TopScorer[];
   group_top_scorers: TopScorer[];
+  stage_top_scorers?: RoundTopScorer[];
   round_top_scorers?: RoundTopScorer[];
   sources: SourceStatus[];
 };
@@ -162,8 +184,38 @@ function pct(value?: number | string | null, digits = 1) {
   return `${(numeric * 100).toFixed(digits)}%`;
 }
 
+function num(value?: number | string | null, digits = 1) {
+  if (value === undefined || value === null || value === "") return "-";
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return "-";
+  return numeric.toFixed(digits);
+}
+
 function truthy(value?: boolean | string) {
   return value === true || value === "true";
+}
+
+function hasManualPlayerAdjustment(row: TopScorer | RoundTopScorer) {
+  return Boolean(
+    row.manual_status ||
+      row.manual_penalty_taker ||
+      row.manual_note ||
+      (row.manual_goal_share_multiplier !== undefined &&
+        row.manual_goal_share_multiplier !== "" &&
+        Number(row.manual_goal_share_multiplier) !== 1),
+  );
+}
+
+function playerContextLine(row: TopScorer | RoundTopScorer) {
+  const goals = Number(row.current_tournament_goals || 0);
+  const starts = Number(row.current_tournament_starts || 0);
+  const apps = Number(row.current_tournament_apps || 0);
+  const parts = [];
+  if (goals > 0) parts.push(`${goals} goal${goals === 1 ? "" : "s"}`);
+  if (starts > 0 || apps > 0) parts.push(`${starts}/${apps} start/app`);
+  if (row.manual_status) parts.push(String(row.manual_status));
+  if (row.manual_penalty_taker) parts.push(`pen ${row.manual_penalty_taker}`);
+  return parts.join(" · ");
 }
 
 function confidenceClass(confidence: string) {
@@ -693,7 +745,9 @@ export default async function Home() {
           <div className="section-header">
             <div>
               <h2 className="section-title">Topscorers</h2>
-              <p className="section-subtitle">Totaal bovenaan. Daarna per ronde, gewogen op xG en Scorito-punten.</p>
+              <p className="section-subtitle">
+                Totaal bovenaan. Daarna per ronde met live goals, starts en handmatige player-info als die is ingevuld.
+              </p>
             </div>
           </div>
           <div className="table-shell">
@@ -704,6 +758,7 @@ export default async function Home() {
                   <th>Speler</th>
                   <th>Team</th>
                   <th>Pos.</th>
+                  <th>Live</th>
                   <th>xG</th>
                   <th>Scorito</th>
                 </tr>
@@ -717,8 +772,12 @@ export default async function Home() {
                     </td>
                     <td>{row.team}</td>
                     <td>{row.position}</td>
-                    <td className="mono">{row.expected_goals?.toFixed(2)}</td>
-                    <td className="mono">{row.expected_scorito_points?.toFixed(1)}</td>
+                    <td>
+                      <div className="player-context">{playerContextLine(row) || "-"}</div>
+                      {hasManualPlayerAdjustment(row) ? <div className="manual-player-pill">manual</div> : null}
+                    </td>
+                    <td className="mono">{num(row.expected_goals, 2)}</td>
+                    <td className="mono">{num(row.expected_scorito_points, 1)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -749,10 +808,18 @@ export default async function Home() {
                           <td>
                             <strong>{row.player}</strong>
                             <div className="metric-note">{row.position || "-"}</div>
+                            {playerContextLine(row) ? (
+                              <div className="player-context">{playerContextLine(row)}</div>
+                            ) : null}
+                            {hasManualPlayerAdjustment(row) ? (
+                              <div className="manual-player-pill">
+                                manual{row.manual_note ? ` · ${row.manual_note}` : ""}
+                              </div>
+                            ) : null}
                           </td>
                           <td>{row.team}</td>
-                          <td className="mono">{Number(row.expected_goals || 0).toFixed(2)}</td>
-                          <td className="mono">{Number(row.expected_scorito_points || 0).toFixed(1)}</td>
+                          <td className="mono">{num(row.expected_goals, 2)}</td>
+                          <td className="mono">{num(row.expected_scorito_points, 1)}</td>
                         </tr>
                       ))}
                     </tbody>
