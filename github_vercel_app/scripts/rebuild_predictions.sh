@@ -22,10 +22,17 @@ if [[ "${SKIP_DOWNLOAD:-0}" != "1" ]]; then
 fi
 
 if [[ "${SKIP_ODDS:-0}" != "1" ]]; then
-  node extract_oddsportal_worldcup2026_fixtures.mjs \
+  if ! node extract_oddsportal_worldcup2026_fixtures.mjs \
     --output data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv \
     --raw-output data/extracted/oddsportal_worldcup2026_fixture_odds_raw.csv \
-    --report outputs/oddsportal_worldcup2026_fixture_odds_report.csv
+    --report outputs/oddsportal_worldcup2026_fixture_odds_report.csv; then
+    if [[ -f data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv ]]; then
+      echo "WARNING: OddsPortal refresh failed; continuing with existing fixture odds schedule."
+    else
+      echo "ERROR: OddsPortal refresh failed and no existing odds schedule is available."
+      exit 1
+    fi
+  fi
 fi
 
 if [[ "${SKIP_ESPN:-0}" != "1" ]]; then
