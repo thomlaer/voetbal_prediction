@@ -416,6 +416,11 @@ tr:last-child td {
   padding: 10px;
 }
 
+.admin-details .subtle-control-panel {
+  background: #fff;
+  border-style: dashed;
+}
+
 .admin-details .control-field input,
 .admin-details .control-field select {
   font-size: 13px;
@@ -441,6 +446,25 @@ tr:last-child td {
 
 .control-grid.lock-grid {
   grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.6fr) auto;
+}
+
+.control-grid.unlock-grid {
+  grid-template-columns: minmax(190px, 1fr) auto;
+}
+
+.control-copy {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.control-copy strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .control-field {
@@ -503,6 +527,12 @@ tr:last-child td {
   font-weight: 900;
   padding: 9px 12px;
   white-space: nowrap;
+}
+
+.danger-button {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #991b1b;
 }
 
 .primary-button:disabled {
@@ -766,6 +796,10 @@ tr:last-child td {
   }
 
   .control-grid.lock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .control-grid.unlock-grid {
     grid-template-columns: 1fr;
   }
 

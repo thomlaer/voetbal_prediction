@@ -35,6 +35,10 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
     kind: "idle",
     message: "Zet een ronde pas vast nadat je die scores echt hebt ingevuld.",
   });
+  const [unlockStatus, setUnlockStatus] = useState<Status>({
+    kind: "idle",
+    message: "Alleen gebruiken als je per ongeluk een ronde hebt vastgezet.",
+  });
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,6 +120,47 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
       setLockCode("");
     } catch {
       setLockStatus({ kind: "error", message: "Geen verbinding met de lock-route." });
+    }
+  }
+
+  async function unlockRound(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setUnlockStatus({ kind: "loading", message: "Ronde ontgrendelen en rebuild starten..." });
+
+    try {
+      const response = await fetch("/api/lock-round", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "unlock",
+          code: lockCode,
+          stage: lockStage,
+          updateSoccerbase: false,
+          deployToVercel: true,
+        }),
+      });
+      const data = (await response.json()) as {
+        ok?: boolean;
+        message?: string;
+        actionsUrl?: string;
+      };
+
+      if (!response.ok || !data.ok) {
+        setUnlockStatus({
+          kind: "error",
+          message: data.message || "Ronde ontgrendelen is mislukt.",
+        });
+        return;
+      }
+
+      setUnlockStatus({
+        kind: "success",
+        message: data.message || "Ronde ontgrendeld.",
+        actionsUrl: data.actionsUrl,
+      });
+      setLockCode("");
+    } catch {
+      setUnlockStatus({ kind: "error", message: "Geen verbinding met de lock-route." });
     }
   }
 
@@ -213,6 +258,39 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
             <>
               {" "}
               <a href={lockStatus.actionsUrl} rel="noreferrer" target="_blank">
+                Bekijk GitHub Actions
+              </a>
+            </>
+          ) : null}
+        </div>
+      </form>
+
+      <form className="control-panel subtle-control-panel" onSubmit={unlockRound}>
+        <div className="control-grid unlock-grid">
+          <div className="control-copy">
+            <strong>Ronde ontgrendelen</strong>
+            <span>Gebruikt dezelfde code en ronde hierboven. Alleen nodig als je per ongeluk hebt vastgezet.</span>
+          </div>
+
+          <button
+            className="secondary-button danger-button"
+            disabled={unlockStatus.kind === "loading" || !lockCode.trim() || !lockStage}
+            type="submit"
+          >
+            {unlockStatus.kind === "loading" ? "Bezig..." : "Ontgrendel ronde"}
+          </button>
+        </div>
+
+        <div
+          className={`status-line ${
+            unlockStatus.kind === "error" ? "red" : unlockStatus.kind === "success" ? "green" : ""
+          }`}
+        >
+          {unlockStatus.message}
+          {unlockStatus.actionsUrl ? (
+            <>
+              {" "}
+              <a href={unlockStatus.actionsUrl} rel="noreferrer" target="_blank">
                 Bekijk GitHub Actions
               </a>
             </>

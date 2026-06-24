@@ -12,6 +12,7 @@ const DEFAULT_REF = "main";
 const LOCK_PATH = "data/extracted/scorito_locked_scores.csv";
 
 type LockRequest = {
+  action?: unknown;
   code?: unknown;
   stage?: unknown;
   updateSoccerbase?: unknown;
@@ -209,7 +210,11 @@ export async function POST(request: Request) {
 
   const stage = textValue(body.stage);
   if (!stage) {
-    return NextResponse.json({ ok: false, message: "Kies eerst een ronde om vast te zetten." }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "Kies eerst een ronde." }, { status: 400 });
+  }
+  const action = textValue(body.action, "lock").toLowerCase();
+  if (!["lock", "unlock"].includes(action)) {
+    return NextResponse.json({ ok: false, message: "Ongeldige ronde-actie." }, { status: 400 });
   }
 
   const dashboardPath = path.join(process.cwd(), "public", "data", "dashboard.json");
@@ -219,44 +224,63 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Deze ronde staat niet in de huidige dashboarddata." }, { status: 404 });
   }
 
-  const locks = stageRows
-    .filter((row) => !row.actual_available && !row.actual_score)
-    .map((row) => {
-      const score = String(row.filled_score || row.score || "").trim();
-      const home = String(row.home_team || "").trim();
-      const away = String(row.away_team || "").trim();
-      if (!parseScore(score) || isPlaceholder(home) || isPlaceholder(away)) return null;
-      return {
-        match_number: String(row.match_number || "").trim(),
-        date: String(row.date || "").slice(0, 10),
-        stage,
-        home_team: home,
-        away_team: away,
-        score,
-        predicted_winner: String(row.filled_predicted_winner || row.predicted_winner || "").trim(),
-        note: `locked_from_dashboard_${new Date().toISOString()}`,
-      };
-    })
-    .filter((row): row is LockRow => Boolean(row?.match_number));
-
-  if (!locks.length) {
-    return NextResponse.json(
-      { ok: false, message: "Geen bruikbare open wedstrijden gevonden om vast te zetten." },
-      { status: 400 },
-    );
-  }
-
   try {
     const remote = await loadRemoteLocks(repository, token, ref);
-    const lockNumbers = new Set(locks.map((row) => row.match_number));
-    const merged = remote.rows.filter((row) => !lockNumbers.has(row.match_number));
-    merged.push(...locks);
+    let merged: Record<string, string>[];
+    let successMessage: string;
+    let changedCount = 0;
+
+    if (action === "unlock") {
+      const before = remote.rows.length;
+      merged = remote.rows.filter((row) => row.stage !== stage);
+      const removed = before - merged.length;
+      if (!removed) {
+        return NextResponse.json(
+          { ok: false, message: `Er stonden geen vastgezette scores voor ${stage}.` },
+          { status: 400 },
+        );
+      }
+      changedCount = removed;
+      successMessage = `${removed} vastgezette scores verwijderd voor ${stage}. GitHub rebuild is gestart.`;
+    } else {
+      const locks = stageRows
+        .filter((row) => !row.actual_available && !row.actual_score)
+        .map((row) => {
+          const score = String(row.filled_score || row.score || "").trim();
+          const home = String(row.home_team || "").trim();
+          const away = String(row.away_team || "").trim();
+          if (!parseScore(score) || isPlaceholder(home) || isPlaceholder(away)) return null;
+          return {
+            match_number: String(row.match_number || "").trim(),
+            date: String(row.date || "").slice(0, 10),
+            stage,
+            home_team: home,
+            away_team: away,
+            score,
+            predicted_winner: String(row.filled_predicted_winner || row.predicted_winner || "").trim(),
+            note: `locked_from_dashboard_${new Date().toISOString()}`,
+          };
+        })
+        .filter((row): row is LockRow => Boolean(row?.match_number));
+
+      if (!locks.length) {
+        return NextResponse.json(
+          { ok: false, message: "Geen bruikbare open wedstrijden gevonden om vast te zetten." },
+          { status: 400 },
+        );
+      }
+      const lockNumbers = new Set(locks.map((row) => row.match_number));
+      merged = remote.rows.filter((row) => !lockNumbers.has(row.match_number));
+      merged.push(...locks);
+      changedCount = locks.length;
+      successMessage = `${locks.length} scores vastgezet voor ${stage}. GitHub rebuild is gestart.`;
+    }
     merged.sort((a, b) => Number(a.match_number || 0) - Number(b.match_number || 0));
 
     const response = await githubRequest(repository, token, `/contents/${LOCK_PATH}`, {
       method: "PUT",
       body: JSON.stringify({
-        message: `Lock ${stage} Scorito scores`,
+        message: `${action === "unlock" ? "Unlock" : "Lock"} ${stage} Scorito scores`,
         content: Buffer.from(writeCsv(merged), "utf8").toString("base64"),
         branch: ref,
         ...(remote.sha ? { sha: remote.sha } : {}),
@@ -281,13 +305,15 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      message: `${locks.length} scores vastgezet voor ${stage}. GitHub rebuild is gestart.`,
+      message: successMessage,
       actionsUrl: `https://github.com/${repository}/actions/workflows/${workflow}`,
-      locked: locks.length,
+      locked: action === "lock" ? changedCount : 0,
+      unlocked: action === "unlock" ? changedCount : 0,
+      action,
     });
   } catch (error) {
     return NextResponse.json(
-      { ok: false, message: "Vastzetten is mislukt.", detail: error instanceof Error ? error.message : String(error) },
+      { ok: false, message: "Ronde-actie is mislukt.", detail: error instanceof Error ? error.message : String(error) },
       { status: 502 },
     );
   }
