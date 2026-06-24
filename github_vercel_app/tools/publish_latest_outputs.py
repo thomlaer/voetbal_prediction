@@ -1281,7 +1281,12 @@ def main() -> None:
         file_status(
             "OddsPortal WK odds",
             model_root / "data" / "extracted" / "oddsportal_worldcup2026_fixture_odds_schedule.csv",
-            "group-stage 1X2 odds and fixture mapping",
+            "current 1X2 odds and fixture mapping",
+        ),
+        file_status(
+            "ESPN fixture schedule",
+            model_root / "data" / "extracted" / "espn_worldcup2026_fixtures.csv",
+            "online fixture/team mapping for unresolved knockout slots",
         ),
         file_status(
             "Soccerbase lineups",

@@ -92,7 +92,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git fetch origin main
           git pull --rebase --autostash origin main
-          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv data/extracted/espn_worldcup2026_results.csv data/extracted/results_training_with_espn.csv data/extracted/soccerbase_match_stats.csv data/extracted/soccerbase_cards_events.csv data/extracted/soccerbase_fetched_games.csv
+          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv data/extracted/espn_worldcup2026_results.csv data/extracted/espn_worldcup2026_fixtures.csv data/extracted/results_training_with_espn.csv data/extracted/soccerbase_match_stats.csv data/extracted/soccerbase_cards_events.csv data/extracted/soccerbase_fetched_games.csv
           if git diff --cached --quiet; then
             echo "No output changes."
           else

@@ -3,9 +3,11 @@
 /*
 Create a World Cup 2026 fixture schedule with current OddsPortal 1X2 odds.
 
-OddsPortal currently exposes the group-stage fixtures and odds through the
-"next matches" page. Knockout fixtures do not have teams/odds yet, so this
-script appends them from the local fixture skeleton and leaves odds blank.
+OddsPortal exposes the currently listed World Cup fixtures through the
+"next matches" page. ESPN's public scoreboard is used as a fixture hydrator:
+when knockout slots such as 1A, 2B, W73, etc. are resolved to real teams,
+those team names are merged into the local 104-match skeleton before odds are
+matched.
 */
 
 import crypto from "node:crypto";
@@ -18,6 +20,9 @@ const DEFAULT_FIXTURES = "data/extracted/worldcup2026_future_fixtures.csv";
 const DEFAULT_OUTPUT = "data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv";
 const DEFAULT_RAW_OUTPUT = "data/extracted/oddsportal_worldcup2026_fixture_odds_raw.csv";
 const DEFAULT_REPORT = "outputs/oddsportal_worldcup2026_fixture_odds_report.csv";
+const DEFAULT_ESPN_SCOREBOARD_URL =
+  "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=200&dates=20260611-20260720";
+const DEFAULT_ESPN_FIXTURES_OUTPUT = "data/extracted/espn_worldcup2026_fixtures.csv";
 
 const DECRYPTION_KEY_TEXT = "J*8sQ!p$7aD_fR2yW@gHn*3bVp#sAdLd_k";
 const DECRYPTION_SALT_TEXT = "5b9a8f2c3e6d1a4b7c8e9d0f1a2b3c4d";
@@ -29,7 +34,10 @@ const TEAM_ALIASES = new Map(
     Curacao: "Curaçao",
     "Cote d'Ivoire": "Ivory Coast",
     "Côte d'Ivoire": "Ivory Coast",
+    "Congo DR": "DR Congo",
     "D.R. Congo": "DR Congo",
+    Turkiye: "Turkey",
+    "TÃ¼rkiye": "Turkey",
     USA: "United States",
     "Winner UEFA Playoff A": "Bosnia and Herzegovina",
     "Winner UEFA Playoff B": "Sweden",
@@ -45,6 +53,10 @@ function parseArgs(argv) {
     output: DEFAULT_OUTPUT,
     rawOutput: DEFAULT_RAW_OUTPUT,
     report: DEFAULT_REPORT,
+    espnScoreboardUrl: DEFAULT_ESPN_SCOREBOARD_URL,
+    espnFixturesOutput: DEFAULT_ESPN_FIXTURES_OUTPUT,
+    skipEspnFixtures: false,
+    skipOddsScrape: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -58,6 +70,14 @@ function parseArgs(argv) {
       args.rawOutput = argv[++i];
     } else if (arg === "--report") {
       args.report = argv[++i];
+    } else if (arg === "--espn-scoreboard-url") {
+      args.espnScoreboardUrl = argv[++i];
+    } else if (arg === "--espn-fixtures-output") {
+      args.espnFixturesOutput = argv[++i];
+    } else if (arg === "--skip-espn-fixtures") {
+      args.skipEspnFixtures = true;
+    } else if (arg === "--skip-odds-scrape") {
+      args.skipOddsScrape = true;
     } else if (arg === "--help" || arg === "-h") {
       printHelpAndExit();
     } else {
@@ -74,8 +94,16 @@ Options:
   --url URL          OddsPortal World Cup next-matches URL.
   --fixtures PATH   Local full 104-match fixture skeleton CSV.
   --output PATH     Output schedule with odds where available.
-  --raw-output PATH Raw OddsPortal group-stage fixture odds.
+  --raw-output PATH Raw OddsPortal fixture odds.
   --report PATH     Coverage report CSV.
+  --espn-scoreboard-url URL
+                    ESPN scoreboard URL used to resolve real knockout teams.
+  --espn-fixtures-output PATH
+                    Output parsed ESPN fixture rows for audit/debugging.
+  --skip-espn-fixtures
+                    Do not use ESPN to hydrate fixture placeholders.
+  --skip-odds-scrape
+                    Debug mode: build the schedule without live OddsPortal odds.
 `);
   process.exit(0);
 }
@@ -121,6 +149,10 @@ async function fetchText(url, referer = "https://www.oddsportal.com") {
     }
   }
   throw lastError;
+}
+
+async function fetchJson(url) {
+  return JSON.parse(await fetchText(url, "https://www.espn.com"));
 }
 
 function extractNextMatchesData(html) {
@@ -220,7 +252,9 @@ function normalizeTeamKey(value) {
       "cote d ivoire": "ivory coast",
       "czech rep": "czech republic",
       "czechia": "czech republic",
+      "congo dr": "dr congo",
       "d r congo": "dr congo",
+      "turkiye": "turkey",
       "usa": "united states",
     }),
   );
@@ -234,9 +268,126 @@ function isPlaceholderTeam(value) {
     text === "nan" ||
     text.startsWith("winner ") ||
     text.startsWith("group ") ||
+    /^[123][a-l]+$/i.test(text) ||
     /^w\d+/.test(text) ||
     /^ru\d+/.test(text)
   );
+}
+
+function slotFromEspnLabel(value) {
+  const text = String(value || "").trim();
+  let match = text.match(/^([123])([A-L]+)$/i);
+  if (match) {
+    return `${match[1]}${match[2].toUpperCase()}`;
+  }
+  match = text.match(/^Group\s+([A-L])\s+Winner$/i);
+  if (match) {
+    return `1${match[1].toUpperCase()}`;
+  }
+  match = text.match(/^Group\s+([A-L])\s+(?:2nd|Second)\s+Place$/i);
+  if (match) {
+    return `2${match[1].toUpperCase()}`;
+  }
+  match = text.match(/^Third\s+Place\s+Group\s+([A-L](?:\s*\/\s*[A-L])+)$/i);
+  if (match) {
+    return `3${match[1].replace(/[^A-L]/gi, "").toUpperCase()}`;
+  }
+  match = text.match(/^Round\s+of\s+32\s+(\d+)\s+Winner$/i);
+  if (match) {
+    return `W${72 + Number(match[1])}`;
+  }
+  match = text.match(/^Round\s+of\s+16\s+(\d+)\s+Winner$/i);
+  if (match) {
+    return `W${88 + Number(match[1])}`;
+  }
+  match = text.match(/^Quarterfinal\s+(\d+)\s+Winner$/i);
+  if (match) {
+    return `W${96 + Number(match[1])}`;
+  }
+  match = text.match(/^Semifinal\s+(\d+)\s+Winner$/i);
+  if (match) {
+    return `W${100 + Number(match[1])}`;
+  }
+  match = text.match(/^Semifinal\s+(\d+)\s+Loser$/i);
+  if (match) {
+    return `RU${100 + Number(match[1])}`;
+  }
+  return "";
+}
+
+function espnTeamInfo(competitor) {
+  const team = competitor?.team || {};
+  const labels = [
+    team.displayName,
+    team.shortDisplayName,
+    team.name,
+    team.abbreviation,
+    team.location,
+  ].filter(Boolean);
+  const slot = labels.map(slotFromEspnLabel).find(Boolean) || "";
+  const label = team.displayName || team.shortDisplayName || team.name || team.location || "";
+  const placeholder = Boolean(slot) || (team.isActive === false && /group|winner|place|round|quarter|semi/i.test(label));
+  return {
+    team: placeholder ? slot || label : modelTeamName(label),
+    slot,
+    is_placeholder: placeholder,
+    display_name: label,
+    abbreviation: team.abbreviation || "",
+  };
+}
+
+function stageFromEspnSeason(event) {
+  const slug = String(event?.season?.slug || "").toLowerCase();
+  const map = new Map(
+    Object.entries({
+      "group-stage": "Group Stage",
+      "round-of-32": "Round of 32",
+      "round-of-16": "Round of 16",
+      quarterfinals: "Quarterfinals",
+      semifinals: "Semifinals",
+      "third-place": "Third Place Playoff",
+      "3rd-place-match": "Third Place Playoff",
+      final: "Final",
+    }),
+  );
+  return map.get(slug) || event?.season?.slug || "";
+}
+
+function parseEspnFixtureRows(payload) {
+  const events = Array.isArray(payload?.events) ? payload.events : [];
+  return events
+    .map((event, index) => {
+      const competition = Array.isArray(event.competitions) ? event.competitions[0] : {};
+      const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
+      const home = competitors.find((item) => item.homeAway === "home") || competitors[0] || {};
+      const away = competitors.find((item) => item.homeAway === "away") || competitors[1] || {};
+      const homeInfo = espnTeamInfo(home);
+      const awayInfo = espnTeamInfo(away);
+      return {
+        source: "espn",
+        espn_event_id: event.id || competition?.id || "",
+        match_number: String(index + 1),
+        date: String(event.date || competition?.date || "").slice(0, 10),
+        kickoff_utc: event.date || competition?.date || "",
+        stage: stageFromEspnSeason(event),
+        home_team: homeInfo.team,
+        away_team: awayInfo.team,
+        home_slot: homeInfo.slot,
+        away_slot: awayInfo.slot,
+        home_is_placeholder: boolString(homeInfo.is_placeholder),
+        away_is_placeholder: boolString(awayInfo.is_placeholder),
+        espn_home_team: homeInfo.display_name,
+        espn_away_team: awayInfo.display_name,
+        espn_home_abbreviation: homeInfo.abbreviation,
+        espn_away_abbreviation: awayInfo.abbreviation,
+        espn_name: event.name || "",
+      };
+    })
+    .filter((row) => row.espn_event_id && row.home_team && row.away_team);
+}
+
+async function fetchEspnFixtures(scoreboardUrl) {
+  return parseEspnFixtureRows(await fetchJson(scoreboardUrl));
 }
 
 function dateDiffDays(left, right) {
@@ -353,6 +504,45 @@ async function scrapeOddsPortal(pageUrl) {
   return rows.map((row) => rawRecord(row, oddsData, pageUrl, scrapedAtUtc));
 }
 
+function fallbackOddsRowsFromSchedule(schedulePath) {
+  if (!schedulePath || !fs.existsSync(schedulePath)) {
+    return [];
+  }
+  return parseCsv(fs.readFileSync(schedulePath, "utf8"))
+    .filter((row) => oddsAvailable(row))
+    .map((row) => {
+      const oddsportalDate =
+        row.oddsportal_date_utc || String(row.oddsportal_kickoff_utc || "").slice(0, 10) || row.date;
+      return {
+        source: "existing_odds_schedule",
+        source_url: row.oddsportal_source_url || row.oddsportal_detail_url || "",
+        scraped_at_utc: row.scraped_at_utc || "",
+        oddsportal_event_id: row.oddsportal_event_id || "",
+        oddsportal_encoded_event_id: row.oddsportal_encoded_event_id || "",
+        oddsportal_date_utc: oddsportalDate,
+        oddsportal_kickoff_utc: row.oddsportal_kickoff_utc || "",
+        oddsportal_home_team: row.oddsportal_home_team || row.home_team,
+        oddsportal_away_team: row.oddsportal_away_team || row.away_team,
+        home_team: modelTeamName(row.oddsportal_home_team || row.home_team),
+        away_team: modelTeamName(row.oddsportal_away_team || row.away_team),
+        tournament: row.tournament || "World Cup 2026",
+        event_stage: row.stage || "",
+        venue: row.venue || "",
+        detail_url: row.oddsportal_detail_url || "",
+        home_odds: row.home_odds,
+        draw_odds: row.draw_odds,
+        away_odds: row.away_odds,
+        max_home_odds: row.max_home_odds,
+        max_draw_odds: row.max_draw_odds,
+        max_away_odds: row.max_away_odds,
+        n_odds_home_win: row.n_odds_home_win,
+        n_odds_draw_win: row.n_odds_draw_win || row.n_odds_draw,
+        n_odds_draw: row.n_odds_draw || row.n_odds_draw_win,
+        n_odds_away_win: row.n_odds_away_win,
+      };
+    });
+}
+
 function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -434,6 +624,21 @@ function splitPlaceholder(groupValue) {
   return parts.length === 2 ? parts : ["", ""];
 }
 
+function normaliseFixtureSlot(slot, matchNumber, side) {
+  const text = String(slot || "").trim();
+  if (String(matchNumber) === "100" && side === "away" && text === "W100") {
+    return "W96";
+  }
+  return text;
+}
+
+function fixtureSlotPair(row) {
+  const [home, away] = splitPlaceholder(row.group);
+  const homeSlot = normaliseFixtureSlot(home || row.home_team, row.match_number, "home");
+  const awaySlot = normaliseFixtureSlot(away || row.away_team, row.match_number, "away");
+  return `${homeSlot}|${awaySlot}`;
+}
+
 function cleanLocalTeam(value, groupValue, side) {
   const text = String(value || "").trim();
   if (text && text.toLowerCase() !== "nan") {
@@ -443,34 +648,91 @@ function cleanLocalTeam(value, groupValue, side) {
   return side === "home" ? home : away;
 }
 
-function buildSchedule(fixtures, oddsRows) {
+function hydrateFixturesWithEspn(fixtures, espnFixtures) {
+  if (!espnFixtures.length) {
+    return fixtures;
+  }
+  const espnByMatchNumber = new Map(espnFixtures.map((row) => [String(row.match_number), row]));
+  const espnBySlotPair = new Map(
+    espnFixtures
+      .filter((row) => row.home_slot && row.away_slot)
+      .map((row) => [`${row.home_slot}|${row.away_slot}`, row]),
+  );
+  return fixtures.map((fixture) => {
+    if (String(fixture.stage || "").toLowerCase().includes("group")) {
+      return fixture;
+    }
+    const espn = espnByMatchNumber.get(String(fixture.match_number)) || espnBySlotPair.get(fixtureSlotPair(fixture));
+    if (!espn) {
+      return fixture;
+    }
+    const hydrated = { ...fixture };
+    hydrated.espn_event_id = espn.espn_event_id;
+    hydrated.espn_home_team = espn.espn_home_team;
+    hydrated.espn_away_team = espn.espn_away_team;
+    hydrated.espn_home_slot = espn.home_slot;
+    hydrated.espn_away_slot = espn.away_slot;
+    hydrated.espn_fixture_stage = espn.stage;
+    hydrated.espn_kickoff_utc = espn.kickoff_utc;
+    hydrated.espn_fixture_name = espn.espn_name;
+    hydrated.fixture_hydrated_from = "espn";
+    const espnHomePlaceholder = isTrue(espn.home_is_placeholder);
+    const espnAwayPlaceholder = isTrue(espn.away_is_placeholder);
+    if (!espnHomePlaceholder && !espnAwayPlaceholder) {
+      hydrated.home_team = espn.home_team;
+      hydrated.away_team = espn.away_team;
+      hydrated.home_is_placeholder = "False";
+      hydrated.away_is_placeholder = "False";
+    } else if (espnHomePlaceholder && espnAwayPlaceholder) {
+      if (espn.home_slot) {
+        hydrated.home_team = espn.home_slot;
+        hydrated.home_is_placeholder = "True";
+      }
+      if (espn.away_slot) {
+        hydrated.away_team = espn.away_slot;
+        hydrated.away_is_placeholder = "True";
+      }
+    } else {
+      hydrated.fixture_hydrated_from = "espn_partial";
+    }
+    return hydrated;
+  });
+}
+
+function buildSchedule(fixtures, oddsRows, espnFixtures = []) {
+  const hydratedFixtures = hydrateFixturesWithEspn(fixtures, espnFixtures);
   const groupFixtures = fixtures.filter((row) => String(row.stage || "").toLowerCase().includes("group"));
   const scheduleRows = [];
   const reportRows = [];
   const usedOddsIndexes = new Set();
-  for (const fixture of fixtures) {
-    const isGroup = String(fixture.stage || "").toLowerCase().includes("group");
-    const odds = isGroup ? findOddsForFixture(fixture, oddsRows, usedOddsIndexes) : null;
+  for (const fixture of hydratedFixtures) {
+    const odds = findOddsForFixture(fixture, oddsRows, usedOddsIndexes);
     const oddsHasValues = odds ? oddsAvailable(odds) : false;
     const [placeholderHome, placeholderAway] = splitPlaceholder(fixture.group);
+    const localHome = cleanLocalTeam(fixture.home_team, fixture.group, "home");
+    const localAway = cleanLocalTeam(fixture.away_team, fixture.group, "away");
+    const homeTeam = odds ? odds.home_team : localHome;
+    const awayTeam = odds ? odds.away_team : localAway;
+    const homePlaceholder = isPlaceholderTeam(homeTeam);
+    const awayPlaceholder = isPlaceholderTeam(awayTeam);
     const output = {
       date: fixture.date,
       match_number: fixture.match_number,
       tournament: fixture.tournament || "FIFA World Cup",
       stage: fixture.stage,
       group: fixture.group,
-      home_team: odds ? odds.home_team : cleanLocalTeam(fixture.home_team, fixture.group, "home"),
-      away_team: odds ? odds.away_team : cleanLocalTeam(fixture.away_team, fixture.group, "away"),
+      home_team: homeTeam,
+      away_team: awayTeam,
       city: fixture.city,
       country: fixture.country,
       venue: odds?.venue || fixture.venue,
       neutral: fixture.neutral,
       home_is_placeholder: odds
         ? "False"
-        : boolString(isTrue(fixture.home_is_placeholder) || !cleanLocalTeam(fixture.home_team, fixture.group, "home")),
+        : boolString(isTrue(fixture.home_is_placeholder) || homePlaceholder || !localHome),
       away_is_placeholder: odds
         ? "False"
-        : boolString(isTrue(fixture.away_is_placeholder) || !cleanLocalTeam(fixture.away_team, fixture.group, "away")),
+        : boolString(isTrue(fixture.away_is_placeholder) || awayPlaceholder || !localAway),
       odds_available: oddsHasValues ? "1" : "0",
       home_odds: odds?.home_odds ?? "",
       draw_odds: odds?.draw_odds ?? "",
@@ -492,9 +754,21 @@ function buildSchedule(fixtures, oddsRows) {
       local_home_team: fixture.home_team,
       local_away_team: fixture.away_team,
       local_kickoff_at: fixture.kickoff_at,
-      placeholder_home_label: odds ? "" : placeholderHome,
-      placeholder_away_label: odds ? "" : placeholderAway,
-      merge_source: odds ? "oddsportal_group_fixture" : "local_fixture_skeleton_no_odds",
+      placeholder_home_label: odds ? "" : homePlaceholder ? homeTeam : placeholderHome,
+      placeholder_away_label: odds ? "" : awayPlaceholder ? awayTeam : placeholderAway,
+      espn_event_id: fixture.espn_event_id ?? "",
+      espn_home_team: fixture.espn_home_team ?? "",
+      espn_away_team: fixture.espn_away_team ?? "",
+      espn_home_slot: fixture.espn_home_slot ?? "",
+      espn_away_slot: fixture.espn_away_slot ?? "",
+      espn_kickoff_utc: fixture.espn_kickoff_utc ?? "",
+      merge_source: odds
+        ? "oddsportal_fixture"
+        : fixture.fixture_hydrated_from === "espn"
+          ? "espn_fixture_no_odds"
+          : fixture.fixture_hydrated_from === "espn_partial"
+            ? "espn_partial_fixture_no_odds"
+            : "local_fixture_skeleton_no_odds",
       scraped_at_utc: odds?.scraped_at_utc ?? new Date().toISOString(),
     };
     scheduleRows.push(output);
@@ -506,6 +780,7 @@ function buildSchedule(fixtures, oddsRows) {
       away_team: output.away_team,
       odds_available: output.odds_available,
       merge_source: output.merge_source,
+      espn_event_id: output.espn_event_id,
     });
   }
   return { scheduleRows, reportRows, groupFixtures, matchedOdds: usedOddsIndexes.size };
@@ -529,10 +804,52 @@ function validateSchedule(scheduleRows, expectedGroupRows) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const oddsRows = await scrapeOddsPortal(args.url);
+  let oddsRows = [];
+  let usedFallbackOdds = false;
+  if (!args.skipOddsScrape) {
+    try {
+      oddsRows = await scrapeOddsPortal(args.url);
+    } catch (error) {
+      oddsRows = fallbackOddsRowsFromSchedule(args.output);
+      if (!oddsRows.length) {
+        throw error;
+      }
+      usedFallbackOdds = true;
+      console.warn(
+        `WARNING: OddsPortal refresh failed; reused ${oddsRows.length} rows from existing schedule. ${error.message}`,
+      );
+    }
+  }
   const fixtures = parseCsv(fs.readFileSync(args.fixtures, "utf8"));
-  const { scheduleRows, reportRows, groupFixtures, matchedOdds } = buildSchedule(fixtures, oddsRows);
+  let espnFixtures = [];
+  if (!args.skipEspnFixtures) {
+    try {
+      espnFixtures = await fetchEspnFixtures(args.espnScoreboardUrl);
+    } catch (error) {
+      console.warn(`WARNING: ESPN fixture hydration failed; continuing with local skeleton. ${error.message}`);
+    }
+  }
+  const { scheduleRows, reportRows, groupFixtures, matchedOdds } = buildSchedule(fixtures, oddsRows, espnFixtures);
   validateSchedule(scheduleRows, groupFixtures.length);
+  if (args.espnFixturesOutput) {
+    writeCsv(args.espnFixturesOutput, espnFixtures, [
+      "source",
+      "espn_event_id",
+      "match_number",
+      "date",
+      "kickoff_utc",
+      "stage",
+      "home_team",
+      "away_team",
+      "home_slot",
+      "away_slot",
+      "home_is_placeholder",
+      "away_is_placeholder",
+      "espn_home_team",
+      "espn_away_team",
+      "espn_name",
+    ]);
+  }
   writeCsv(args.rawOutput, oddsRows, [
     "source",
     "source_url",
@@ -583,6 +900,12 @@ async function main() {
     "oddsportal_encoded_event_id",
     "oddsportal_kickoff_utc",
     "oddsportal_detail_url",
+    "espn_event_id",
+    "espn_home_team",
+    "espn_away_team",
+    "espn_home_slot",
+    "espn_away_slot",
+    "espn_kickoff_utc",
     "merge_source",
   ]);
   writeCsv(args.report, reportRows, [
@@ -593,13 +916,22 @@ async function main() {
     "away_team",
     "odds_available",
     "merge_source",
+    "espn_event_id",
   ]);
   const withOdds = scheduleRows.filter((row) => row.odds_available === "1").length;
-  console.log(`OddsPortal group fixtures: ${oddsRows.length}`);
+  const knockoutWithOdds = scheduleRows.filter(
+    (row) => row.odds_available === "1" && !String(row.stage || "").toLowerCase().includes("group"),
+  ).length;
+  console.log(`OddsPortal fixtures scraped: ${usedFallbackOdds ? 0 : oddsRows.length}`);
+  if (usedFallbackOdds) {
+    console.log(`Fallback odds rows reused: ${oddsRows.length}`);
+  }
+  console.log(`ESPN fixtures parsed: ${espnFixtures.length}`);
   console.log(`Local group fixture slots: ${groupFixtures.length}`);
-  console.log(`Matched OddsPortal group fixtures: ${matchedOdds}`);
+  console.log(`Matched OddsPortal fixtures: ${matchedOdds}`);
   console.log(`Wrote ${scheduleRows.length} schedule rows to ${args.output}`);
   console.log(`Rows with 1X2 odds: ${withOdds}`);
+  console.log(`Knockout rows with 1X2 odds: ${knockoutWithOdds}`);
   console.log(`Rows without odds: ${scheduleRows.length - withOdds}`);
 }
 
