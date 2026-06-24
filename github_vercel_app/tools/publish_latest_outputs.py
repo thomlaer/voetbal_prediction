@@ -917,7 +917,7 @@ def build_round_top_scorers(
     top_scorers: list[dict[str, Any]],
     group_top_scorers: list[dict[str, Any]],
     champions: list[dict[str, Any]],
-    limit_per_stage: int = 8,
+    limit_per_stage: int = 10,
 ) -> list[dict[str, Any]]:
     champion_by_team = {normalize_key(row.get("team")): row for row in champions}
     stages = [
@@ -1014,7 +1014,7 @@ def route_team_keys_by_topscorer_stage(predictions: list[dict[str, Any]]) -> dic
 def normalize_stage_top_scorers(
     rows: list[dict[str, Any]],
     predictions: list[dict[str, Any]] | None = None,
-    limit_per_stage: int = 8,
+    limit_per_stage: int = 10,
 ) -> list[dict[str, Any]]:
     if not rows:
         return []

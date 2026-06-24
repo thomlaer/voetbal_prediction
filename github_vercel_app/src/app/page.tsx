@@ -168,6 +168,8 @@ type DashboardData = {
   sources: SourceStatus[];
 };
 
+const TOPSCORER_DISPLAY_LIMIT = 10;
+
 async function loadDashboard(): Promise<DashboardData | null> {
   try {
     const file = path.join(process.cwd(), "public", "data", "dashboard.json");
@@ -764,7 +766,7 @@ export default async function Home() {
                 </tr>
               </thead>
               <tbody>
-                {data.top_scorers.slice(0, 12).map((row) => (
+                {data.top_scorers.slice(0, TOPSCORER_DISPLAY_LIMIT).map((row) => (
                   <tr key={`${row.rank}-${row.player}`}>
                     <td className="mono">{row.rank}</td>
                     <td>
@@ -789,7 +791,7 @@ export default async function Home() {
                 <div className="team-card" key={section.stage}>
                   <div className="team-card-top">
                     <strong>{section.label}</strong>
-                    <span className="pill">top {section.rows.length}</span>
+                    <span className="pill">top {Math.min(TOPSCORER_DISPLAY_LIMIT, section.rows.length)}</span>
                   </div>
                   <table>
                     <thead>
@@ -802,7 +804,7 @@ export default async function Home() {
                       </tr>
                     </thead>
                     <tbody>
-                      {section.rows.slice(0, 6).map((row) => (
+                      {section.rows.slice(0, TOPSCORER_DISPLAY_LIMIT).map((row) => (
                         <tr key={`${section.stage}-${row.round_rank}-${row.player}`}>
                           <td className="mono">{row.round_rank}</td>
                           <td>
