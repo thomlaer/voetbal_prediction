@@ -662,7 +662,7 @@ export default async function Home() {
         <section id="groepen" className="section">
           <div className="section-header">
             <div>
-              <h2 className="section-title">Groepsstanden</h2>
+              <h2 className="section-title">Verwachte groepsstanden</h2>
               <p className="section-subtitle">Verwachte eindstand op basis van de invulscores.</p>
             </div>
           </div>
