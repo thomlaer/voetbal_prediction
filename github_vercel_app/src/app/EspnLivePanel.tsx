@@ -191,7 +191,11 @@ export function EspnLivePanel({ defaultStandingsOpen = false }: EspnLivePanelPro
                       <td className="mono">{team.rank}</td>
                       <td>
                         {team.advanced ? <strong>{team.team}</strong> : team.team}
-                        {team.advanced ? <div className="metric-note">door volgens ESPN</div> : null}
+                        {team.advanced ? (
+                          <div className="metric-note">
+                            gekwalificeerd volgens ESPN{team.played < 3 ? ", plek nog open" : ""}
+                          </div>
+                        ) : null}
                       </td>
                       <td className="mono">
                         {team.wins}-{team.draws}-{team.losses}
