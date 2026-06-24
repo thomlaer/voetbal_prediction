@@ -40,6 +40,12 @@ if [[ "${SKIP_ESPN:-0}" != "1" ]]; then
     --output data/extracted/espn_worldcup2026_results.csv
 fi
 
+TRAINING_RESULTS="data/extracted/results_training_with_espn.csv"
+"$PYTHON" -X utf8 github_vercel_app/tools/build_training_results_with_espn.py \
+  --base data/results.csv \
+  --espn data/extracted/espn_worldcup2026_results.csv \
+  --output "$TRAINING_RESULTS"
+
 if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
     SOCCERBASE_URLS="${SOCCERBASE_URLS:-https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73}"
@@ -97,6 +103,7 @@ fi
 
 "$PYTHON" -X utf8 train_xgboost_worldcup.py \
   --skip-download \
+  --results "$TRAINING_RESULTS" \
   --use-soccerbase-stat-features \
   --use-soccerbase-card-features \
   "${EXTRA_TRAIN_ARGS[@]}" \
