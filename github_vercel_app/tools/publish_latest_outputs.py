@@ -985,10 +985,41 @@ def build_round_top_scorers(
     return ranked
 
 
-def normalize_stage_top_scorers(rows: list[dict[str, Any]], limit_per_stage: int = 8) -> list[dict[str, Any]]:
+ROUND_TOPSCORER_ROUTE_STAGES = {
+    "Group Stage": {"Group Stage"},
+    "Round of 32": {"Round of 32"},
+    "Round of 16": {"Round of 16"},
+    "Quarterfinals": {"Quarterfinals"},
+    "Semifinals": {"Semifinals"},
+    "Final/Third": {"Final", "Third Place Playoff"},
+}
+
+
+def route_team_keys_by_topscorer_stage(predictions: list[dict[str, Any]]) -> dict[str, set[str]]:
+    teams_by_stage: dict[str, set[str]] = {}
+    for topscorer_stage, prediction_stages in ROUND_TOPSCORER_ROUTE_STAGES.items():
+        teams: set[str] = set()
+        for row in predictions:
+            if str(row.get("stage", "")) not in prediction_stages:
+                continue
+            for field in ("home_team", "away_team"):
+                team = canonical_team_name(row.get(field, ""))
+                if team and not is_placeholder_team(team):
+                    teams.add(normalize_key(team))
+        if teams:
+            teams_by_stage[topscorer_stage] = teams
+    return teams_by_stage
+
+
+def normalize_stage_top_scorers(
+    rows: list[dict[str, Any]],
+    predictions: list[dict[str, Any]] | None = None,
+    limit_per_stage: int = 8,
+) -> list[dict[str, Any]]:
     if not rows:
         return []
     stage_order = {stage: idx for idx, stage in enumerate(STAGE_ORDER + ["Final/Third"])}
+    route_teams = route_team_keys_by_topscorer_stage(predictions or [])
     grouped_rows: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         stage = str(row.get("stage", ""))
@@ -998,6 +1029,15 @@ def normalize_stage_top_scorers(rows: list[dict[str, Any]], limit_per_stage: int
 
     output: list[dict[str, Any]] = []
     for stage, stage_rows in grouped_rows.items():
+        allowed_teams = route_teams.get(stage)
+        if allowed_teams:
+            route_filtered_rows = [
+                row
+                for row in stage_rows
+                if normalize_key(canonical_team_name(row.get("team", ""))) in allowed_teams
+            ]
+            if route_filtered_rows:
+                stage_rows = route_filtered_rows
         stage_rows.sort(
             key=lambda item: (
                 float(item.get("recommended_stage_topscorer_score") or 0.0),
@@ -1010,8 +1050,8 @@ def normalize_stage_top_scorers(rows: list[dict[str, Any]], limit_per_stage: int
             output.append(
                 {
                     **row,
-                    "round_rank": row.get("stage_rank") or rank,
-                    "stage_rank": row.get("stage_rank") or rank,
+                    "round_rank": rank,
+                    "stage_rank": rank,
                     "stage_label": row.get("stage_label") or stage,
                     "stage_order": row.get("stage_order", stage_order.get(stage, 999)),
                 }
@@ -1195,7 +1235,7 @@ def main() -> None:
     stage_top_scorers = read_csv(run_dir / "scorito_stage_topscorer_picks.csv")
     group_standings = build_group_standings(predictions, champions)
     round_top_scorers = (
-        normalize_stage_top_scorers(stage_top_scorers)
+        normalize_stage_top_scorers(stage_top_scorers, predictions)
         if stage_top_scorers
         else build_round_top_scorers(top_scorers, group_top_scorers, champions)
     )
