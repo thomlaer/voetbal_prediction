@@ -1126,9 +1126,10 @@ def player_live_form_multiplier(context_row: dict[str, float]) -> tuple[float, f
     )
 
     availability = 1.0
-    if lineup_matches >= 2 and apps <= 0:
+    has_goal_evidence = goals > 0 or penalties > 0
+    if not has_goal_evidence and lineup_matches >= 2 and apps <= 0:
         availability = 0.08
-    elif lineup_matches >= 1 and apps <= 0:
+    elif not has_goal_evidence and lineup_matches >= 1 and apps <= 0:
         availability = 0.35
     if red_cards > 0:
         availability *= 0.70

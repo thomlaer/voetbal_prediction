@@ -73,6 +73,7 @@ type GroupStanding = {
   group: string;
   team: string;
   points: string;
+  gf?: number | string;
   gd: string;
   rank: string;
   qualified_by_pick: string;
@@ -232,6 +233,7 @@ function isPlayed(row: Prediction) {
 }
 
 function resultClass(row: Prediction) {
+  if (isPlayed(row) && !row.pre_match_score) return "";
   if (row.prediction_exact === true) return "green";
   if (row.prediction_outcome_correct === true) return "orange";
   if (isPlayed(row)) return "red";
@@ -239,6 +241,7 @@ function resultClass(row: Prediction) {
 }
 
 function resultLabel(row: Prediction) {
+  if (isPlayed(row) && !row.pre_match_score) return "Geen pre-match";
   if (row.prediction_exact === true) return "Exact";
   if (row.prediction_outcome_correct === true) return "Winnaar goed";
   if (isPlayed(row)) return "Mis";
@@ -337,7 +340,7 @@ function stageStatus(stage: string, rows: Prediction[], starts: Map<string, numb
 }
 
 function displayScore(row: Prediction) {
-  return row.filled_score || row.pre_match_score || row.score;
+  return predictionScoreForDisplay(row) || "-";
 }
 
 function winnerFromScore(row: Prediction) {
@@ -351,13 +354,7 @@ function winnerFromScore(row: Prediction) {
 }
 
 function displayWinner(row: Prediction) {
-  return (
-    winnerFromScore(row) ||
-    row.filled_predicted_winner ||
-    row.pre_match_predicted_winner ||
-    row.predicted_winner ||
-    row.model_predicted_winner
-  );
+  return predictionWinnerForDisplay(row) || "-";
 }
 
 function matchupLabel(row: Prediction) {
@@ -419,8 +416,60 @@ function groupStatus(rows: GroupStanding[]) {
   return { label: "Projectie", note: `nog geen volledige echte poule${suffix}`, className: "" };
 }
 
+function groupNumber(value: string | number | undefined) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function allGroupsComplete(groups: Record<string, GroupStanding[]>) {
+  const groupRows = Object.values(groups);
+  return groupRows.length > 0 && groupRows.every((rows) => rows.some((row) => truthy(row.group_complete)));
+}
+
+function groupProjectionShouldOpen(groups: Record<string, GroupStanding[]>) {
+  return !allGroupsComplete(groups);
+}
+
+function bestThirdPlaceRows(groups: Record<string, GroupStanding[]>) {
+  return Object.entries(groups)
+    .map(([group, rows]) => {
+      const third = rows.find((row) => groupNumber(row.rank) === 3);
+      return third ? { ...third, group } : null;
+    })
+    .filter((row): row is GroupStanding => Boolean(row))
+    .sort((a, b) => {
+      const pointDiff = groupNumber(b.points) - groupNumber(a.points);
+      if (pointDiff !== 0) return pointDiff;
+      const gdDiff = groupNumber(b.gd) - groupNumber(a.gd);
+      if (gdDiff !== 0) return gdDiff;
+      const gfDiff = groupNumber(b.gf) - groupNumber(a.gf);
+      if (gfDiff !== 0) return gfDiff;
+      return String(a.team).localeCompare(String(b.team));
+    });
+}
+
+function predictionScoreForDisplay(row: Prediction) {
+  if (isPlayed(row)) return row.pre_match_score || "";
+  return row.filled_score || row.pre_match_score || row.score || "";
+}
+
+function predictionWinnerForDisplay(row: Prediction) {
+  const scoreWinner = winnerFromScore(row);
+  if (isPlayed(row)) {
+    return scoreWinner || row.pre_match_predicted_winner || "";
+  }
+  return (
+    scoreWinner ||
+    row.filled_predicted_winner ||
+    row.pre_match_predicted_winner ||
+    row.predicted_winner ||
+    row.model_predicted_winner ||
+    ""
+  );
+}
+
 function playedPanelRow(row: Prediction): PlayedMatchRow {
-  const predictedScore = row.filled_score || row.pre_match_score || row.score || "";
+  const predictedScore = predictionScoreForDisplay(row);
   const actualScore = row.actual_score || "";
 
   return {
@@ -431,12 +480,7 @@ function playedPanelRow(row: Prediction): PlayedMatchRow {
     home_team: row.home_team,
     away_team: row.away_team,
     predicted_score: predictedScore,
-    predicted_winner:
-      row.filled_predicted_winner ||
-      row.pre_match_predicted_winner ||
-      winnerFromScore(row) ||
-      row.predicted_winner ||
-      "",
+    predicted_winner: predictionWinnerForDisplay(row),
     actual_score: actualScore,
     actual_winner: row.actual_winner || "",
     actual_source: row.actual_source || "dashboard",
@@ -470,6 +514,9 @@ export default async function Home() {
   const stageMap = new Map(rounds.map((section) => [section.stage, section.rows]));
   const currentFillStage = firstOpenStage(rounds, starts, snapshotKey);
   const groups = grouped(data.group_standings);
+  const thirdPlaceRows = bestThirdPlaceRows(groups);
+  const groupProjectionOpen = groupProjectionShouldOpen(groups);
+  const thirdPlaceOfficial = allGroupsComplete(groups);
   const lockStages = rounds.map(({ stage, rows }) => ({
     stage,
     label: stageLabel(stage),
@@ -660,63 +707,120 @@ export default async function Home() {
         </section>
 
         <section id="groepen" className="section">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">Verwachte groepsstanden</h2>
-              <p className="section-subtitle">Verwachte eindstand op basis van de invulscores.</p>
-            </div>
-          </div>
-          <div className="cards-grid">
-            {Object.entries(groups).map(([group, rows]) => {
-              const status = groupStatus(rows);
+          <details className="section-details group-projection-details" open={groupProjectionOpen}>
+            <summary className="section-header collapse-summary">
+              <div>
+                <h2 className="section-title">Verwachte groepsstanden</h2>
+                <p className="section-subtitle">Verwachte eindstand op basis van de invulscores.</p>
+              </div>
+              <span className="collapse-actions">
+                <span className={`pill ${groupProjectionOpen ? "green" : ""}`}>
+                  {groupProjectionOpen ? "Poulefase loopt" : "Poulefase klaar"}
+                </span>
+                <span className="collapse-caret" aria-hidden="true" />
+              </span>
+            </summary>
+            <div className="cards-grid">
+              {Object.entries(groups).map(([group, rows]) => {
+                const status = groupStatus(rows);
 
-              return (
-                <div className={`team-card ${status.className === "green" ? "confirmed-card" : ""}`} key={group}>
-                  <div className="team-card-top">
-                    <strong>Poule {group}</strong>
-                    <span className={`pill ${status.className}`}>{status.label}</span>
+                return (
+                  <div className={`team-card ${status.className === "green" ? "confirmed-card" : ""}`} key={group}>
+                    <div className="team-card-top">
+                      <strong>Poule {group}</strong>
+                      <span className={`pill ${status.className}`}>{status.label}</span>
+                    </div>
+                    <div className="metric-note">{status.note}</div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Team</th>
+                          <th>Pts</th>
+                          <th>GD</th>
+                          <th>Door</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows
+                          .sort((a, b) => Number(a.rank) - Number(b.rank))
+                          .map((row) => {
+                            const confirmedQualified = truthy(row.qualified_confirmed);
+
+                            return (
+                              <tr
+                                className={confirmedQualified ? "confirmed-qualified-row" : ""}
+                                key={`${group}-${row.team}`}
+                              >
+                                <td className="mono">{row.rank}</td>
+                                <td>
+                                  {confirmedQualified ? <strong>{row.team}</strong> : row.team}
+                                  {truthy(row.rank_confirmed) ? <div className="metric-note">plek vast</div> : null}
+                                </td>
+                                <td className="mono">{row.points}p</td>
+                                <td className="mono">GD {row.gd}</td>
+                                <td className="mono">
+                                  {confirmedQualified ? <span className="pill green">zeker</span> : pct(row.advance_r16_prob)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="metric-note">{status.note}</div>
+                );
+              })}
+            </div>
+            {thirdPlaceRows.length ? (
+              <div className="third-place-card">
+                <div className="team-card-top">
+                  <strong>Beste nummers 3</strong>
+                  <span className="pill">{thirdPlaceOfficial ? "top 8 door" : "top 8 verwacht door"}</span>
+                </div>
+                <div className="metric-note">Gerangschikt op punten, doelsaldo en goals voor uit de verwachte poulestanden.</div>
+                <div className="table-shell third-place-table">
                   <table>
                     <thead>
                       <tr>
                         <th>#</th>
+                        <th>Poule</th>
                         <th>Team</th>
                         <th>Pts</th>
                         <th>GD</th>
-                        <th>Door</th>
+                        <th>GF</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {rows
-                        .sort((a, b) => Number(a.rank) - Number(b.rank))
-                        .map((row) => {
-                          const confirmedQualified = truthy(row.qualified_confirmed);
+                      {thirdPlaceRows.map((row, index) => {
+                        const advances = index < 8;
 
-                          return (
-                            <tr
-                              className={confirmedQualified ? "confirmed-qualified-row" : ""}
-                              key={`${group}-${row.team}`}
-                            >
-                              <td className="mono">{row.rank}</td>
-                              <td>
-                                {confirmedQualified ? <strong>{row.team}</strong> : row.team}
-                                {truthy(row.rank_confirmed) ? <div className="metric-note">plek vast</div> : null}
-                              </td>
-                              <td className="mono">{row.points}p</td>
-                              <td className="mono">GD {row.gd}</td>
-                              <td className="mono">
-                                {confirmedQualified ? <span className="pill green">zeker</span> : pct(row.advance_r16_prob)}
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        return (
+                          <tr className={advances ? "confirmed-qualified-row" : ""} key={`third-${row.group}-${row.team}`}>
+                            <td className="mono">{index + 1}</td>
+                            <td className="mono">{row.group}</td>
+                            <td>{advances ? <strong>{row.team}</strong> : row.team}</td>
+                            <td className="mono">{row.points}p</td>
+                            <td className="mono">GD {row.gd}</td>
+                            <td className="mono">{groupNumber(row.gf)}</td>
+                            <td>
+                              {advances ? (
+                                <span className={`pill ${thirdPlaceOfficial ? "green" : "orange"}`}>
+                                  {thirdPlaceOfficial ? "door" : "verwacht door"}
+                                </span>
+                              ) : (
+                                <span className="pill">uit</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            ) : null}
+          </details>
           <EspnLivePanel />
         </section>
 

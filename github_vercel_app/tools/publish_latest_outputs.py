@@ -768,15 +768,25 @@ def attach_actual_results(
         if output.get("actual_available") or output.get("actual_score"):
             output["new_model_score"] = ""
             output["new_model_predicted_winner"] = ""
+            if output.get("pre_match_source") == "current_run":
+                output["pre_match_score"] = ""
+                output["pre_match_predicted_winner"] = ""
+                output["pre_match_confidence"] = ""
+                output["pre_match_model_favourite_prob"] = ""
+                output["pre_match_source"] = "missing_pre_match_prediction"
 
         output = canonicalize_prediction_row(output)
 
         if output["actual_available"]:
             predicted_score = output.get("pre_match_score", "")
-            predicted_outcome = score_outcome(predicted_score)
-            actual_outcome = str(output.get("actual_outcome", ""))
-            output["prediction_exact"] = str(predicted_score) == str(output.get("actual_score", ""))
-            output["prediction_outcome_correct"] = bool(predicted_outcome) and predicted_outcome == actual_outcome
+            if predicted_score:
+                predicted_outcome = score_outcome(predicted_score)
+                actual_outcome = str(output.get("actual_outcome", ""))
+                output["prediction_exact"] = str(predicted_score) == str(output.get("actual_score", ""))
+                output["prediction_outcome_correct"] = bool(predicted_outcome) and predicted_outcome == actual_outcome
+            else:
+                output["prediction_exact"] = ""
+                output["prediction_outcome_correct"] = ""
         else:
             output["prediction_exact"] = ""
             output["prediction_outcome_correct"] = ""

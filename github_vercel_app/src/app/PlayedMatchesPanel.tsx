@@ -155,8 +155,8 @@ export function PlayedMatchesPanel({ initialRows }: PlayedMatchesPanelProps) {
                     </div>
                   </td>
                   <td>
-                    <span className="score">{row.predicted_score}</span>
-                    <div className="metric-note">{row.predicted_winner}</div>
+                    <span className="score">{row.predicted_score || "-"}</span>
+                    <div className="metric-note">{row.predicted_winner || "-"}</div>
                   </td>
                   <td>
                     <span className="score actual-score">{row.actual_score || "-"}</span>

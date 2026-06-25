@@ -97,6 +97,7 @@ function winnerFromScore(row: Prediction, score: string) {
 }
 
 function predictedScore(row: Prediction) {
+  if (row.actual_available || row.actual_score) return row.pre_match_score || "";
   return row.filled_score || row.pre_match_score || row.score || "";
 }
 
@@ -141,14 +142,16 @@ function resultFlags(predictionScore: string, actualScore: string) {
   };
 }
 
-function resultClass(exact: boolean, outcomeCorrect: boolean, hasActual: boolean) {
+function resultClass(exact: boolean, outcomeCorrect: boolean, hasActual: boolean, hasPrediction: boolean) {
+  if (hasActual && !hasPrediction) return "";
   if (exact) return "green";
   if (outcomeCorrect) return "orange";
   if (hasActual) return "red";
   return "";
 }
 
-function resultLabel(exact: boolean, outcomeCorrect: boolean, hasActual: boolean) {
+function resultLabel(exact: boolean, outcomeCorrect: boolean, hasActual: boolean, hasPrediction: boolean) {
+  if (hasActual && !hasPrediction) return "Geen pre-match";
   if (exact) return "Exact";
   if (outcomeCorrect) return "Winnaar goed";
   if (hasActual) return "Mis";
@@ -173,6 +176,7 @@ export async function GET() {
         const actualScore = espnActualScore || storedActualScore;
         const hasActual = Boolean(actualScore);
         const predictionScore = predictedScore(row);
+        const hasPrediction = Boolean(predictionScore);
         const flags = resultFlags(predictionScore, actualScore);
         const source = espnActualScore ? "ESPN live" : row.actual_source || "dashboard";
         const backupMismatch = Boolean(espnActualScore && storedActualScore && espnActualScore !== storedActualScore);
@@ -195,8 +199,8 @@ export async function GET() {
           backup_mismatch: backupMismatch,
           prediction_exact: flags.prediction_exact,
           prediction_outcome_correct: flags.prediction_outcome_correct,
-          result_class: resultClass(flags.prediction_exact, flags.prediction_outcome_correct, hasActual),
-          result_label: resultLabel(flags.prediction_exact, flags.prediction_outcome_correct, hasActual),
+          result_class: resultClass(flags.prediction_exact, flags.prediction_outcome_correct, hasActual, hasPrediction),
+          result_label: resultLabel(flags.prediction_exact, flags.prediction_outcome_correct, hasActual, hasPrediction),
         };
       })
       .filter((row): row is NonNullable<typeof row> => row !== null)
