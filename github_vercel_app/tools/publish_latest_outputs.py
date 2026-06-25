@@ -622,6 +622,21 @@ def load_locked_scores(path: Path) -> dict[str, dict[str, Any]]:
     return locked
 
 
+def load_prematch_scores(path: Path) -> dict[str, dict[str, Any]]:
+    prematch: dict[str, dict[str, Any]] = {}
+    for row in read_csv(path):
+        match_number = str(row.get("match_number", "")).strip()
+        score = str(row.get("score", "")).strip()
+        if not match_number or parse_score(score) is None:
+            continue
+        prematch[match_number] = {
+            "score": score,
+            "predicted_winner": str(row.get("predicted_winner", "")).strip(),
+            "note": row.get("note", ""),
+        }
+    return prematch
+
+
 def attach_actual_results(
     predictions: list[dict[str, Any]],
     results_path: Path,
@@ -629,6 +644,7 @@ def attach_actual_results(
     previous_dashboard: dict[str, Any],
     snapshot_key: int | None,
     locked_scores: dict[str, dict[str, Any]],
+    prematch_scores: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     actuals = load_soccerbase_actuals(soccerbase_stats_path)
     actuals.update(load_worldcup_actuals(results_path))
@@ -764,6 +780,24 @@ def attach_actual_results(
             output["pre_match_predicted_winner"] = manual_winner
             output["score_source"] = "manual_locked_score"
             output["pre_match_source"] = "manual_locked_score"
+
+        prematch_score = prematch_scores.get(str(output.get("match_number", "")).strip())
+        if (
+            prematch_score
+            and (output.get("actual_available") or output.get("actual_score"))
+            and output.get("pre_match_source") in {"current_run", "missing_pre_match_prediction", ""}
+        ):
+            prematch_value = prematch_score["score"]
+            prematch_winner = prematch_score.get("predicted_winner") or score_winner(
+                prematch_value,
+                output.get("home_team", ""),
+                output.get("away_team", ""),
+            )
+            output["pre_match_score"] = prematch_value
+            output["pre_match_predicted_winner"] = prematch_winner
+            output["pre_match_confidence"] = ""
+            output["pre_match_model_favourite_prob"] = ""
+            output["pre_match_source"] = "excel_prematch_score"
 
         if output.get("actual_available") or output.get("actual_score"):
             output["new_model_score"] = ""
@@ -1223,6 +1257,7 @@ def main() -> None:
 
     soccerbase_stats_path = model_root / "data" / "extracted" / "soccerbase_match_stats.csv"
     locked_scores = load_locked_scores(model_root / "data" / "extracted" / "scorito_locked_scores.csv")
+    prematch_scores = load_prematch_scores(model_root / "data" / "extracted" / "scorito_prematch_scores.csv")
     predictions = attach_actual_results(
         predictions,
         results_path,
@@ -1230,6 +1265,7 @@ def main() -> None:
         previous_dashboard,
         snapshot_key,
         locked_scores,
+        prematch_scores,
     )
     played_match_numbers = {
         str(row.get("match_number", "")).strip()
