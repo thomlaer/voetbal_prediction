@@ -223,6 +223,9 @@ export async function POST(request: Request) {
   if (!stageRows.length) {
     return NextResponse.json({ ok: false, message: "Deze ronde staat niet in de huidige dashboarddata." }, { status: 404 });
   }
+  const stageMatchNumbers = new Set(
+    stageRows.map((row) => String(row.match_number || "").trim()).filter(Boolean),
+  );
 
   try {
     const remote = await loadRemoteLocks(repository, token, ref);
@@ -232,7 +235,13 @@ export async function POST(request: Request) {
 
     if (action === "unlock") {
       const before = remote.rows.length;
-      merged = remote.rows.filter((row) => row.stage !== stage);
+      merged = remote.rows.filter((row) => {
+        const rowStage = String(row.stage || "").trim();
+        const rowMatchNumber = String(row.match_number || "").trim();
+        const sameStage = rowStage === stage;
+        const legacyStageMatch = !rowStage && stageMatchNumbers.has(rowMatchNumber);
+        return !(sameStage || legacyStageMatch);
+      });
       const removed = before - merged.length;
       if (!removed) {
         return NextResponse.json(
