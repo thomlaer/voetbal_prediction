@@ -776,6 +776,30 @@ def existing_soccerbase_game_ids(paths: Iterable[str]) -> set[str]:
     return game_ids
 
 
+def existing_lineup_game_ids(path: str, min_rows_per_game: int = 18) -> set[str]:
+    """Game ids with enough stored lineup rows to count as lineup-fetched.
+
+    Match stats can arrive before the lineup bubble is available or before our
+    parser understands it. Those stats rows must not block a later lineup retry.
+    """
+    csv_path = Path(path)
+    if not csv_path.exists():
+        return set()
+    counts: dict[str, int] = {}
+    with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = set(reader.fieldnames or [])
+        if "soccerbase_game_id" not in fieldnames or "player_name" not in fieldnames:
+            return set()
+        for row in reader:
+            game_id = str(row.get("soccerbase_game_id", "")).strip()
+            player_name = str(row.get("player_name", "")).strip()
+            if not game_id or not player_name:
+                continue
+            counts[game_id] = counts.get(game_id, 0) + 1
+    return {game_id for game_id, count in counts.items() if count >= min_rows_per_game}
+
+
 def has_completed_score(row: dict[str, object]) -> bool:
     return bool(str(row.get("home_score", "")).strip() and str(row.get("away_score", "")).strip())
 
@@ -1042,13 +1066,7 @@ def main() -> int:
     existing_stats = read_existing_csv(args.stats_output) if args.incremental else []
     existing_cards = read_existing_csv(args.cards_output) if args.incremental else []
     existing_cache = read_existing_csv(args.fetched_games_cache) if args.incremental else []
-    skip_game_ids = (
-        existing_soccerbase_game_ids(
-            [args.fetched_games_cache, args.lineups_output, args.stats_output, args.cards_output]
-        )
-        if args.incremental
-        else set()
-    )
+    skip_game_ids = existing_lineup_game_ids(args.lineups_output) if args.incremental else set()
 
     lineups, stats, cards, report_rows = scrape(args, skip_game_ids)
     lineups = matcher.enrich(lineups)

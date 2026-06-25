@@ -214,7 +214,7 @@ function playerContextLine(row: TopScorer | RoundTopScorer) {
   const apps = Number(row.current_tournament_apps || 0);
   const parts = [];
   if (goals > 0) parts.push(`${goals} goal${goals === 1 ? "" : "s"}`);
-  if (starts > 0 || apps > 0) parts.push(`${starts}/${apps} start/app`);
+  if (starts > 0 || apps > 0) parts.push(`${starts}/${apps} basis/app in lineups`);
   if (row.manual_status) parts.push(String(row.manual_status));
   if (row.manual_penalty_taker) parts.push(`pen ${row.manual_penalty_taker}`);
   return parts.join(" · ");
