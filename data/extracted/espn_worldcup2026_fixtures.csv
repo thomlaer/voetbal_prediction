@@ -1,0 +1,105 @@
+source,espn_event_id,match_number,date,kickoff_utc,stage,home_team,away_team,home_slot,away_slot,home_is_placeholder,away_is_placeholder,espn_home_team,espn_away_team,espn_name,espn_home_abbreviation,espn_away_abbreviation
+espn,760415,1,2026-06-11,2026-06-11T19:00Z,Group Stage,Mexico,South Africa,,,False,False,Mexico,South Africa,South Africa at Mexico,MEX,RSA
+espn,760414,2,2026-06-12,2026-06-12T02:00Z,Group Stage,South Korea,Czechia,,,False,False,South Korea,Czechia,Czechia at South Korea,KOR,CZE
+espn,760416,3,2026-06-12,2026-06-12T19:00Z,Group Stage,Canada,Bosnia and Herzegovina,,,False,False,Canada,Bosnia-Herzegovina,Bosnia-Herzegovina at Canada,CAN,BIH
+espn,760417,4,2026-06-13,2026-06-13T01:00Z,Group Stage,United States,Paraguay,,,False,False,United States,Paraguay,Paraguay at United States,USA,PAR
+espn,760420,5,2026-06-13,2026-06-13T19:00Z,Group Stage,Qatar,Switzerland,,,False,False,Qatar,Switzerland,Switzerland at Qatar,QAT,SUI
+espn,760419,6,2026-06-13,2026-06-13T22:00Z,Group Stage,Brazil,Morocco,,,False,False,Brazil,Morocco,Morocco at Brazil,BRA,MAR
+espn,760418,7,2026-06-14,2026-06-14T01:00Z,Group Stage,Haiti,Scotland,,,False,False,Haiti,Scotland,Scotland at Haiti,HAI,SCO
+espn,760421,8,2026-06-14,2026-06-14T04:00Z,Group Stage,Australia,Türkiye,,,False,False,Australia,Türkiye,Türkiye at Australia,AUS,TUR
+espn,760422,9,2026-06-14,2026-06-14T17:00Z,Group Stage,Germany,Curaçao,,,False,False,Germany,Curaçao,Curaçao at Germany,GER,CUW
+espn,760425,10,2026-06-14,2026-06-14T20:00Z,Group Stage,Netherlands,Japan,,,False,False,Netherlands,Japan,Japan at Netherlands,NED,JPN
+espn,760423,11,2026-06-14,2026-06-14T23:00Z,Group Stage,Ivory Coast,Ecuador,,,False,False,Ivory Coast,Ecuador,Ecuador at Ivory Coast,CIV,ECU
+espn,760424,12,2026-06-15,2026-06-15T02:00Z,Group Stage,Sweden,Tunisia,,,False,False,Sweden,Tunisia,Tunisia at Sweden,SWE,TUN
+espn,760428,13,2026-06-15,2026-06-15T16:00Z,Group Stage,Spain,Cape Verde,,,False,False,Spain,Cape Verde,Cape Verde at Spain,ESP,CPV
+espn,760426,14,2026-06-15,2026-06-15T19:00Z,Group Stage,Belgium,Egypt,,,False,False,Belgium,Egypt,Egypt at Belgium,BEL,EGY
+espn,760429,15,2026-06-15,2026-06-15T22:00Z,Group Stage,Saudi Arabia,Uruguay,,,False,False,Saudi Arabia,Uruguay,Uruguay at Saudi Arabia,KSA,URU
+espn,760427,16,2026-06-16,2026-06-16T01:00Z,Group Stage,Iran,New Zealand,,,False,False,Iran,New Zealand,New Zealand at Iran,IRN,NZL
+espn,760432,17,2026-06-16,2026-06-16T19:00Z,Group Stage,France,Senegal,,,False,False,France,Senegal,Senegal at France,FRA,SEN
+espn,760430,18,2026-06-16,2026-06-16T22:00Z,Group Stage,Iraq,Norway,,,False,False,Iraq,Norway,Norway at Iraq,IRQ,NOR
+espn,760433,19,2026-06-17,2026-06-17T01:00Z,Group Stage,Argentina,Algeria,,,False,False,Argentina,Algeria,Algeria at Argentina,ARG,ALG
+espn,760431,20,2026-06-17,2026-06-17T04:00Z,Group Stage,Austria,Jordan,,,False,False,Austria,Jordan,Jordan at Austria,AUT,JOR
+espn,760435,21,2026-06-17,2026-06-17T17:00Z,Group Stage,Portugal,DR Congo,,,False,False,Portugal,Congo DR,Congo DR at Portugal,POR,COD
+espn,760437,22,2026-06-17,2026-06-17T20:00Z,Group Stage,England,Croatia,,,False,False,England,Croatia,Croatia at England,ENG,CRO
+espn,760434,23,2026-06-17,2026-06-17T23:00Z,Group Stage,Ghana,Panama,,,False,False,Ghana,Panama,Panama at Ghana,GHA,PAN
+espn,760436,24,2026-06-18,2026-06-18T02:00Z,Group Stage,Uzbekistan,Colombia,,,False,False,Uzbekistan,Colombia,Colombia at Uzbekistan,UZB,COL
+espn,760438,25,2026-06-18,2026-06-18T16:00Z,Group Stage,Czechia,South Africa,,,False,False,Czechia,South Africa,South Africa at Czechia,CZE,RSA
+espn,760439,26,2026-06-18,2026-06-18T19:00Z,Group Stage,Switzerland,Bosnia and Herzegovina,,,False,False,Switzerland,Bosnia-Herzegovina,Bosnia-Herzegovina at Switzerland,SUI,BIH
+espn,760440,27,2026-06-18,2026-06-18T22:00Z,Group Stage,Canada,Qatar,,,False,False,Canada,Qatar,Qatar at Canada,CAN,QAT
+espn,760441,28,2026-06-19,2026-06-19T01:00Z,Group Stage,Mexico,South Korea,,,False,False,Mexico,South Korea,South Korea at Mexico,MEX,KOR
+espn,760442,29,2026-06-19,2026-06-19T19:00Z,Group Stage,United States,Australia,,,False,False,United States,Australia,Australia at United States,USA,AUS
+espn,760445,30,2026-06-19,2026-06-19T22:00Z,Group Stage,Scotland,Morocco,,,False,False,Scotland,Morocco,Morocco at Scotland,SCO,MAR
+espn,760444,31,2026-06-20,2026-06-20T00:30Z,Group Stage,Brazil,Haiti,,,False,False,Brazil,Haiti,Haiti at Brazil,BRA,HAI
+espn,760443,32,2026-06-20,2026-06-20T03:00Z,Group Stage,Türkiye,Paraguay,,,False,False,Türkiye,Paraguay,Paraguay at Türkiye,TUR,PAR
+espn,760447,33,2026-06-20,2026-06-20T17:00Z,Group Stage,Netherlands,Sweden,,,False,False,Netherlands,Sweden,Sweden at Netherlands,NED,SWE
+espn,760448,34,2026-06-20,2026-06-20T20:00Z,Group Stage,Germany,Ivory Coast,,,False,False,Germany,Ivory Coast,Ivory Coast at Germany,GER,CIV
+espn,760446,35,2026-06-21,2026-06-21T00:00Z,Group Stage,Ecuador,Curaçao,,,False,False,Ecuador,Curaçao,Curaçao at Ecuador,ECU,CUW
+espn,760449,36,2026-06-21,2026-06-21T04:00Z,Group Stage,Tunisia,Japan,,,False,False,Tunisia,Japan,Japan at Tunisia,TUN,JPN
+espn,760453,37,2026-06-21,2026-06-21T16:00Z,Group Stage,Spain,Saudi Arabia,,,False,False,Spain,Saudi Arabia,Saudi Arabia at Spain,ESP,KSA
+espn,760451,38,2026-06-21,2026-06-21T19:00Z,Group Stage,Belgium,Iran,,,False,False,Belgium,Iran,Iran at Belgium,BEL,IRN
+espn,760450,39,2026-06-21,2026-06-21T22:00Z,Group Stage,Uruguay,Cape Verde,,,False,False,Uruguay,Cape Verde,Cape Verde at Uruguay,URU,CPV
+espn,760452,40,2026-06-22,2026-06-22T01:00Z,Group Stage,New Zealand,Egypt,,,False,False,New Zealand,Egypt,Egypt at New Zealand,NZL,EGY
+espn,760456,41,2026-06-22,2026-06-22T17:00Z,Group Stage,Argentina,Austria,,,False,False,Argentina,Austria,Austria at Argentina,ARG,AUT
+espn,760457,42,2026-06-22,2026-06-22T21:00Z,Group Stage,France,Iraq,,,False,False,France,Iraq,Iraq at France,FRA,IRQ
+espn,760454,43,2026-06-23,2026-06-23T00:00Z,Group Stage,Norway,Senegal,,,False,False,Norway,Senegal,Senegal at Norway,NOR,SEN
+espn,760455,44,2026-06-23,2026-06-23T03:00Z,Group Stage,Jordan,Algeria,,,False,False,Jordan,Algeria,Algeria at Jordan,JOR,ALG
+espn,760461,45,2026-06-23,2026-06-23T17:00Z,Group Stage,Portugal,Uzbekistan,,,False,False,Portugal,Uzbekistan,Uzbekistan at Portugal,POR,UZB
+espn,760458,46,2026-06-23,2026-06-23T20:00Z,Group Stage,England,Ghana,,,False,False,England,Ghana,Ghana at England,ENG,GHA
+espn,760460,47,2026-06-23,2026-06-23T23:00Z,Group Stage,Panama,Croatia,,,False,False,Panama,Croatia,Croatia at Panama,PAN,CRO
+espn,760459,48,2026-06-24,2026-06-24T02:00Z,Group Stage,Colombia,DR Congo,,,False,False,Colombia,Congo DR,Congo DR at Colombia,COL,COD
+espn,760462,49,2026-06-24,2026-06-24T19:00Z,Group Stage,Bosnia and Herzegovina,Qatar,,,False,False,Bosnia-Herzegovina,Qatar,Qatar at Bosnia-Herzegovina,BIH,QAT
+espn,760463,50,2026-06-24,2026-06-24T19:00Z,Group Stage,Switzerland,Canada,,,False,False,Switzerland,Canada,Canada at Switzerland,SUI,CAN
+espn,760464,51,2026-06-24,2026-06-24T22:00Z,Group Stage,Morocco,Haiti,,,False,False,Morocco,Haiti,Haiti at Morocco,MAR,HAI
+espn,760465,52,2026-06-24,2026-06-24T22:00Z,Group Stage,Scotland,Brazil,,,False,False,Scotland,Brazil,Brazil at Scotland,SCO,BRA
+espn,760467,53,2026-06-25,2026-06-25T01:00Z,Group Stage,Czechia,Mexico,,,False,False,Czechia,Mexico,Mexico at Czechia,CZE,MEX
+espn,760466,54,2026-06-25,2026-06-25T01:00Z,Group Stage,South Africa,South Korea,,,False,False,South Africa,South Korea,South Korea at South Africa,RSA,KOR
+espn,760473,55,2026-06-25,2026-06-25T20:00Z,Group Stage,Curaçao,Ivory Coast,,,False,False,Curaçao,Ivory Coast,Ivory Coast at Curaçao,CUW,CIV
+espn,760468,56,2026-06-25,2026-06-25T20:00Z,Group Stage,Ecuador,Germany,,,False,False,Ecuador,Germany,Germany at Ecuador,ECU,GER
+espn,760471,57,2026-06-25,2026-06-25T23:00Z,Group Stage,Japan,Sweden,,,False,False,Japan,Sweden,Sweden at Japan,JPN,SWE
+espn,760472,58,2026-06-25,2026-06-25T23:00Z,Group Stage,Tunisia,Netherlands,,,False,False,Tunisia,Netherlands,Netherlands at Tunisia,TUN,NED
+espn,760469,59,2026-06-26,2026-06-26T02:00Z,Group Stage,Paraguay,Australia,,,False,False,Paraguay,Australia,Australia at Paraguay,PAR,AUS
+espn,760470,60,2026-06-26,2026-06-26T02:00Z,Group Stage,Türkiye,United States,,,False,False,Türkiye,United States,United States at Türkiye,TUR,USA
+espn,760475,61,2026-06-26,2026-06-26T19:00Z,Group Stage,Norway,France,,,False,False,Norway,France,France at Norway,NOR,FRA
+espn,760474,62,2026-06-26,2026-06-26T19:00Z,Group Stage,Senegal,Iraq,,,False,False,Senegal,Iraq,Iraq at Senegal,SEN,IRQ
+espn,760478,63,2026-06-27,2026-06-27T00:00Z,Group Stage,Cape Verde,Saudi Arabia,,,False,False,Cape Verde,Saudi Arabia,Saudi Arabia at Cape Verde,CPV,KSA
+espn,760479,64,2026-06-27,2026-06-27T00:00Z,Group Stage,Uruguay,Spain,,,False,False,Uruguay,Spain,Spain at Uruguay,URU,ESP
+espn,760476,65,2026-06-27,2026-06-27T03:00Z,Group Stage,Egypt,Iran,,,False,False,Egypt,Iran,Iran at Egypt,EGY,IRN
+espn,760477,66,2026-06-27,2026-06-27T03:00Z,Group Stage,New Zealand,Belgium,,,False,False,New Zealand,Belgium,Belgium at New Zealand,NZL,BEL
+espn,760480,67,2026-06-27,2026-06-27T21:00Z,Group Stage,Croatia,Ghana,,,False,False,Croatia,Ghana,Ghana at Croatia,CRO,GHA
+espn,760485,68,2026-06-27,2026-06-27T21:00Z,Group Stage,Panama,England,,,False,False,Panama,England,England at Panama,PAN,ENG
+espn,760481,69,2026-06-27,2026-06-27T23:30Z,Group Stage,Colombia,Portugal,,,False,False,Colombia,Portugal,Portugal at Colombia,COL,POR
+espn,760482,70,2026-06-27,2026-06-27T23:30Z,Group Stage,DR Congo,Uzbekistan,,,False,False,Congo DR,Uzbekistan,Uzbekistan at Congo DR,COD,UZB
+espn,760484,71,2026-06-28,2026-06-28T02:00Z,Group Stage,Algeria,Austria,,,False,False,Algeria,Austria,Austria at Algeria,ALG,AUT
+espn,760483,72,2026-06-28,2026-06-28T02:00Z,Group Stage,Jordan,Argentina,,,False,False,Jordan,Argentina,Argentina at Jordan,JOR,ARG
+espn,760486,73,2026-06-28,2026-06-28T19:00Z,Round of 32,South Africa,Canada,,,False,False,South Africa,Canada,Canada at South Africa,RSA,CAN
+espn,760487,74,2026-06-29,2026-06-29T17:00Z,Round of 32,Brazil,2F,,2F,False,True,Brazil,Group F 2nd Place,Group F 2nd Place at Brazil,BRA,2F
+espn,760489,75,2026-06-29,2026-06-29T20:30Z,Round of 32,Germany,3ABCDF,,3ABCDF,False,True,Germany,Third Place Group A/B/C/D/F,Third Place Group A/B/C/D/F at Germany,GER,3RD
+espn,760488,76,2026-06-30,2026-06-30T01:00Z,Round of 32,1F,Morocco,1F,,True,False,Group F Winner,Morocco,Morocco at Group F Winner,1F,MAR
+espn,760490,77,2026-06-30,2026-06-30T17:00Z,Round of 32,2E,2I,2E,2I,True,True,Group E 2nd Place,Group I 2nd Place,Group I 2nd Place at Group E 2nd Place,2E,2I
+espn,760492,78,2026-06-30,2026-06-30T21:00Z,Round of 32,1I,3CDFGH,1I,3CDFGH,True,True,Group I Winner,Third Place Group C/D/F/G/H,Third Place Group C/D/F/G/H at Group I Winner,1I,3RD
+espn,760491,79,2026-07-01,2026-07-01T01:00Z,Round of 32,Mexico,3CEFHI,,3CEFHI,False,True,Mexico,Third Place Group C/E/F/H/I,Third Place Group C/E/F/H/I at Mexico,MEX,3RD
+espn,760495,80,2026-07-01,2026-07-01T16:00Z,Round of 32,1L,3EHIJK,1L,3EHIJK,True,True,Group L Winner,Third Place Group E/H/I/J/K,Third Place Group E/H/I/J/K at Group L Winner,1L,3RD
+espn,760493,81,2026-07-01,2026-07-01T20:00Z,Round of 32,1G,3AEHIJ,1G,3AEHIJ,True,True,Group G Winner,Third Place Group A/E/H/I/J,Third Place Group A/E/H/I/J at Group G Winner,1G,3RD
+espn,760494,82,2026-07-02,2026-07-02T00:00Z,Round of 32,United States,3BEFIJ,,3BEFIJ,False,True,United States,Third Place Group B/E/F/I/J,Third Place Group B/E/F/I/J at United States,USA,3RD
+espn,760497,83,2026-07-02,2026-07-02T19:00Z,Round of 32,1H,2J,1H,2J,True,True,Group H Winner,Group J 2nd Place,Group J 2nd Place at Group H Winner,1H,2J
+espn,760496,84,2026-07-02,2026-07-02T23:00Z,Round of 32,2K,2L,2K,2L,True,True,Group K 2nd Place,Group L 2nd Place,Group L 2nd Place at Group K 2nd Place,2K,2L
+espn,760498,85,2026-07-03,2026-07-03T03:00Z,Round of 32,Switzerland,3EFGIJ,,3EFGIJ,False,True,Switzerland,Third Place Group E/F/G/I/J,Third Place Group E/F/G/I/J at Switzerland,SUI,3RD
+espn,760499,86,2026-07-03,2026-07-03T18:00Z,Round of 32,2D,2G,2D,2G,True,True,Group D 2nd Place,Group G 2nd Place,Group G 2nd Place at Group D 2nd Place,2D,2G
+espn,760500,87,2026-07-03,2026-07-03T22:00Z,Round of 32,Argentina,2H,,2H,False,True,Argentina,Group H 2nd Place,Group H 2nd Place at Argentina,ARG,2H
+espn,760501,88,2026-07-04,2026-07-04T01:30Z,Round of 32,1K,3DEIJL,1K,3DEIJL,True,True,Group K Winner,Third Place Group D/E/I/J/L,Third Place Group D/E/I/J/L at Group K Winner,1K,3RD
+espn,760502,89,2026-07-04,2026-07-04T17:00Z,Round of 16,W73,W75,W73,W75,True,True,Round of 32 1 Winner,Round of 32 3 Winner,Round of 32 3 Winner at Round of 32 1 Winner,RD32,RD32
+espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,W74,W77,W74,W77,True,True,Round of 32 2 Winner,Round of 32 5 Winner,Round of 32 5 Winner at Round of 32 2 Winner,RD32,RD32
+espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,W76,W78,W76,W78,True,True,Round of 32 4 Winner,Round of 32 6 Winner,Round of 32 6 Winner at Round of 32 4 Winner,RD32,RD32
+espn,760505,92,2026-07-06,2026-07-06T00:00Z,Round of 16,W79,W80,W79,W80,True,True,Round of 32 7 Winner,Round of 32 8 Winner,Round of 32 8 Winner at Round of 32 7 Winner,RD32,RD32
+espn,760506,93,2026-07-06,2026-07-06T19:00Z,Round of 16,W83,W84,W83,W84,True,True,Round of 32 11 Winner,Round of 32 12 Winner,Round of 32 12 Winner at Round of 32 11 Winner,RD32,RD32
+espn,760507,94,2026-07-07,2026-07-07T00:00Z,Round of 16,W81,W82,W81,W82,True,True,Round of 32 9 Winner,Round of 32 10 Winner,Round of 32 10 Winner at Round of 32 9 Winner,RD32,RD32
+espn,760509,95,2026-07-07,2026-07-07T16:00Z,Round of 16,W86,W88,W86,W88,True,True,Round of 32 14 Winner,Round of 32 16 Winner,Round of 32 16 Winner at Round of 32 14 Winner,RD32,RD32
+espn,760508,96,2026-07-07,2026-07-07T20:00Z,Round of 16,W85,W87,W85,W87,True,True,Round of 32 13 Winner,Round of 32 15 Winner,Round of 32 15 Winner at Round of 32 13 Winner,RD32,RD32
+espn,760510,97,2026-07-09,2026-07-09T20:00Z,Quarterfinals,W89,W90,W89,W90,True,True,Round of 16 1 Winner,Round of 16 2 Winner,Round of 16 2 Winner at Round of 16 1 Winner,RD16 W1,RD16 W2
+espn,760511,98,2026-07-10,2026-07-10T19:00Z,Quarterfinals,W93,W94,W93,W94,True,True,Round of 16 5 Winner,Round of 16 6 Winner,Round of 16 6 Winner at Round of 16 5 Winner,RD16 W5,RD16 W6
+espn,760512,99,2026-07-11,2026-07-11T21:00Z,Quarterfinals,W91,W92,W91,W92,True,True,Round of 16 3 Winner,Round of 16 4 Winner,Round of 16 4 Winner at Round of 16 3 Winner,RD16 W3,RD16 W4
+espn,760513,100,2026-07-12,2026-07-12T01:00Z,Quarterfinals,W95,W96,W95,W96,True,True,Round of 16 7 Winner,Round of 16 8 Winner,Round of 16 8 Winner at Round of 16 7 Winner,RD16 W7,RD16 W8
+espn,760514,101,2026-07-14,2026-07-14T19:00Z,Semifinals,W97,W98,W97,W98,True,True,Quarterfinal 1 Winner,Quarterfinal 2 Winner,Quarterfinal 2 Winner at Quarterfinal 1 Winner,QFW1,QFW2
+espn,760515,102,2026-07-15,2026-07-15T19:00Z,Semifinals,W99,W100,W99,W100,True,True,Quarterfinal 3 Winner,Quarterfinal 4 Winner,Quarterfinal 4 Winner at Quarterfinal 3 Winner,QFW3,QW4
+espn,760516,103,2026-07-18,2026-07-18T21:00Z,Third Place Playoff,RU101,RU102,RU101,RU102,True,True,Semifinal 1 Loser,Semifinal 2 Loser,Semifinal 2 Loser at Semifinal 1 Loser,SF L1,SF L2
+espn,760517,104,2026-07-19,2026-07-19T19:00Z,Final,W101,W102,W101,W102,True,True,Semifinal 1 Winner,Semifinal 2 Winner,Semifinal 2 Winner at Semifinal 1 Winner,SFW1,SFW2

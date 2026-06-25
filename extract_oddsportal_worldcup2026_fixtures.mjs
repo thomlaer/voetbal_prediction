@@ -544,6 +544,81 @@ function fallbackOddsRowsFromSchedule(schedulePath) {
     });
 }
 
+function oddsRowsFromRaw(rawPath) {
+  if (!rawPath || !fs.existsSync(rawPath)) {
+    return [];
+  }
+  return parseCsv(fs.readFileSync(rawPath, "utf8"))
+    .filter((row) => oddsAvailable(row))
+    .map((row) => ({
+      source: row.source || "existing_odds_raw",
+      source_url: row.source_url || "",
+      scraped_at_utc: row.scraped_at_utc || "",
+      oddsportal_event_id: row.oddsportal_event_id || "",
+      oddsportal_encoded_event_id: row.oddsportal_encoded_event_id || "",
+      oddsportal_date_utc: row.oddsportal_date_utc || String(row.oddsportal_kickoff_utc || "").slice(0, 10),
+      oddsportal_kickoff_utc: row.oddsportal_kickoff_utc || "",
+      oddsportal_home_team: row.oddsportal_home_team || row.home_team,
+      oddsportal_away_team: row.oddsportal_away_team || row.away_team,
+      home_team: modelTeamName(row.home_team || row.oddsportal_home_team),
+      away_team: modelTeamName(row.away_team || row.oddsportal_away_team),
+      tournament: row.tournament || "World Cup 2026",
+      event_stage: row.event_stage || "",
+      venue: row.venue || "",
+      venue_town: row.venue_town || "",
+      venue_country: row.venue_country || "",
+      detail_url: row.detail_url || "",
+      home_odds: row.home_odds,
+      draw_odds: row.draw_odds,
+      away_odds: row.away_odds,
+      max_home_odds: row.max_home_odds,
+      max_draw_odds: row.max_draw_odds,
+      max_away_odds: row.max_away_odds,
+      n_odds_home_win: row.n_odds_home_win,
+      n_odds_draw_win: row.n_odds_draw_win || row.n_odds_draw,
+      n_odds_draw: row.n_odds_draw || row.n_odds_draw_win,
+      n_odds_away_win: row.n_odds_away_win,
+    }));
+}
+
+function oddsRowKey(row) {
+  const eventId = String(row.oddsportal_event_id || "").trim();
+  if (eventId) {
+    return `event:${eventId}`;
+  }
+  const encoded = String(row.oddsportal_encoded_event_id || "").trim();
+  if (encoded) {
+    return `encoded:${encoded}`;
+  }
+  return [
+    "teams",
+    row.oddsportal_date_utc || "",
+    normalizeTeamKey(row.home_team || row.oddsportal_home_team),
+    normalizeTeamKey(row.away_team || row.oddsportal_away_team),
+  ].join("|");
+}
+
+function mergeOddsRows(existingRows, freshRows) {
+  const merged = new Map();
+  for (const row of existingRows) {
+    if (oddsAvailable(row)) {
+      merged.set(oddsRowKey(row), row);
+    }
+  }
+  for (const row of freshRows) {
+    if (oddsAvailable(row)) {
+      merged.set(oddsRowKey(row), row);
+    }
+  }
+  return [...merged.values()].sort((left, right) => {
+    const dateCompare = String(left.oddsportal_date_utc || "").localeCompare(String(right.oddsportal_date_utc || ""));
+    if (dateCompare !== 0) {
+      return dateCompare;
+    }
+    return normalizeTeamKey(left.home_team).localeCompare(normalizeTeamKey(right.home_team));
+  });
+}
+
 function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -802,22 +877,27 @@ function validateSchedule(scheduleRows, expectedGroupRows) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  let oddsRows = [];
+  const cachedRawOdds = oddsRowsFromRaw(args.rawOutput);
+  let freshOddsRows = [];
   let usedFallbackOdds = false;
+  let scrapeFailed = false;
   if (!args.skipOddsScrape) {
     try {
-      oddsRows = await scrapeOddsPortal(args.url);
+      freshOddsRows = await scrapeOddsPortal(args.url);
     } catch (error) {
-      oddsRows = fallbackOddsRowsFromSchedule(args.output);
-      if (!oddsRows.length) {
+      const scheduleFallbackRows = fallbackOddsRowsFromSchedule(args.output);
+      freshOddsRows = scheduleFallbackRows;
+      if (!cachedRawOdds.length && !scheduleFallbackRows.length) {
         throw error;
       }
       usedFallbackOdds = true;
+      scrapeFailed = true;
       console.warn(
-        `WARNING: OddsPortal refresh failed; reused ${oddsRows.length} rows from existing schedule. ${error.message}`,
+        `WARNING: OddsPortal refresh failed; reused ${cachedRawOdds.length} cached raw odds rows and ${scheduleFallbackRows.length} existing schedule odds rows. ${error.message}`,
       );
     }
   }
+  const oddsRows = mergeOddsRows(cachedRawOdds, freshOddsRows);
   const fixtures = parseCsv(fs.readFileSync(args.fixtures, "utf8"));
   let espnFixtures = [];
   if (!args.skipEspnFixtures) {
@@ -868,7 +948,14 @@ async function main() {
     "max_away_odds",
     "n_odds_home_win",
     "n_odds_draw_win",
+    "n_odds_draw",
     "n_odds_away_win",
+    "tournament",
+    "event_stage",
+    "venue",
+    "venue_town",
+    "venue_country",
+    "detail_url",
   ]);
   writeCsv(args.output, scheduleRows, [
     "date",
@@ -896,8 +983,15 @@ async function main() {
     "n_odds_away_win",
     "oddsportal_event_id",
     "oddsportal_encoded_event_id",
+    "oddsportal_date_utc",
     "oddsportal_kickoff_utc",
     "oddsportal_detail_url",
+    "oddsportal_source_url",
+    "local_home_team",
+    "local_away_team",
+    "local_kickoff_at",
+    "placeholder_home_label",
+    "placeholder_away_label",
     "espn_event_id",
     "espn_home_team",
     "espn_away_team",
@@ -920,10 +1014,12 @@ async function main() {
   const knockoutWithOdds = scheduleRows.filter(
     (row) => row.odds_available === "1" && !String(row.stage || "").toLowerCase().includes("group"),
   ).length;
-  console.log(`OddsPortal fixtures scraped: ${usedFallbackOdds ? 0 : oddsRows.length}`);
+  console.log(`OddsPortal fixtures scraped: ${scrapeFailed ? 0 : freshOddsRows.length}`);
+  console.log(`Cached raw odds rows loaded: ${cachedRawOdds.length}`);
   if (usedFallbackOdds) {
-    console.log(`Fallback odds rows reused: ${oddsRows.length}`);
+    console.log(`Fallback odds rows reused: ${freshOddsRows.length}`);
   }
+  console.log(`Merged odds rows available: ${oddsRows.length}`);
   console.log(`ESPN fixtures parsed: ${espnFixtures.length}`);
   console.log(`Local group fixture slots: ${groupFixtures.length}`);
   console.log(`Matched OddsPortal fixtures: ${matchedOdds}`);
