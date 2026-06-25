@@ -200,6 +200,20 @@ def date_key(value: Any) -> int | None:
     return int(f"{match.group(1)}{match.group(2)}{match.group(3)}")
 
 
+def normalize_date_text(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", text)
+    if match:
+        return f"{match.group(1)}-{match.group(2)}-{match.group(3)}"
+    match = re.match(r"^(\d{1,2})[-/](\d{1,2})[-/](\d{4})", text)
+    if match:
+        day, month, year = match.groups()
+        return f"{year}-{int(month):02d}-{int(day):02d}"
+    return text[:10]
+
+
 def stage_start_keys(rows: list[dict[str, Any]]) -> dict[str, int]:
     starts: dict[str, int] = {}
     for row in rows:
@@ -607,34 +621,59 @@ def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
     )
 
 
-def load_locked_scores(path: Path) -> dict[str, dict[str, Any]]:
-    locked: dict[str, dict[str, Any]] = {}
+def fixture_key(row: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        normalize_date_text(row.get("date", "")),
+        normalize_key(row.get("home_team", "")),
+        normalize_key(row.get("away_team", "")),
+    )
+
+
+def load_score_overrides(path: Path) -> dict[str, dict[Any, dict[str, Any]]]:
+    overrides: dict[str, dict[Any, dict[str, Any]]] = {"by_number": {}, "by_fixture": {}}
     for row in read_csv(path):
         match_number = str(row.get("match_number", "")).strip()
         score = str(row.get("score", "")).strip()
         if not match_number or parse_score(score) is None:
             continue
-        locked[match_number] = {
+        key = fixture_key(row)
+        entry = {
             "score": score,
             "predicted_winner": str(row.get("predicted_winner", "")).strip(),
             "note": row.get("note", ""),
+            "_fixture_key": key if all(key) else None,
         }
-    return locked
+        overrides["by_number"][match_number] = entry
+        if all(key):
+            overrides["by_fixture"][key] = entry
+    return overrides
 
 
-def load_prematch_scores(path: Path) -> dict[str, dict[str, Any]]:
-    prematch: dict[str, dict[str, Any]] = {}
-    for row in read_csv(path):
-        match_number = str(row.get("match_number", "")).strip()
-        score = str(row.get("score", "")).strip()
-        if not match_number or parse_score(score) is None:
-            continue
-        prematch[match_number] = {
-            "score": score,
-            "predicted_winner": str(row.get("predicted_winner", "")).strip(),
-            "note": row.get("note", ""),
-        }
-    return prematch
+def get_score_override(
+    overrides: dict[str, dict[Any, dict[str, Any]]],
+    row: dict[str, Any],
+) -> dict[str, Any] | None:
+    key = fixture_key(row)
+    if all(key):
+        by_fixture = overrides.get("by_fixture", {})
+        if key in by_fixture:
+            return by_fixture[key]
+    by_number = overrides.get("by_number", {})
+    entry = by_number.get(str(row.get("match_number", "")).strip())
+    if not entry:
+        return None
+    entry_key = entry.get("_fixture_key")
+    if entry_key and all(key) and entry_key != key:
+        return None
+    return entry
+
+
+def load_locked_scores(path: Path) -> dict[str, dict[Any, dict[str, Any]]]:
+    return load_score_overrides(path)
+
+
+def load_prematch_scores(path: Path) -> dict[str, dict[Any, dict[str, Any]]]:
+    return load_score_overrides(path)
 
 
 def attach_actual_results(
@@ -643,8 +682,8 @@ def attach_actual_results(
     soccerbase_stats_path: Path,
     previous_dashboard: dict[str, Any],
     snapshot_key: int | None,
-    locked_scores: dict[str, dict[str, Any]],
-    prematch_scores: dict[str, dict[str, Any]],
+    locked_scores: dict[str, dict[Any, dict[str, Any]]],
+    prematch_scores: dict[str, dict[Any, dict[str, Any]]],
 ) -> list[dict[str, Any]]:
     actuals = load_soccerbase_actuals(soccerbase_stats_path)
     actuals.update(load_worldcup_actuals(results_path))
@@ -760,7 +799,7 @@ def attach_actual_results(
             )
             output["pre_match_source"] = previous.get("pre_match_source") or "previous_dashboard"
 
-        locked_score = locked_scores.get(str(output.get("match_number", "")).strip())
+        locked_score = get_score_override(locked_scores, output)
         if locked_score:
             manual_score = locked_score["score"]
             manual_winner = locked_score.get("predicted_winner") or score_winner(
@@ -781,11 +820,11 @@ def attach_actual_results(
             output["score_source"] = "manual_locked_score"
             output["pre_match_source"] = "manual_locked_score"
 
-        prematch_score = prematch_scores.get(str(output.get("match_number", "")).strip())
+        prematch_score = get_score_override(prematch_scores, output)
         if (
             prematch_score
             and (output.get("actual_available") or output.get("actual_score"))
-            and output.get("pre_match_source") in {"current_run", "missing_pre_match_prediction", ""}
+            and output.get("pre_match_source") != "manual_locked_score"
         ):
             prematch_value = prematch_score["score"]
             prematch_winner = prematch_score.get("predicted_winner") or score_winner(
