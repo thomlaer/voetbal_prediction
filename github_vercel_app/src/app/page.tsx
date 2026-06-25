@@ -512,7 +512,7 @@ export default async function Home() {
         <section className="summary-grid" aria-label="Samenvatting">
           <div className="metric">
             <div className="metric-label">Laatste versie</div>
-            <div className="metric-value">{data.metadata.generated_at}</div>
+            <div className="metric-value">{data.metadata.generated_at} UTC</div>
             <div className="metric-note">{data.metadata.source_run}</div>
           </div>
           <div className="metric">
