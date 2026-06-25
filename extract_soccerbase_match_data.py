@@ -111,6 +111,11 @@ def parse_args() -> argparse.Namespace:
         default=60,
         help="In incremental mode, only fetch missing completed matches from the last N days. Use 0 for no date window.",
     )
+    parser.add_argument(
+        "--worldcup-date-pages",
+        default="",
+        help="Optional YYYY-MM-DD:YYYY-MM-DD range; add Soccerbase daily result pages and keep only World Cup rows.",
+    )
     parser.add_argument("--skip-errors", action="store_true")
     return parser.parse_args()
 
@@ -125,6 +130,7 @@ def load_urls(args: argparse.Namespace) -> list[str]:
             line = line.strip()
             if line and not line.startswith("#"):
                 urls.append(line)
+    urls.extend(worldcup_date_urls(getattr(args, "worldcup_date_pages", "")))
     return list(dict.fromkeys(urls))
 
 
@@ -191,6 +197,31 @@ def query_param(url: str, name: str) -> str:
     return urllib.parse.parse_qs(urllib.parse.urlparse(url).query).get(name, [""])[0]
 
 
+def is_results_date_url(url: str) -> bool:
+    parsed = urllib.parse.urlparse(url)
+    return parsed.path.endswith("/matches/results.sd") and bool(query_param(url, "date"))
+
+
+def worldcup_date_urls(value: str) -> list[str]:
+    text = str(value or "").strip()
+    if not text:
+        return []
+    if ":" in text:
+        start_text, end_text = text.split(":", 1)
+    elif "," in text:
+        start_text, end_text = text.split(",", 1)
+    else:
+        start_text = end_text = text
+    start = date.fromisoformat(start_text.strip())
+    end = date.fromisoformat(end_text.strip())
+    if end < start:
+        start, end = end, start
+    return [
+        f"{BASE_URL}/matches/results.sd?date={(start + timedelta(days=offset)).isoformat()}"
+        for offset in range((end - start).days + 1)
+    ]
+
+
 def select_options(page_html: str, select_id: str) -> list[tuple[str, str]]:
     match = re.search(
         rf'<select[^>]+id="{re.escape(select_id)}"[^>]*>(.*?)</select>',
@@ -215,6 +246,9 @@ def discover_tournament_urls(session: requests.Session, source_url: str, delay_m
     text = fetch_text(session, source_url)
     if delay_ms:
         time.sleep(delay_ms / 1000)
+
+    if is_results_date_url(source_url):
+        return [(source_url, query_param(source_url, "date") or page_title(text))]
 
     source_tourn_id = query_param(source_url, "tourn_id")
     if source_tourn_id:
@@ -843,7 +877,9 @@ def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> t
             print(f"  skipped discovery: {error}", file=sys.stderr)
     tournament_targets = list(dict.fromkeys(tournament_targets))
     if args.max_tournaments:
-        tournament_targets = tournament_targets[: args.max_tournaments]
+        date_targets = [target for target in tournament_targets if is_results_date_url(target[0])]
+        regular_targets = [target for target in tournament_targets if not is_results_date_url(target[0])]
+        tournament_targets = regular_targets[: args.max_tournaments] + date_targets
 
     matches_by_id: dict[str, MatchRow] = {}
     report_rows: list[dict] = []
@@ -870,6 +906,12 @@ def scrape(args: argparse.Namespace, skip_game_ids: set[str] | None = None) -> t
                             time.sleep(args.delay_ms / 1000)
                 for page_url, page_label, page_html in pages:
                     page_matches = parse_matches(page_html, page_url, tournament_url, competition, season_label, page_label)
+                    if is_results_date_url(page_url):
+                        for match in page_matches:
+                            match.competition = match.stage
+                        page_matches = [
+                            match for match in page_matches if normalize_key(match.competition) == "world cup"
+                        ]
                     for match in page_matches:
                         matches_by_id.setdefault(match.soccerbase_game_id, match)
                     tournament_match_count += len(page_matches)

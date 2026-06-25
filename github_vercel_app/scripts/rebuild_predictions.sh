@@ -76,6 +76,9 @@ if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   if [[ -n "${SOCCERBASE_MAX_FETCH_GAMES:-}" ]]; then
     SOCCERBASE_ARGS+=(--max-fetch-games "$SOCCERBASE_MAX_FETCH_GAMES")
   fi
+  if [[ -n "${SOCCERBASE_WORLDCUP_DATE_PAGES:-}" ]]; then
+    SOCCERBASE_ARGS+=(--worldcup-date-pages "$SOCCERBASE_WORLDCUP_DATE_PAGES")
+  fi
   echo "Soccerbase refresh args: ${SOCCERBASE_ARGS[*]}"
   "$PYTHON" -X utf8 extract_soccerbase_match_data.py "${SOCCERBASE_ARGS[@]}"
 fi

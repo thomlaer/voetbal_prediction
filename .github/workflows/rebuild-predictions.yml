@@ -80,6 +80,7 @@ jobs:
           SOCCERBASE_LOOKBACK_DAYS: "7"
           SOCCERBASE_MAX_TOURNAMENTS: "1"
           SOCCERBASE_MAX_FETCH_GAMES: "40"
+          SOCCERBASE_WORLDCUP_DATE_PAGES: "2026-06-28:2026-07-19"
         run: bash github_vercel_app/scripts/rebuild_predictions.sh
 
       - name: Build Vercel app
