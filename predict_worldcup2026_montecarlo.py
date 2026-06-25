@@ -492,6 +492,8 @@ def resolve_slot(
         return winners[int(label[1:])]
     if label.startswith("RU"):
         return losers[int(label[2:])]
+    if label and label.lower() != "nan":
+        return label
     raise ValueError(f"Unsupported bracket label: {label}")
 
 

@@ -129,6 +129,8 @@ def resolve_slot(
         if match_num not in winners:
             raise ValueError(f"Winnaar van wedstrijd {match_num} nog niet bekend")
         return winners[match_num]
+    if label and label.lower() != "nan":
+        return label
     raise ValueError(f"Onbekend label: {label}")
 
 
