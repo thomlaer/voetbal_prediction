@@ -49,9 +49,9 @@ TRAINING_RESULTS="data/extracted/results_training_with_espn.csv"
 if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
     SOCCERBASE_URLS="${SOCCERBASE_URLS:-https://www.soccerbase.com/tournaments/tournament.sd?comp_id=73}"
-    SOCCERBASE_LOOKBACK_DAYS="${SOCCERBASE_LOOKBACK_DAYS:-7}"
+    SOCCERBASE_LOOKBACK_DAYS="${SOCCERBASE_LOOKBACK_DAYS:-14}"
     SOCCERBASE_MAX_TOURNAMENTS="${SOCCERBASE_MAX_TOURNAMENTS:-1}"
-    SOCCERBASE_MAX_FETCH_GAMES="${SOCCERBASE_MAX_FETCH_GAMES:-40}"
+    SOCCERBASE_MAX_FETCH_GAMES="${SOCCERBASE_MAX_FETCH_GAMES:-50}"
   fi
   SOCCERBASE_ARGS=(
     --skip-errors \
