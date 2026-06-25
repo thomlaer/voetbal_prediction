@@ -9,7 +9,7 @@ import json
 import re
 import shutil
 import unicodedata
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -1172,7 +1172,7 @@ def main() -> None:
     public_files = APP_ROOT / "public" / "files"
     public_data.mkdir(parents=True, exist_ok=True)
     public_files.mkdir(parents=True, exist_ok=True)
-    generated_at = datetime.now()
+    generated_at = datetime.now(timezone.utc)
     snapshot_key = date_key(generated_at.strftime("%Y-%m-%d"))
 
     match = re.search(r"(\d{8})$", run_dir.name)
