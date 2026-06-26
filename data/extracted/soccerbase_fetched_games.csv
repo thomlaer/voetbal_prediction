@@ -8797,3 +8797,371 @@ soccerbase_game_id,date,home_team,away_team,status
 948930,2026-06-26,Japan,Sweden,lineup_fetched
 948927,2026-06-26,Turkey,USA,lineup_fetched
 948926,2026-06-26,Paraguay,Australia,lineup_fetched
+949432,2026-06-26,Norway,France,lineup_fetched
+957127,2026-06-26,Senegal,Iraq,lineup_fetched
+923541,2025-11-17,Germany,Slovakia,lineup_fetched
+923514,2025-11-17,N Ireland,Luxembourg,lineup_fetched
+923551,2025-11-14,Luxembourg,Germany,lineup_fetched
+923502,2025-11-14,Slovakia,N Ireland,lineup_fetched
+923564,2025-10-13,N Ireland,Germany,lineup_fetched
+923489,2025-10-13,Slovakia,Luxembourg,lineup_fetched
+923555,2025-10-10,Germany,Luxembourg,lineup_fetched
+923477,2025-10-10,N Ireland,Slovakia,lineup_fetched
+923536,2025-09-07,Germany,N Ireland,lineup_fetched
+923461,2025-09-07,Luxembourg,Slovakia,lineup_fetched
+923448,2025-09-04,Luxembourg,N Ireland,lineup_fetched
+923531,2025-09-04,Slovakia,Germany,lineup_fetched
+923516,2025-11-18,Kosovo,Switzerland,lineup_fetched
+923517,2025-11-18,Sweden,Slovenia,lineup_fetched
+923507,2025-11-15,Slovenia,Kosovo,lineup_fetched
+923508,2025-11-15,Switzerland,Sweden,lineup_fetched
+923490,2025-10-13,Slovenia,Switzerland,lineup_fetched
+923491,2025-10-13,Sweden,Kosovo,lineup_fetched
+923478,2025-10-10,Kosovo,Slovenia,lineup_fetched
+923479,2025-10-10,Sweden,Switzerland,lineup_fetched
+923464,2025-09-08,Kosovo,Sweden,lineup_fetched
+923465,2025-09-08,Switzerland,Slovenia,lineup_fetched
+923451,2025-09-05,Slovenia,Sweden,lineup_fetched
+923452,2025-09-05,Switzerland,Kosovo,lineup_fetched
+923518,2025-11-18,Belarus,Greece,lineup_fetched
+923569,2025-11-18,Scotland,Denmark,lineup_fetched
+923554,2025-11-15,Denmark,Belarus,lineup_fetched
+923509,2025-11-15,Greece,Scotland,lineup_fetched
+923560,2025-10-12,Denmark,Greece,lineup_fetched
+923486,2025-10-12,Scotland,Belarus,lineup_fetched
+923559,2025-10-09,Belarus,Denmark,lineup_fetched
+923472,2025-10-09,Scotland,Greece,lineup_fetched
+923466,2025-09-08,Belarus,Scotland,lineup_fetched
+923544,2025-09-08,Greece,Denmark,lineup_fetched
+923529,2025-09-05,Denmark,Scotland,lineup_fetched
+923453,2025-09-05,Greece,Belarus,lineup_fetched
+923535,2025-11-16,Azerbaijan,France,lineup_fetched
+923512,2025-11-16,Ukraine,Iceland,lineup_fetched
+923498,2025-11-13,Azerbaijan,Iceland,lineup_fetched
+923548,2025-11-13,France,Ukraine,lineup_fetched
+923565,2025-10-13,Iceland,France,lineup_fetched
+923492,2025-10-13,Ukraine,Azerbaijan,lineup_fetched
+923556,2025-10-10,France,Azerbaijan,lineup_fetched
+923480,2025-10-10,Iceland,Ukraine,lineup_fetched
+923468,2025-09-09,Azerbaijan,Ukraine,lineup_fetched
+923537,2025-09-09,France,Iceland,lineup_fetched
+923454,2025-09-05,Iceland,Azerbaijan,lineup_fetched
+923533,2025-09-05,Ukraine,France,lineup_fetched
+923519,2025-11-18,Bulgaria,Georgia,lineup_fetched
+923545,2025-11-18,Spain,Turkey,lineup_fetched
+923553,2025-11-15,Georgia,Spain,lineup_fetched
+923504,2025-11-15,Turkey,Bulgaria,lineup_fetched
+923566,2025-10-14,Spain,Bulgaria,lineup_fetched
+923495,2025-10-14,Turkey,Georgia,lineup_fetched
+923484,2025-10-11,Bulgaria,Turkey,lineup_fetched
+923557,2025-10-11,Spain,Georgia,lineup_fetched
+923459,2025-09-07,Georgia,Bulgaria,lineup_fetched
+923539,2025-09-07,Turkey,Spain,lineup_fetched
+923532,2025-09-04,Bulgaria,Spain,lineup_fetched
+923447,2025-09-04,Georgia,Turkey,lineup_fetched
+923511,2025-11-16,Hungary,Ireland,lineup_fetched
+923538,2025-11-16,Portugal,Armenia,lineup_fetched
+923499,2025-11-13,Armenia,Hungary,lineup_fetched
+923549,2025-11-13,Ireland,Portugal,lineup_fetched
+923496,2025-10-14,Ireland,Armenia,lineup_fetched
+923567,2025-10-14,Portugal,Hungary,lineup_fetched
+923482,2025-10-11,Hungary,Armenia,lineup_fetched
+923558,2025-10-11,Portugal,Ireland,lineup_fetched
+923469,2025-09-09,Armenia,Ireland,lineup_fetched
+923547,2025-09-09,Hungary,Portugal,lineup_fetched
+923534,2025-09-06,Armenia,Portugal,lineup_fetched
+923456,2025-09-06,Ireland,Hungary,lineup_fetched
+923515,2025-11-17,Malta,Poland,lineup_fetched
+923543,2025-11-17,Netherlands,Lithuania,lineup_fetched
+923501,2025-11-14,Finland,Malta,lineup_fetched
+923552,2025-11-14,Poland,Netherlands,lineup_fetched
+923487,2025-10-12,Lithuania,Poland,lineup_fetched
+923561,2025-10-12,Netherlands,Finland,lineup_fetched
+923473,2025-10-09,Finland,Lithuania,lineup_fetched
+923562,2025-10-09,Malta,Netherlands,lineup_fetched
+923542,2025-09-07,Lithuania,Netherlands,lineup_fetched
+923462,2025-09-07,Poland,Finland,lineup_fetched
+923449,2025-09-04,Lithuania,Malta,lineup_fetched
+923528,2025-09-04,Netherlands,Poland,lineup_fetched
+923443,2025-06-10,Finland,Poland,lineup_fetched
+923527,2025-06-10,Netherlands,Malta,lineup_fetched
+923525,2025-06-07,Finland,Netherlands,lineup_fetched
+923438,2025-06-07,Malta,Lithuania,lineup_fetched
+923426,2025-03-24,Lithuania,Finland,lineup_fetched
+923427,2025-03-24,Poland,Malta,lineup_fetched
+923418,2025-03-21,Malta,Finland,lineup_fetched
+923419,2025-03-21,Poland,Lithuania,lineup_fetched
+923520,2025-11-18,Austria,Bosnia-HZ.,lineup_fetched
+923521,2025-11-18,Romania,San Marino,lineup_fetched
+923510,2025-11-15,Bosnia-HZ.,Romania,lineup_fetched
+923505,2025-11-15,Cyprus,Austria,lineup_fetched
+923488,2025-10-12,Romania,Austria,lineup_fetched
+923485,2025-10-12,San Marino,Cyprus,lineup_fetched
+923474,2025-10-09,Austria,San Marino,lineup_fetched
+923475,2025-10-09,Cyprus,Bosnia-HZ.,lineup_fetched
+923470,2025-09-09,Bosnia-HZ.,Austria,lineup_fetched
+923471,2025-09-09,Cyprus,Romania,lineup_fetched
+923457,2025-09-06,Austria,Cyprus,lineup_fetched
+923458,2025-09-06,San Marino,Bosnia-HZ.,lineup_fetched
+923444,2025-06-10,Romania,Cyprus,lineup_fetched
+923445,2025-06-10,San Marino,Austria,lineup_fetched
+923439,2025-06-07,Austria,Romania,lineup_fetched
+923437,2025-06-07,Bosnia-HZ.,San Marino,lineup_fetched
+923428,2025-03-24,Bosnia-HZ.,Cyprus,lineup_fetched
+923429,2025-03-24,San Marino,Romania,lineup_fetched
+923420,2025-03-21,Cyprus,San Marino,lineup_fetched
+923421,2025-03-21,Romania,Bosnia-HZ.,lineup_fetched
+923513,2025-11-16,Israel,Moldova,lineup_fetched
+923540,2025-11-16,Italy,Norway,lineup_fetched
+923550,2025-11-13,Moldova,Italy,lineup_fetched
+923500,2025-11-13,Norway,Estonia,lineup_fetched
+923497,2025-10-14,Estonia,Moldova,lineup_fetched
+923568,2025-10-14,Italy,Israel,lineup_fetched
+923563,2025-10-11,Estonia,Italy,lineup_fetched
+923483,2025-10-11,Norway,Israel,lineup_fetched
+923467,2025-09-09,Norway,Moldova,lineup_fetched
+923546,2025-09-08,Israel,Italy,lineup_fetched
+923530,2025-09-05,Italy,Estonia,lineup_fetched
+923455,2025-09-05,Moldova,Israel,lineup_fetched
+923441,2025-06-09,Estonia,Norway,lineup_fetched
+923526,2025-06-09,Italy,Moldova,lineup_fetched
+923434,2025-06-06,Estonia,Israel,lineup_fetched
+923524,2025-06-06,Norway,Italy,lineup_fetched
+923430,2025-03-25,Israel,Norway,lineup_fetched
+923431,2025-03-25,Moldova,Estonia,lineup_fetched
+923424,2025-03-22,Israel,Estonia,lineup_fetched
+923423,2025-03-22,Moldova,Norway,lineup_fetched
+923522,2025-11-18,Belgium,Liechtenstein,lineup_fetched
+923523,2025-11-18,Wales,N Macedonia,lineup_fetched
+923503,2025-11-15,Kazakhstan,Belgium,lineup_fetched
+923506,2025-11-15,Liechtenstein,Wales,lineup_fetched
+923493,2025-10-13,N Macedonia,Kazakhstan,lineup_fetched
+923494,2025-10-13,Wales,Belgium,lineup_fetched
+923481,2025-10-10,Belgium,N Macedonia,lineup_fetched
+923476,2025-10-10,Kazakhstan,Liechtenstein,lineup_fetched
+923463,2025-09-07,Belgium,Kazakhstan,lineup_fetched
+923460,2025-09-07,N Macedonia,Liechtenstein,lineup_fetched
+923446,2025-09-04,Kazakhstan,Wales,lineup_fetched
+923450,2025-09-04,Liechtenstein,Belgium,lineup_fetched
+923442,2025-06-09,Belgium,Wales,lineup_fetched
+923440,2025-06-09,Kazakhstan,N Macedonia,lineup_fetched
+923435,2025-06-06,N Macedonia,Belgium,lineup_fetched
+923436,2025-06-06,Wales,Liechtenstein,lineup_fetched
+923432,2025-03-25,Liechtenstein,Kazakhstan,lineup_fetched
+923433,2025-03-25,N Macedonia,Wales,lineup_fetched
+923422,2025-03-22,Liechtenstein,N Macedonia,lineup_fetched
+923425,2025-03-22,Wales,Kazakhstan,lineup_fetched
+923588,2025-11-16,Albania,England,lineup_fetched
+923589,2025-11-16,Serbia,Latvia,lineup_fetched
+923586,2025-11-13,Andorra,Albania,lineup_fetched
+923587,2025-11-13,England,Serbia,lineup_fetched
+923584,2025-10-14,Andorra,Serbia,lineup_fetched
+923585,2025-10-14,Latvia,England,lineup_fetched
+923582,2025-10-11,Latvia,Andorra,lineup_fetched
+923583,2025-10-11,Serbia,Albania,lineup_fetched
+923580,2025-09-09,Albania,Latvia,lineup_fetched
+923581,2025-09-09,Serbia,England,lineup_fetched
+923579,2025-09-06,England,Andorra,lineup_fetched
+923578,2025-09-06,Latvia,Serbia,lineup_fetched
+923576,2025-06-10,Latvia,Albania,lineup_fetched
+923577,2025-06-10,Serbia,Andorra,lineup_fetched
+923575,2025-06-07,Albania,Serbia,lineup_fetched
+923574,2025-06-07,Andorra,England,lineup_fetched
+923572,2025-03-24,Albania,Andorra,lineup_fetched
+923573,2025-03-24,England,Latvia,lineup_fetched
+923570,2025-03-21,Andorra,Latvia,lineup_fetched
+923571,2025-03-21,England,Albania,lineup_fetched
+923601,2025-11-17,Czech Rep,Gibraltar,lineup_fetched
+923606,2025-11-17,Montenegro,Croatia,lineup_fetched
+923607,2025-11-14,Croatia,Faroe Islands,lineup_fetched
+923600,2025-11-14,Gibraltar,Montenegro,lineup_fetched
+923609,2025-10-12,Croatia,Gibraltar,lineup_fetched
+923599,2025-10-12,Faroe Islands,Czech Rep,lineup_fetched
+923608,2025-10-09,Czech Rep,Croatia,lineup_fetched
+923598,2025-10-09,Faroe Islands,Montenegro,lineup_fetched
+923605,2025-09-08,Croatia,Montenegro,lineup_fetched
+923597,2025-09-08,Gibraltar,Faroe Islands,lineup_fetched
+923604,2025-09-05,Faroe Islands,Croatia,lineup_fetched
+923596,2025-09-05,Montenegro,Czech Rep,lineup_fetched
+923603,2025-06-09,Croatia,Czech Rep,lineup_fetched
+923595,2025-06-09,Faroe Islands,Gibraltar,lineup_fetched
+923594,2025-06-06,Czech Rep,Montenegro,lineup_fetched
+923602,2025-06-06,Gibraltar,Croatia,lineup_fetched
+923592,2025-03-25,Gibraltar,Czech Rep,lineup_fetched
+923593,2025-03-25,Montenegro,Faroe Islands,lineup_fetched
+923591,2025-03-22,Czech Rep,Faroe Islands,lineup_fetched
+923590,2025-03-22,Montenegro,Gibraltar,lineup_fetched
+893626,2025-09-10,Bolivia,Brazil,lineup_fetched
+893851,2025-09-10,Chile,Uruguay,lineup_fetched
+893852,2025-09-10,Ecuador,Argentina,lineup_fetched
+893853,2025-09-10,Peru,Paraguay,lineup_fetched
+893854,2025-09-10,Venezuela,Colombia,lineup_fetched
+893625,2025-09-05,Argentina,Venezuela,lineup_fetched
+893847,2025-09-05,Brazil,Chile,lineup_fetched
+893848,2025-09-05,Colombia,Bolivia,lineup_fetched
+893849,2025-09-05,Paraguay,Ecuador,lineup_fetched
+893850,2025-09-05,Uruguay,Peru,lineup_fetched
+893624,2025-06-11,Argentina,Colombia,lineup_fetched
+893844,2025-06-11,Brazil,Paraguay,lineup_fetched
+893845,2025-06-11,Peru,Ecuador,lineup_fetched
+893846,2025-06-11,Uruguay,Venezuela,lineup_fetched
+893843,2025-06-10,Bolivia,Chile,lineup_fetched
+893623,2025-06-06,Chile,Argentina,lineup_fetched
+893839,2025-06-06,Colombia,Peru,lineup_fetched
+893840,2025-06-06,Ecuador,Brazil,lineup_fetched
+893841,2025-06-06,Paraguay,Uruguay,lineup_fetched
+893842,2025-06-06,Venezuela,Bolivia,lineup_fetched
+893622,2025-03-26,Argentina,Brazil,lineup_fetched
+893836,2025-03-26,Chile,Ecuador,lineup_fetched
+893837,2025-03-26,Colombia,Paraguay,lineup_fetched
+893838,2025-03-26,Venezuela,Peru,lineup_fetched
+893835,2025-03-25,Bolivia,Uruguay,lineup_fetched
+893621,2025-03-21,Brazil,Colombia,lineup_fetched
+893831,2025-03-21,Ecuador,Venezuela,lineup_fetched
+893833,2025-03-21,Peru,Bolivia,lineup_fetched
+893834,2025-03-21,Uruguay,Argentina,lineup_fetched
+893832,2025-03-20,Paraguay,Chile,lineup_fetched
+893620,2024-11-20,Argentina,Peru,lineup_fetched
+893828,2024-11-20,Brazil,Uruguay,lineup_fetched
+893829,2024-11-20,Chile,Venezuela,lineup_fetched
+893827,2024-11-19,Bolivia,Paraguay,lineup_fetched
+893830,2024-11-19,Colombia,Ecuador,lineup_fetched
+893824,2024-11-16,Peru,Chile,lineup_fetched
+893825,2024-11-16,Uruguay,Colombia,lineup_fetched
+893619,2024-11-15,Ecuador,Bolivia,lineup_fetched
+893823,2024-11-14,Paraguay,Argentina,lineup_fetched
+893826,2024-11-14,Venezuela,Brazil,lineup_fetched
+893618,2024-10-16,Argentina,Bolivia,lineup_fetched
+893819,2024-10-16,Brazil,Peru,lineup_fetched
+893821,2024-10-16,Paraguay,Venezuela,lineup_fetched
+893822,2024-10-16,Uruguay,Ecuador,lineup_fetched
+893820,2024-10-15,Colombia,Chile,lineup_fetched
+893817,2024-10-12,Peru,Uruguay,lineup_fetched
+893815,2024-10-11,Chile,Brazil,lineup_fetched
+893617,2024-10-10,Bolivia,Colombia,lineup_fetched
+893816,2024-10-10,Ecuador,Paraguay,lineup_fetched
+893818,2024-10-10,Venezuela,Argentina,lineup_fetched
+893813,2024-09-11,Paraguay,Brazil,lineup_fetched
+893616,2024-09-10,Chile,Bolivia,lineup_fetched
+893811,2024-09-10,Colombia,Argentina,lineup_fetched
+893812,2024-09-10,Ecuador,Peru,lineup_fetched
+893814,2024-09-10,Venezuela,Uruguay,lineup_fetched
+893808,2024-09-07,Brazil,Ecuador,lineup_fetched
+893809,2024-09-07,Peru,Colombia,lineup_fetched
+893810,2024-09-07,Uruguay,Paraguay,lineup_fetched
+893615,2024-09-06,Argentina,Chile,lineup_fetched
+893807,2024-09-05,Bolivia,Venezuela,lineup_fetched
+893614,2023-11-22,Brazil,Argentina,lineup_fetched
+893805,2023-11-22,Peru,Venezuela,lineup_fetched
+893803,2023-11-21,Ecuador,Chile,lineup_fetched
+893804,2023-11-21,Paraguay,Colombia,lineup_fetched
+893806,2023-11-21,Uruguay,Bolivia,lineup_fetched
+893613,2023-11-17,Argentina,Uruguay,lineup_fetched
+893800,2023-11-17,Chile,Paraguay,lineup_fetched
+893801,2023-11-17,Colombia,Brazil,lineup_fetched
+893799,2023-11-16,Bolivia,Peru,lineup_fetched
+893802,2023-11-16,Venezuela,Ecuador,lineup_fetched
+893612,2023-10-18,Ecuador,Colombia,lineup_fetched
+893796,2023-10-18,Peru,Argentina,lineup_fetched
+893797,2023-10-18,Uruguay,Brazil,lineup_fetched
+893795,2023-10-17,Paraguay,Bolivia,lineup_fetched
+893798,2023-10-17,Venezuela,Chile,lineup_fetched
+893611,2023-10-13,Argentina,Paraguay,lineup_fetched
+893791,2023-10-13,Bolivia,Ecuador,lineup_fetched
+893792,2023-10-13,Brazil,Venezuela,lineup_fetched
+893793,2023-10-13,Chile,Peru,lineup_fetched
+893794,2023-10-12,Colombia,Uruguay,lineup_fetched
+893790,2023-09-13,Chile,Colombia,lineup_fetched
+893610,2023-09-13,Peru,Brazil,lineup_fetched
+893609,2023-09-12,Bolivia,Argentina,lineup_fetched
+893788,2023-09-12,Ecuador,Uruguay,lineup_fetched
+893789,2023-09-12,Venezuela,Paraguay,lineup_fetched
+893786,2023-09-09,Brazil,Bolivia,lineup_fetched
+893787,2023-09-09,Uruguay,Chile,lineup_fetched
+893608,2023-09-08,Argentina,Ecuador,lineup_fetched
+893785,2023-09-08,Colombia,Venezuela,lineup_fetched
+893784,2023-09-07,Paraguay,Peru,lineup_fetched
+901175,2024-03-26,Turks & Caicos,Anguilla,lineup_fetched
+903227,2024-03-26,Virgin Isl. (UK),Virgin Isl. (US),lineup_fetched
+901174,2024-03-22,Anguilla,Turks & Caicos,lineup_fetched
+903226,2024-03-22,Virgin Isl. (US),Virgin Isl. (UK),lineup_fetched
+920293,2025-06-10,Iran,North Korea,lineup_fetched
+920297,2025-06-10,Kyrgyzstan,UAE,lineup_fetched
+920300,2025-06-10,Uzbekistan,Qatar,lineup_fetched
+920286,2025-06-05,North Korea,Kyrgyzstan,lineup_fetched
+920291,2025-06-05,Qatar,Iran,lineup_fetched
+920292,2025-06-05,UAE,Uzbekistan,lineup_fetched
+920278,2025-03-25,Iran,Uzbekistan,lineup_fetched
+920283,2025-03-25,Kyrgyzstan,Qatar,lineup_fetched
+920277,2025-03-25,North Korea,UAE,lineup_fetched
+920269,2025-03-20,Iran,UAE,lineup_fetched
+920274,2025-03-20,Qatar,North Korea,lineup_fetched
+920276,2025-03-20,Uzbekistan,Kyrgyzstan,lineup_fetched
+920265,2024-11-19,Kyrgyzstan,Iran,lineup_fetched
+920262,2024-11-19,North Korea,Uzbekistan,lineup_fetched
+920268,2024-11-19,UAE,Qatar,lineup_fetched
+920254,2024-11-14,North Korea,Iran,lineup_fetched
+920259,2024-11-14,Qatar,Uzbekistan,lineup_fetched
+920260,2024-11-14,UAE,Kyrgyzstan,lineup_fetched
+920245,2024-10-15,Iran,Qatar,lineup_fetched
+920249,2024-10-15,Kyrgyzstan,North Korea,lineup_fetched
+920252,2024-10-15,Uzbekistan,UAE,lineup_fetched
+920241,2024-10-10,Qatar,Kyrgyzstan,lineup_fetched
+920243,2024-10-10,UAE,North Korea,lineup_fetched
+920244,2024-10-10,Uzbekistan,Iran,lineup_fetched
+919088,2024-09-10,Kyrgyzstan,Uzbekistan,lineup_fetched
+920235,2024-09-10,North Korea,Qatar,lineup_fetched
+919090,2024-09-10,UAE,Iran,lineup_fetched
+919077,2024-09-05,Iran,Kyrgyzstan,lineup_fetched
+919082,2024-09-05,Qatar,UAE,lineup_fetched
+919084,2024-09-05,Uzbekistan,North Korea,lineup_fetched
+920295,2025-06-10,Jordan,Iraq,lineup_fetched
+920298,2025-06-10,Palestine,Oman,lineup_fetched
+920296,2025-06-10,South Korea,Kuwait,lineup_fetched
+920288,2025-06-05,Iraq,South Korea,lineup_fetched
+920289,2025-06-05,Kuwait,Palestine,lineup_fetched
+920290,2025-06-05,Oman,Jordan,lineup_fetched
+920282,2025-03-25,Kuwait,Oman,lineup_fetched
+920284,2025-03-25,Palestine,Iraq,lineup_fetched
+920281,2025-03-25,South Korea,Jordan,lineup_fetched
+920270,2025-03-20,Iraq,Kuwait,lineup_fetched
+920272,2025-03-20,Jordan,Palestine,lineup_fetched
+920273,2025-03-20,South Korea,Oman,lineup_fetched
+920264,2024-11-19,Kuwait,Jordan,lineup_fetched
+920266,2024-11-19,Oman,Iraq,lineup_fetched
+920267,2024-11-19,Palestine,South Korea,lineup_fetched
+920256,2024-11-14,Iraq,Jordan,lineup_fetched
+920257,2024-11-14,Kuwait,South Korea,lineup_fetched
+920258,2024-11-14,Oman,Palestine,lineup_fetched
+920247,2024-10-15,Jordan,Oman,lineup_fetched
+920250,2024-10-15,Palestine,Kuwait,lineup_fetched
+920248,2024-10-15,South Korea,Iraq,lineup_fetched
+920238,2024-10-10,Iraq,Palestine,lineup_fetched
+920239,2024-10-10,Jordan,South Korea,lineup_fetched
+920240,2024-10-10,Oman,Kuwait,lineup_fetched
+919087,2024-09-10,Kuwait,Iraq,lineup_fetched
+919089,2024-09-10,Oman,South Korea,lineup_fetched
+920236,2024-09-10,Palestine,Jordan,lineup_fetched
+919078,2024-09-05,Iraq,Oman,lineup_fetched
+919080,2024-09-05,Jordan,Kuwait,lineup_fetched
+919081,2024-09-05,South Korea,Palestine,lineup_fetched
+893601,2023-10-17,Bangladesh,Maldives,lineup_fetched
+893952,2023-10-17,Bhutan,Hong Kong,lineup_fetched
+893953,2023-10-17,Brunei,Indonesia,lineup_fetched
+893954,2023-10-17,Guam,Singapore,lineup_fetched
+893955,2023-10-17,Laos,Nepal,lineup_fetched
+893956,2023-10-17,Macau,Myanmar,lineup_fetched
+893957,2023-10-17,Mongolia,Afghanistan,lineup_fetched
+893958,2023-10-17,Pakistan,Cambodia,lineup_fetched
+893959,2023-10-17,Sri Lanka,Yemen,lineup_fetched
+893960,2023-10-17,Timor-Leste,Chinese Taipei,lineup_fetched
+893600,2023-10-12,Afghanistan,Mongolia,lineup_fetched
+893943,2023-10-12,Cambodia,Pakistan,lineup_fetched
+893944,2023-10-12,Chinese Taipei,Timor-Leste,lineup_fetched
+893945,2023-10-12,Hong Kong,Bhutan,lineup_fetched
+893946,2023-10-12,Indonesia,Brunei,lineup_fetched
+893947,2023-10-12,Maldives,Bangladesh,lineup_fetched
+893948,2023-10-12,Myanmar,Macau,lineup_fetched
+893949,2023-10-12,Nepal,Laos,lineup_fetched
+893950,2023-10-12,Singapore,Guam,lineup_fetched
+893951,2023-10-12,Yemen,Sri Lanka,lineup_fetched
