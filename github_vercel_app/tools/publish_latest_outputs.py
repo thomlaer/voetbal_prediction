@@ -13,6 +13,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.worksheet.table import Table, TableStyleInfo
+
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_ROOT = APP_ROOT.parent
@@ -908,13 +912,6 @@ def copy_if_exists(source: Path, destination: Path) -> str:
     return "/" + destination.relative_to(public_root).as_posix()
 
 
-def copy_first_existing(sources: list[Path], destination: Path) -> str:
-    for source in sources:
-        if source.exists():
-            return copy_if_exists(source, destination)
-    return ""
-
-
 def write_csv(rows: list[dict[str, Any]], destination: Path) -> str:
     destination.parent.mkdir(parents=True, exist_ok=True)
     public_root = APP_ROOT / "public"
@@ -927,6 +924,126 @@ def write_csv(rows: list[dict[str, Any]], destination: Path) -> str:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+    return "/" + destination.relative_to(public_root).as_posix()
+
+
+def write_prediction_excel(
+    rows: list[dict[str, Any]],
+    destination: Path,
+    *,
+    include_probabilities: bool,
+) -> str:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    public_root = APP_ROOT / "public"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "WK 2026 voorspellingen"
+    sheet.sheet_view.showGridLines = False
+
+    if include_probabilities:
+        title = "WK 2026 - Scorito-scores met kansen"
+        headers = [
+            "Nr",
+            "Datum",
+            "Ronde",
+            "Groep",
+            "Thuis",
+            "Uit",
+            "Scorito-score",
+            "Modelscore",
+            "Nieuw model",
+            "Kans thuis",
+            "Kans gelijk",
+            "Kans uit",
+            "Voorspelde winnaar",
+            "Status",
+            "Uitslag",
+        ]
+    else:
+        title = "WK 2026 - Scorito-scores"
+        headers = ["Nr", "Datum", "Ronde", "Groep", "Wedstrijd", "Scorito-score"]
+
+    sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(headers))
+    title_cell = sheet.cell(row=1, column=1, value=title)
+    title_cell.fill = PatternFill("solid", fgColor="0D1B1E")
+    title_cell.font = Font(name="Arial", size=14, bold=True, color="FFFFFF")
+    title_cell.alignment = Alignment(horizontal="left", vertical="center")
+    sheet.row_dimensions[1].height = 28
+
+    for column, header in enumerate(headers, start=1):
+        cell = sheet.cell(row=2, column=column, value=header)
+        cell.fill = PatternFill("solid", fgColor="DCEAE8")
+        cell.font = Font(name="Arial", size=10, bold=True, color="0D1B1E")
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    sheet.row_dimensions[2].height = 30
+
+    sorted_rows = sorted(rows, key=lambda row: int(row.get("match_number") or 0))
+    for excel_row, row in enumerate(sorted_rows, start=3):
+        date_value: Any = str(row.get("date", ""))
+        try:
+            date_value = datetime.strptime(date_value[:10], "%Y-%m-%d")
+        except ValueError:
+            pass
+        score = str(row.get("score", "") or "-")
+        if include_probabilities:
+            actual_available = bool(row.get("actual_available"))
+            values = [
+                row.get("match_number", ""),
+                date_value,
+                row.get("stage", ""),
+                row.get("group", ""),
+                row.get("home_team", ""),
+                row.get("away_team", ""),
+                score,
+                "" if actual_available else row.get("model_score", ""),
+                "" if actual_available else row.get("new_model_score", ""),
+                "" if actual_available else row.get("prob_home_win", ""),
+                "" if actual_available else row.get("prob_draw", ""),
+                "" if actual_available else row.get("prob_away_win", ""),
+                row.get("predicted_winner", ""),
+                "Vastgezet" if row.get("round_locked") else "Open",
+                row.get("actual_score", "") if actual_available else "",
+            ]
+        else:
+            values = [
+                row.get("match_number", ""),
+                date_value,
+                row.get("stage", ""),
+                row.get("group", ""),
+                f"{row.get('home_team', '')} - {row.get('away_team', '')}",
+                score,
+            ]
+        for column, value in enumerate(values, start=1):
+            cell = sheet.cell(row=excel_row, column=column, value=value)
+            cell.font = Font(name="Arial", size=10)
+            cell.alignment = Alignment(vertical="center")
+        sheet.cell(row=excel_row, column=2).number_format = "yyyy-mm-dd"
+        score_column = 7 if include_probabilities else 6
+        sheet.cell(row=excel_row, column=score_column).font = Font(name="Arial", size=10, bold=True)
+        sheet.cell(row=excel_row, column=score_column).alignment = Alignment(horizontal="center")
+        if include_probabilities:
+            for column in (10, 11, 12):
+                sheet.cell(row=excel_row, column=column).number_format = "0.0%"
+                sheet.cell(row=excel_row, column=column).alignment = Alignment(horizontal="right")
+
+    last_row = len(sorted_rows) + 2
+    if sorted_rows:
+        table = Table(displayName="ScoritoScoresMetKansen" if include_probabilities else "ScoritoScores", ref=f"A2:{chr(64 + len(headers))}{last_row}")
+        table.tableStyleInfo = TableStyleInfo(
+            name="TableStyleMedium2",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False,
+        )
+        sheet.add_table(table)
+    sheet.freeze_panes = "A3"
+    widths = [7, 13, 20, 9, 24, 14]
+    if include_probabilities:
+        widths = [7, 13, 20, 9, 19, 19, 14, 13, 13, 13, 13, 13, 22, 13, 12]
+    for column, width in enumerate(widths, start=1):
+        sheet.column_dimensions[chr(64 + column)].width = width
+    workbook.save(destination)
     return "/" + destination.relative_to(public_root).as_posix()
 
 
@@ -1290,9 +1407,6 @@ def main() -> None:
     generated_at = datetime.now(timezone.utc)
     snapshot_key = date_key(generated_at.strftime("%Y-%m-%d"))
 
-    match = re.search(r"(\d{8})$", run_dir.name)
-    label = match.group(1) if match else generated_at.strftime("%Y%m%d")
-
     previous_dashboard = load_json(public_data / "dashboard.json")
     predictions = compact_predictions(read_csv(run_dir / "scorito_invuladvies.csv"))
     changes = read_csv(run_dir / f"score_changes_vs_{args.previous_label}.csv")
@@ -1377,21 +1491,15 @@ def main() -> None:
     )
 
     downloads = {
-        "compact_excel": copy_first_existing(
-            [
-                run_dir / f"Scorito_scores_puur_{label}.xlsx",
-                run_dir / "Scorito_scores_puur_latest.xlsx",
-                run_dir / "WK2026_Voorspellingen.xlsx",
-            ],
+        "compact_excel": write_prediction_excel(
+            predictions,
             public_files / "Scorito_scores_puur_latest.xlsx",
+            include_probabilities=False,
         ),
-        "probabilities_excel": copy_first_existing(
-            [
-                run_dir / f"Scorito_scores_met_kansen_{label}.xlsx",
-                run_dir / "Scorito_scores_met_kansen_latest.xlsx",
-                run_dir / "WK2026_Voorspellingen.xlsx",
-            ],
+        "probabilities_excel": write_prediction_excel(
+            predictions,
             public_files / "Scorito_scores_met_kansen_latest.xlsx",
+            include_probabilities=True,
         ),
         "full_excel": copy_if_exists(
             run_dir / "WK2026_Voorspellingen.xlsx",
