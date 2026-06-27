@@ -41,6 +41,7 @@ if [[ "${SKIP_ESPN:-0}" != "1" ]]; then
 fi
 
 TRAINING_RESULTS="data/extracted/results_training_with_espn.csv"
+SOCCERBASE_CURRENT_LINEUPS="${SOCCERBASE_CURRENT_LINEUPS:-data/extracted/soccerbase_worldcup2026_lineups.csv}"
 "$PYTHON" -X utf8 github_vercel_app/tools/build_training_results_with_espn.py \
   --base data/results.csv \
   --espn data/extracted/espn_worldcup2026_results.csv \
@@ -57,7 +58,7 @@ if [[ "${UPDATE_SOCCERBASE:-1}" == "1" ]]; then
   SOCCERBASE_ARGS=(
     --skip-errors \
     --incremental \
-    --lineups-output data/extracted/soccerbase_lineups_used.csv \
+    --lineups-output "$SOCCERBASE_CURRENT_LINEUPS" \
     --stats-output data/extracted/soccerbase_match_stats.csv \
     --cards-output data/extracted/soccerbase_cards_events.csv \
     --report-output outputs/soccerbase_extraction_report.csv
@@ -145,6 +146,7 @@ mkdir -p "$DRAW_OUT"
   --group-predictions "$DRAW_OUT/worldcup2026_group_match_predictions.csv" \
   --bracket "$DRAW_OUT/worldcup2026_bracket_prediction.csv" \
   --team-probabilities "$DRAW_OUT/worldcup2026_montecarlo_team_probabilities.csv" \
+  --lineups "$SOCCERBASE_CURRENT_LINEUPS" \
   --output-dir "$DRAW_OUT"
 
 "$PYTHON" -X utf8 generate_worldcup_excel.py \

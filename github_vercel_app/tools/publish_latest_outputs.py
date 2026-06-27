@@ -1422,8 +1422,8 @@ def main() -> None:
         ),
         file_status(
             "Soccerbase lineups",
-            model_root / "data" / "extracted" / "soccerbase_lineups_used.csv",
-            "available as source; current default model does not enable lineup feature flag",
+            model_root / "data" / "extracted" / "soccerbase_worldcup2026_lineups.csv",
+            "used for live player starts/apps; current default outcome model keeps lineup features disabled",
         ),
         file_status(
             "Soccerbase stats",
