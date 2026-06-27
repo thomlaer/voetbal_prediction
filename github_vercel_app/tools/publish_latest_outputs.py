@@ -1314,17 +1314,32 @@ def main() -> None:
     metrics = load_json(metrics_path)
 
     results_path = model_root / "data" / "results.csv"
+    training_results_path = model_root / "data" / "extracted" / "results_training_with_espn.csv"
+    espn_results_path = model_root / "data" / "extracted" / "espn_worldcup2026_results.csv"
     latest_match_date = ""
+    latest_training_match_date = ""
     row_count = None
-    if results_path.exists():
-        rows = read_csv(results_path)
+    metadata_results_path = training_results_path if training_results_path.exists() else results_path
+    if metadata_results_path.exists():
+        rows = read_csv(metadata_results_path)
         row_count = len(rows)
         dates = [
             str(row.get("date", ""))
             for row in rows
             if has_score_value(row.get("home_score")) and has_score_value(row.get("away_score"))
         ]
-        latest_match_date = max(dates) if dates else ""
+        latest_training_match_date = max(dates) if dates else ""
+        latest_match_date = latest_training_match_date
+    if espn_results_path.exists():
+        espn_dates = [
+            str(row.get("date", ""))
+            for row in read_csv(espn_results_path)
+            if has_score_value(row.get("home_score"))
+            and has_score_value(row.get("away_score"))
+            and str(row.get("completed", "true")).strip().lower() in {"1", "true", "yes", "y"}
+        ]
+        if espn_dates:
+            latest_match_date = max([latest_match_date, *espn_dates])
 
     soccerbase_stats_path = model_root / "data" / "extracted" / "soccerbase_match_stats.csv"
     locked_scores = load_locked_scores(model_root / "data" / "extracted" / "scorito_locked_scores.csv")
@@ -1435,6 +1450,7 @@ def main() -> None:
             "exact_score_accuracy": metrics.get("score_exact_accuracy"),
             "row_count": row_count,
             "latest_match_date": latest_match_date,
+            "latest_training_match_date": latest_training_match_date,
             "features": metrics.get("features"),
             "lineup_features_enabled": metrics.get("soccerbase_lineup_features_enabled"),
             "stat_features_enabled": metrics.get("soccerbase_stat_features_enabled"),
