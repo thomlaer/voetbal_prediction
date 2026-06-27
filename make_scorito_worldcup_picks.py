@@ -1090,6 +1090,38 @@ def find_player_context(
     if exact is not None:
         output = dict(exact)
         output["player_context_match_score"] = 1.0
+        player_tokens = player_key.split()
+        alias_key = (
+            team_key,
+            player_tokens[0][0] if player_tokens else "",
+            player_tokens[-1] if player_tokens else "",
+        )
+        alias_is_unique = context.get("squad_alias_counts", {}).get(alias_key, 1) == 1
+        for candidate_key, record in context.get("by_team", {}).get(team_key, []):
+            if candidate_key == player_key:
+                continue
+            candidate_tokens = candidate_key.split()
+            if (
+                not alias_is_unique
+                or len(player_tokens) < 2
+                or len(candidate_tokens) < 2
+                or len(candidate_tokens[0]) != 1
+                or player_tokens[-1] != candidate_tokens[-1]
+                or player_tokens[0][0] != candidate_tokens[0]
+                or person_name_match_score(player_key, candidate_key) < 0.74
+            ):
+                continue
+            for field in (
+                "current_tournament_goals",
+                "current_tournament_penalty_goals",
+                "current_tournament_apps",
+                "current_tournament_starts",
+                "current_tournament_sub_apps",
+                "current_tournament_yellow_cards",
+                "current_tournament_red_cards",
+                "lineup_team_matches",
+            ):
+                output[field] = max(float(output.get(field, 0.0)), float(record.get(field, 0.0)))
         return output
 
     best_score = 0.0
@@ -1247,6 +1279,19 @@ def build_topscorer_ranking(args: argparse.Namespace, team_probs: pd.DataFrame) 
         args,
         {topscorer_team_key(team) for team in squads["team"].dropna().unique()},
     )
+    squad_alias_counts: dict[tuple[str, str, str], int] = defaultdict(int)
+    for squad_player in squads.itertuples(index=False):
+        squad_player_key = normalize_person_name(clean_player_name(getattr(squad_player, "player", "")))
+        squad_tokens = squad_player_key.split()
+        if len(squad_tokens) >= 2:
+            squad_alias_counts[
+                (
+                    topscorer_team_key(getattr(squad_player, "team", "")),
+                    squad_tokens[0][0],
+                    squad_tokens[-1],
+                )
+            ] += 1
+    player_context["squad_alias_counts"] = dict(squad_alias_counts)
     manual_adjustments = load_manual_player_adjustments(
         getattr(args, "player_adjustments", DEFAULT_PLAYER_ADJUSTMENTS)
     )
