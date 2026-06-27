@@ -845,7 +845,7 @@ def attach_actual_results(
         prematch_score = get_score_override(prematch_scores, output)
         if (
             prematch_score
-            and (output.get("actual_available") or output.get("actual_score"))
+            and output.get("round_locked")
             and output.get("pre_match_source") != "manual_locked_score"
         ):
             prematch_value = prematch_score["score"]
@@ -854,11 +854,21 @@ def attach_actual_results(
                 output.get("home_team", ""),
                 output.get("away_team", ""),
             )
+            output["filled_score"] = prematch_value
+            output["filled_predicted_winner"] = prematch_winner
+            output["score"] = prematch_value
+            output["predicted_winner"] = prematch_winner
             output["pre_match_score"] = prematch_value
             output["pre_match_predicted_winner"] = prematch_winner
             output["pre_match_confidence"] = ""
             output["pre_match_model_favourite_prob"] = ""
+            output["score_source"] = "excel_prematch_score"
             output["pre_match_source"] = "excel_prematch_score"
+            if not output.get("actual_available") and str(model_score) != str(prematch_value):
+                output["new_model_score"] = model_score
+                output["new_model_predicted_winner"] = (
+                    model_winner if str(model_winner) != str(prematch_winner) else ""
+                )
 
         if output.get("actual_available") or output.get("actual_score"):
             output["new_model_score"] = ""

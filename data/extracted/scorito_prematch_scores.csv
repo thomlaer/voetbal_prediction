@@ -1,105 +1,73 @@
-﻿match_number,date,stage,group,home_team,away_team,score,predicted_winner,note
-1,11-06-2026,Groepsfase,A,Mexico,South Africa,2-0,Mexico,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-2,11-06-2026,Groepsfase,A,South Korea,Czech Republic,1-0,South Korea,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-3,12-06-2026,Groepsfase,B,Canada,Bosnia and Herzegovina,2-0,Canada,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-4,12-06-2026,Groepsfase,D,United States,Paraguay,1-0,United States,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-5,13-06-2026,Groepsfase,B,Qatar,Switzerland,0-2,Switzerland,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-6,13-06-2026,Groepsfase,C,Brazil,Morocco,1-0,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-7,13-06-2026,Groepsfase,C,Haiti,Scotland,0-1,Scotland,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-8,14-06-2026,Groepsfase,D,Australia,Turkey,0-1,Turkey,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-9,14-06-2026,Groepsfase,E,Germany,Curaçao,2-0,Germany,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-10,14-06-2026,Groepsfase,F,Netherlands,Japan,1-0,Netherlands,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-11,14-06-2026,Groepsfase,E,Ivory Coast,Ecuador,0-1,Ecuador,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-12,14-06-2026,Groepsfase,F,Sweden,Tunisia,0-1,Tunisia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-13,15-06-2026,Groepsfase,H,Spain,Cape Verde,2-0,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-14,15-06-2026,Groepsfase,G,Belgium,Egypt,1-0,Belgium,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-15,15-06-2026,Groepsfase,H,Saudi Arabia,Uruguay,0-1,Uruguay,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-16,15-06-2026,Groepsfase,G,Iran,New Zealand,1-0,Iran,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-17,16-06-2026,Groepsfase,I,France,Senegal,1-0,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-18,16-06-2026,Groepsfase,I,Iraq,Norway,0-1,Norway,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-19,16-06-2026,Groepsfase,J,Argentina,Algeria,2-0,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-20,17-06-2026,Groepsfase,J,Austria,Jordan,1-0,Austria,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-21,17-06-2026,Groepsfase,K,Portugal,DR Congo,2-0,Portugal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-22,17-06-2026,Groepsfase,L,England,Croatia,1-0,England,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-23,17-06-2026,Groepsfase,L,Ghana,Panama,0-1,Panama,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-24,17-06-2026,Groepsfase,K,Uzbekistan,Colombia,0-1,Colombia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-25,18-06-2026,Groepsfase,A,Czech Republic,South Africa,1-0,Czech Republic,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-26,18-06-2026,Groepsfase,B,Switzerland,Bosnia and Herzegovina,2-0,Switzerland,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-27,18-06-2026,Groepsfase,B,Canada,Qatar,2-0,Canada,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-28,18-06-2026,Groepsfase,A,Mexico,South Korea,1-0,Mexico,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-29,19-06-2026,Groepsfase,D,United States,Australia,1-0,United States,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-30,19-06-2026,Groepsfase,C,Scotland,Morocco,0-1,Morocco,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-31,19-06-2026,Groepsfase,C,Brazil,Haiti,2-0,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-32,20-06-2026,Groepsfase,D,Turkey,Paraguay,0-1,Paraguay,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-33,20-06-2026,Groepsfase,F,Netherlands,Sweden,2-0,Netherlands,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-34,20-06-2026,Groepsfase,E,Germany,Ivory Coast,1-0,Germany,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-35,20-06-2026,Groepsfase,E,Ecuador,Curaçao,2-0,Ecuador,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-36,21-06-2026,Groepsfase,F,Tunisia,Japan,0-1,Japan,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-37,21-06-2026,Groepsfase,H,Spain,Saudi Arabia,2-0,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-38,21-06-2026,Groepsfase,G,Belgium,Iran,1-0,Belgium,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-39,21-06-2026,Groepsfase,H,Uruguay,Cape Verde,2-0,Uruguay,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-40,21-06-2026,Groepsfase,G,New Zealand,Egypt,0-1,Egypt,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-41,22-06-2026,Groepsfase,J,Argentina,Austria,1-0,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-42,22-06-2026,Groepsfase,I,France,Iraq,2-0,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-43,22-06-2026,Groepsfase,I,Norway,Senegal,1-0,Norway,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-44,22-06-2026,Groepsfase,J,Jordan,Algeria,0-1,Algeria,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-45,23-06-2026,Groepsfase,K,Portugal,Uzbekistan,2-0,Portugal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-46,23-06-2026,Groepsfase,L,England,Ghana,2-0,England,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-47,23-06-2026,Groepsfase,L,Panama,Croatia,0-1,Croatia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-48,23-06-2026,Groepsfase,K,Colombia,DR Congo,1-0,Colombia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-49,24-06-2026,Groepsfase,B,Bosnia and Herzegovina,Qatar,1-0,Bosnia and Herzegovina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-50,24-06-2026,Groepsfase,B,Switzerland,Canada,1-0,Switzerland,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-51,24-06-2026,Groepsfase,C,Scotland,Brazil,0-1,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-52,24-06-2026,Groepsfase,C,Morocco,Haiti,2-0,Morocco,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-53,24-06-2026,Groepsfase,A,Czech Republic,Mexico,0-1,Mexico,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-54,24-06-2026,Groepsfase,A,South Africa,South Korea,0-1,South Korea,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-55,25-06-2026,Groepsfase,E,Curaçao,Ivory Coast,0-1,Ivory Coast,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-56,25-06-2026,Groepsfase,E,Ecuador,Germany,0-1,Germany,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-57,25-06-2026,Groepsfase,F,Japan,Sweden,1-0,Japan,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-58,25-06-2026,Groepsfase,F,Tunisia,Netherlands,0-1,Netherlands,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-59,25-06-2026,Groepsfase,D,Paraguay,Australia,1-0,Paraguay,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-60,25-06-2026,Groepsfase,D,Turkey,United States,1-0,Turkey,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-61,26-06-2026,Groepsfase,I,Norway,France,0-1,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-62,26-06-2026,Groepsfase,I,Senegal,Iraq,1-0,Senegal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-63,26-06-2026,Groepsfase,H,Cape Verde,Saudi Arabia,0-1,Saudi Arabia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-64,26-06-2026,Groepsfase,H,Uruguay,Spain,0-1,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-65,26-06-2026,Groepsfase,G,New Zealand,Belgium,0-2,Belgium,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-66,26-06-2026,Groepsfase,G,Egypt,Iran,0-1,Iran,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-67,27-06-2026,Groepsfase,L,Croatia,Ghana,2-0,Croatia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-68,27-06-2026,Groepsfase,L,Panama,England,0-1,England,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-69,27-06-2026,Groepsfase,K,Colombia,Portugal,0-1,Portugal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-70,27-06-2026,Groepsfase,K,DR Congo,Uzbekistan,0-1,Uzbekistan,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-71,27-06-2026,Groepsfase,J,Algeria,Austria,0-1,Austria,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-72,27-06-2026,Groepsfase,J,Jordan,Argentina,0-1,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-73,28-06-2026,Ronde van 32,,South Korea,Canada,1-2,Canada,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-74,29-06-2026,Ronde van 32,,Brazil,Japan,1-0,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-75,29-06-2026,Ronde van 32,,Germany,Czech Republic,1-0,Germany,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-76,29-06-2026,Ronde van 32,,Netherlands,Morocco,1-0,Netherlands,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-77,30-06-2026,Ronde van 32,,Ecuador,Norway,2-1,Ecuador,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-78,30-06-2026,Ronde van 32,,France,Egypt,2-0,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-79,30-06-2026,Ronde van 32,,Mexico,Ivory Coast,1-0,Mexico,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-80,01-07-2026,Ronde van 32,,England,Senegal,1-0,England,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-81,01-07-2026,Ronde van 32,,Belgium,Algeria,1-0,Belgium,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-82,01-07-2026,Ronde van 32,,United States,Sweden,2-1,United States,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-83,02-07-2026,Ronde van 32,,Spain,Austria,2-0,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-84,02-07-2026,Ronde van 32,,Colombia,Croatia,2-1,Colombia,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-85,02-07-2026,Ronde van 32,,Switzerland,Paraguay,2-1,Switzerland,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-86,03-07-2026,Ronde van 32,,Turkey,Iran,1-0,Turkey,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-87,03-07-2026,Ronde van 32,,Argentina,Uruguay,1-0,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-88,03-07-2026,Ronde van 32,,Portugal,Scotland,1-0,Portugal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-89,04-07-2026,Ronde van 16,,Canada,Germany,0-1,Germany,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-90,04-07-2026,Ronde van 16,,Brazil,Ecuador,2-1,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-91,05-07-2026,Ronde van 16,,Netherlands,France,0-1,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-92,05-07-2026,Ronde van 16,,Mexico,England,1-2,England,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-93,06-07-2026,Ronde van 16,,Spain,Colombia,1-0,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-94,06-07-2026,Ronde van 16,,Belgium,United States,1-0,Belgium,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-95,07-07-2026,Ronde van 16,,Turkey,Portugal,1-2,Portugal,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-96,07-07-2026,Ronde van 16,,Switzerland,Argentina,0-1,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-97,09-07-2026,Kwartfinales,,Germany,Brazil,1-2,Brazil,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-98,10-07-2026,Kwartfinales,,Spain,Belgium,2-0,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-99,11-07-2026,Kwartfinales,,France,England,2-1,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-100,11-07-2026,Kwartfinales,,Portugal,Argentina,0-1,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-101,14-07-2026,Halve finales,,Brazil,Spain,0-1,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-102,15-07-2026,Halve finales,,France,Argentina,1-2,Argentina,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-103,18-07-2026,3e Plaatswedstrijd,,Brazil,France,1-2,France,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
-104,19-07-2026,Finale,,Spain,Argentina,2-1,Spain,Imported from user WK2026_Voorspellingen.xlsx as original pre-match filled score.
+match_number,date,stage,group,home_team,away_team,score,predicted_winner,note
+1,11-06-2026,Groepsfase,A,Mexico,South Africa,2-0,Mexico,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+2,11-06-2026,Groepsfase,A,South Korea,Czech Republic,1-1,Draw,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+3,12-06-2026,Groepsfase,B,Canada,Bosnia and Herzegovina,2-0,Canada,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+4,12-06-2026,Groepsfase,D,United States,Paraguay,1-0,United States,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+5,13-06-2026,Groepsfase,B,Qatar,Switzerland,0-2,Switzerland,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+6,13-06-2026,Groepsfase,C,Brazil,Morocco,2-1,Brazil,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+7,13-06-2026,Groepsfase,C,Haiti,Scotland,1-2,Scotland,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+8,14-06-2026,Groepsfase,D,Australia,Turkey,0-1,Turkey,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+9,14-06-2026,Groepsfase,E,Germany,Curaçao,2-1,Germany,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+10,14-06-2026,Groepsfase,F,Netherlands,Japan,2-1,Netherlands,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+11,14-06-2026,Groepsfase,E,Ivory Coast,Ecuador,1-2,Ecuador,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+12,14-06-2026,Groepsfase,F,Sweden,Tunisia,2-1,Sweden,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+13,15-06-2026,Groepsfase,H,Spain,Cape Verde,3-0,Spain,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+14,15-06-2026,Groepsfase,G,Belgium,Egypt,2-1,Belgium,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+15,15-06-2026,Groepsfase,H,Saudi Arabia,Uruguay,0-1,Uruguay,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+16,15-06-2026,Groepsfase,G,Iran,New Zealand,2-1,Iran,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+17,16-06-2026,Groepsfase,I,France,Senegal,2-1,France,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+18,16-06-2026,Groepsfase,I,Iraq,Norway,0-2,Norway,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+19,16-06-2026,Groepsfase,J,Argentina,Algeria,2-0,Argentina,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+20,17-06-2026,Groepsfase,J,Austria,Jordan,2-1,Austria,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+21,17-06-2026,Groepsfase,K,Portugal,DR Congo,2-0,Portugal,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+22,17-06-2026,Groepsfase,L,England,Croatia,2-1,England,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+23,17-06-2026,Groepsfase,L,Ghana,Panama,2-1,Ghana,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+24,17-06-2026,Groepsfase,K,Uzbekistan,Colombia,1-2,Colombia,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+25,18-06-2026,Groepsfase,A,Czech Republic,South Africa,1-0,Czech Republic,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+26,18-06-2026,Groepsfase,B,Switzerland,Bosnia and Herzegovina,2-0,Switzerland,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+27,18-06-2026,Groepsfase,B,Canada,Qatar,2-0,Canada,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+28,18-06-2026,Groepsfase,A,Mexico,South Korea,2-1,Mexico,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+29,19-06-2026,Groepsfase,D,United States,Australia,1-0,United States,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+30,19-06-2026,Groepsfase,C,Scotland,Morocco,1-2,Morocco,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+31,19-06-2026,Groepsfase,C,Brazil,Haiti,3-0,Brazil,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+32,20-06-2026,Groepsfase,D,Turkey,Paraguay,2-1,Turkey,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+33,20-06-2026,Groepsfase,F,Netherlands,Sweden,2-1,Netherlands,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+34,20-06-2026,Groepsfase,E,Germany,Ivory Coast,2-1,Germany,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+35,20-06-2026,Groepsfase,E,Ecuador,Curaçao,3-0,Ecuador,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+36,21-06-2026,Groepsfase,F,Tunisia,Japan,0-1,Japan,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+37,21-06-2026,Groepsfase,H,Spain,Saudi Arabia,3-0,Spain,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+38,21-06-2026,Groepsfase,G,Belgium,Iran,2-1,Belgium,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+39,21-06-2026,Groepsfase,H,Uruguay,Cape Verde,2-0,Uruguay,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+40,21-06-2026,Groepsfase,G,New Zealand,Egypt,1-2,Egypt,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+41,22-06-2026,Groepsfase,J,Argentina,Austria,1-0,Argentina,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+42,22-06-2026,Groepsfase,I,France,Iraq,2-1,France,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+43,22-06-2026,Groepsfase,I,Norway,Senegal,2-1,Norway,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+44,22-06-2026,Groepsfase,J,Jordan,Algeria,0-1,Algeria,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+45,23-06-2026,Groepsfase,K,Portugal,Uzbekistan,2-0,Portugal,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+46,23-06-2026,Groepsfase,L,England,Ghana,3-0,England,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+47,23-06-2026,Groepsfase,L,Panama,Croatia,1-2,Croatia,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+48,23-06-2026,Groepsfase,K,Colombia,DR Congo,2-0,Colombia,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+49,24-06-2026,Groepsfase,B,Bosnia and Herzegovina,Qatar,1-0,Bosnia and Herzegovina,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+50,24-06-2026,Groepsfase,B,Switzerland,Canada,2-1,Switzerland,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+51,24-06-2026,Groepsfase,C,Scotland,Brazil,0-1,Brazil,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+52,24-06-2026,Groepsfase,C,Morocco,Haiti,2-1,Morocco,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+53,24-06-2026,Groepsfase,A,Czech Republic,Mexico,1-2,Mexico,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+54,24-06-2026,Groepsfase,A,South Africa,South Korea,0-1,South Korea,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+55,25-06-2026,Groepsfase,E,Curaçao,Ivory Coast,1-2,Ivory Coast,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+56,25-06-2026,Groepsfase,E,Ecuador,Germany,1-2,Germany,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+57,25-06-2026,Groepsfase,F,Japan,Sweden,2-1,Japan,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+58,25-06-2026,Groepsfase,F,Tunisia,Netherlands,0-1,Netherlands,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+59,25-06-2026,Groepsfase,D,Paraguay,Australia,1-0,Paraguay,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+60,25-06-2026,Groepsfase,D,Turkey,United States,2-1,Turkey,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+61,26-06-2026,Groepsfase,I,Norway,France,1-2,France,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+62,26-06-2026,Groepsfase,I,Senegal,Iraq,2-1,Senegal,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+63,26-06-2026,Groepsfase,H,Cape Verde,Saudi Arabia,1-1,Draw,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+64,26-06-2026,Groepsfase,H,Uruguay,Spain,0-1,Spain,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+65,26-06-2026,Groepsfase,G,New Zealand,Belgium,1-2,Belgium,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+66,26-06-2026,Groepsfase,G,Egypt,Iran,1-1,Draw,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+67,27-06-2026,Groepsfase,L,Croatia,Ghana,2-0,Croatia,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+68,27-06-2026,Groepsfase,L,Panama,England,0-2,England,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+69,27-06-2026,Groepsfase,K,Colombia,Portugal,1-2,Portugal,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+70,27-06-2026,Groepsfase,K,DR Congo,Uzbekistan,2-1,DR Congo,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+71,27-06-2026,Groepsfase,J,Algeria,Austria,1-1,Draw,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
+72,27-06-2026,Groepsfase,J,Jordan,Argentina,1-2,Argentina,Imported from user Scorito_scores_puur.xlsx as the locked group-stage entry score.
