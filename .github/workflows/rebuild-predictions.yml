@@ -89,24 +89,52 @@ jobs:
 
       - name: Commit updated dashboard data
         run: |
+          publish_files=(
+            github_vercel_app/public/data
+            github_vercel_app/public/files
+            data/results.csv
+            data/shootouts.csv
+            data/goalscorers.csv
+            data/former_names.csv
+            data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv
+            data/extracted/espn_worldcup2026_results.csv
+            data/extracted/espn_worldcup2026_fixtures.csv
+            data/extracted/results_training_with_espn.csv
+            data/extracted/soccerbase_worldcup2026_lineups.csv
+            data/extracted/soccerbase_match_stats.csv
+            data/extracted/soccerbase_cards_events.csv
+            data/extracted/soccerbase_fetched_games.csv
+          )
+          publish_dir="$RUNNER_TEMP/prediction-publish"
+          git fetch origin main
+          git worktree add --detach "$publish_dir" origin/main
+          copied_files=()
+          for path in "${publish_files[@]}"; do
+            if [[ -d "$path" ]]; then
+              mkdir -p "$publish_dir/$path"
+              cp -a "$path/." "$publish_dir/$path/"
+              copied_files+=("$path")
+            elif [[ -f "$path" ]]; then
+              mkdir -p "$publish_dir/$(dirname "$path")"
+              cp -a "$path" "$publish_dir/$path"
+              copied_files+=("$path")
+            fi
+          done
+          cd "$publish_dir"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git fetch origin main
-          git pull --rebase --autostash origin main
-          git add github_vercel_app/public/data github_vercel_app/public/files data/results.csv data/shootouts.csv data/goalscorers.csv data/former_names.csv data/extracted/oddsportal_worldcup2026_fixture_odds_schedule.csv data/extracted/espn_worldcup2026_results.csv data/extracted/espn_worldcup2026_fixtures.csv data/extracted/results_training_with_espn.csv data/extracted/soccerbase_match_stats.csv data/extracted/soccerbase_cards_events.csv data/extracted/soccerbase_fetched_games.csv
-          if [[ -f data/extracted/soccerbase_worldcup2026_lineups.csv ]]; then
-            git add data/extracted/soccerbase_worldcup2026_lineups.csv
-          fi
+          git add -- "${copied_files[@]}"
           if git diff --cached --quiet; then
             echo "No output changes."
           else
             git commit -m "Update WK predictions"
             for attempt in 1 2 3; do
-              if git push; then
+              if git push origin HEAD:main; then
                 exit 0
               fi
               echo "Push failed, rebasing on latest origin/main before retry $attempt..."
-              git pull --rebase origin main
+              git fetch origin main
+              git rebase origin/main
               sleep 5
             done
             echo "Failed to push after retries."
