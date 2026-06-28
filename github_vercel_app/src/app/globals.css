@@ -408,6 +408,22 @@ tr:last-child td {
   padding: 10px 12px;
 }
 
+.lineup-note {
+  margin: -6px 0 18px;
+}
+
+.lineup-note.complete {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: var(--green);
+}
+
+.lineup-note.warning {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
 .control-panel {
   border: 1px solid var(--line);
   border-radius: 8px;

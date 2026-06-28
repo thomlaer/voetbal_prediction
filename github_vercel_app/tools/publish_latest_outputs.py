@@ -219,13 +219,6 @@ def canonicalize_prediction_row(row: dict[str, Any]) -> dict[str, Any]:
     return output
 
 
-def date_key(value: Any) -> int | None:
-    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", str(value or ""))
-    if not match:
-        return None
-    return int(f"{match.group(1)}{match.group(2)}{match.group(3)}")
-
-
 def normalize_date_text(value: Any) -> str:
     text = str(value or "").strip()
     if not text:
@@ -238,23 +231,6 @@ def normalize_date_text(value: Any) -> str:
         day, month, year = match.groups()
         return f"{year}-{int(month):02d}-{int(day):02d}"
     return text[:10]
-
-
-def stage_start_keys(rows: list[dict[str, Any]]) -> dict[str, int]:
-    starts: dict[str, int] = {}
-    for row in rows:
-        stage = str(row.get("stage", ""))
-        key = date_key(row.get("date"))
-        if not stage or key is None:
-            continue
-        if stage not in starts or key < starts[stage]:
-            starts[stage] = key
-    return starts
-
-
-def is_stage_locked(stage: Any, starts: dict[str, int], snapshot_key: int | None) -> bool:
-    stage_key = str(stage or "")
-    return snapshot_key is not None and stage_key in starts and snapshot_key >= starts[stage_key]
 
 
 def outcome_label(home_goals: int, away_goals: int) -> str:
@@ -707,7 +683,6 @@ def attach_actual_results(
     results_path: Path,
     soccerbase_stats_path: Path,
     previous_dashboard: dict[str, Any],
-    snapshot_key: int | None,
     locked_scores: dict[str, dict[Any, dict[str, Any]]],
     prematch_scores: dict[str, dict[Any, dict[str, Any]]],
 ) -> list[dict[str, Any]]:
@@ -725,8 +700,6 @@ def attach_actual_results(
         for row in previous_rows
         if isinstance(row, dict) and str(row.get("match_number", "")).strip()
     }
-    starts = stage_start_keys(predictions)
-
     enriched: list[dict[str, Any]] = []
     for row in predictions:
         output = dict(row)
@@ -744,7 +717,9 @@ def attach_actual_results(
         output["predicted_winner"] = model_winner
         model_confidence = output.get("confidence", "")
         model_favourite_prob = output.get("model_favourite_prob", "")
-        locked = is_stage_locked(output.get("stage", ""), starts, snapshot_key)
+        locked_score = get_score_override(locked_scores, output)
+        prematch_score = get_score_override(prematch_scores, output)
+        locked = bool(locked_score or prematch_score)
 
         output["model_score"] = model_score
         output["model_predicted_winner"] = model_winner
@@ -825,7 +800,6 @@ def attach_actual_results(
             )
             output["pre_match_source"] = previous.get("pre_match_source") or "previous_dashboard"
 
-        locked_score = get_score_override(locked_scores, output)
         if locked_score:
             manual_score = locked_score["score"]
             manual_winner = locked_score.get("predicted_winner") or score_winner(
@@ -846,7 +820,6 @@ def attach_actual_results(
             output["score_source"] = "manual_locked_score"
             output["pre_match_source"] = "manual_locked_score"
 
-        prematch_score = get_score_override(prematch_scores, output)
         if (
             prematch_score
             and output.get("round_locked")
@@ -901,6 +874,82 @@ def attach_actual_results(
             output["prediction_outcome_correct"] = ""
         enriched.append(output)
     return enriched
+
+
+def build_lineup_coverage(
+    predictions: list[dict[str, Any]],
+    lineups_path: Path,
+) -> dict[str, Any]:
+    played = [
+        row
+        for row in predictions
+        if row.get("actual_available") or row.get("actual_score")
+    ]
+    starters_by_fixture: dict[tuple[str, str, str], set[tuple[str, str]]] = {}
+    for row in read_csv(lineups_path):
+        is_starter = str(row.get("is_starter", "")).strip().lower() in {"1", "true", "yes"}
+        if not is_starter and str(row.get("squad_status", "")).strip().lower() != "starter":
+            continue
+        key = (
+            normalize_date_text(row.get("date", "")),
+            normalize_key(row.get("home_team", "")),
+            normalize_key(row.get("away_team", "")),
+        )
+        if not all(key):
+            continue
+        player_key = str(row.get("player_id", "") or row.get("player_name", "")).strip()
+        team_key = normalize_key(row.get("team", ""))
+        if not player_key:
+            continue
+        starters_by_fixture.setdefault(key, set()).add((team_key, player_key))
+
+    missing: list[str] = []
+    for row in played:
+        fixture_date = normalize_date_text(row.get("date", ""))
+        try:
+            target_date = datetime.strptime(fixture_date, "%Y-%m-%d").date()
+        except ValueError:
+            target_date = None
+        home_key = normalize_key(row.get("home_team", ""))
+        away_key = normalize_key(row.get("away_team", ""))
+        best_starter_count = 0
+        for (lineup_date, lineup_home, lineup_away), starters in starters_by_fixture.items():
+            if (lineup_home, lineup_away) != (home_key, away_key):
+                continue
+            if target_date is not None:
+                try:
+                    date_distance = abs((datetime.strptime(lineup_date, "%Y-%m-%d").date() - target_date).days)
+                except ValueError:
+                    continue
+                if date_distance > 1:
+                    continue
+            elif lineup_date != fixture_date:
+                continue
+            best_starter_count = max(best_starter_count, len(starters))
+        if best_starter_count < 18:
+            missing.append(f"{row.get('home_team', '')} - {row.get('away_team', '')}")
+
+    played_count = len(played)
+    missing_count = len(missing)
+    complete_count = played_count - missing_count
+    if not played_count:
+        message = "Nog geen gespeelde wedstrijden om line-ups te controleren."
+    elif not missing_count:
+        message = f"Line-ups compleet voor alle {played_count} gespeelde wedstrijden."
+    else:
+        shown = missing[:4]
+        suffix = f" en {missing_count - len(shown)} meer" if missing_count > len(shown) else ""
+        message = (
+            f"Line-ups ontbreken nog voor {missing_count} van {played_count} gespeelde wedstrijden: "
+            f"{', '.join(shown)}{suffix}."
+        )
+    return {
+        "played_matches": played_count,
+        "complete_matches": complete_count,
+        "missing_matches": missing_count,
+        "missing_fixtures": missing,
+        "message": message,
+    }
 
 
 def copy_if_exists(source: Path, destination: Path) -> str:
@@ -1405,7 +1454,6 @@ def main() -> None:
     public_data.mkdir(parents=True, exist_ok=True)
     public_files.mkdir(parents=True, exist_ok=True)
     generated_at = datetime.now(timezone.utc)
-    snapshot_key = date_key(generated_at.strftime("%Y-%m-%d"))
 
     previous_dashboard = load_json(public_data / "dashboard.json")
     predictions = compact_predictions(read_csv(run_dir / "scorito_invuladvies.csv"))
@@ -1463,9 +1511,12 @@ def main() -> None:
         results_path,
         soccerbase_stats_path,
         previous_dashboard,
-        snapshot_key,
         locked_scores,
         prematch_scores,
+    )
+    lineup_coverage = build_lineup_coverage(
+        predictions,
+        model_root / "data" / "extracted" / "soccerbase_worldcup2026_lineups.csv",
     )
     played_match_numbers = {
         str(row.get("match_number", "")).strip()
@@ -1563,6 +1614,7 @@ def main() -> None:
             "lineup_features_enabled": metrics.get("soccerbase_lineup_features_enabled"),
             "stat_features_enabled": metrics.get("soccerbase_stat_features_enabled"),
             "card_features_enabled": metrics.get("soccerbase_card_features_enabled"),
+            "lineup_coverage": lineup_coverage,
         },
         "downloads": downloads,
         "predictions": predictions,

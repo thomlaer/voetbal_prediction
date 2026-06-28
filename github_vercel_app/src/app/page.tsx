@@ -151,6 +151,13 @@ type DashboardData = {
     lineup_features_enabled?: boolean;
     stat_features_enabled?: boolean;
     card_features_enabled?: boolean;
+    lineup_coverage?: {
+      played_matches: number;
+      complete_matches: number;
+      missing_matches: number;
+      missing_fixtures: string[];
+      message: string;
+    };
   };
   downloads: {
     compact_excel?: string;
@@ -281,30 +288,6 @@ function stageLabel(stage: string) {
   return STAGE_LABELS[stage] || stage || "-";
 }
 
-function dateKey(value?: string) {
-  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return null;
-  return Number(`${match[1]}${match[2]}${match[3]}`);
-}
-
-function stageStartKeys(rows: Prediction[]) {
-  const starts = new Map<string, number>();
-  for (const row of rows) {
-    const key = dateKey(row.date);
-    if (key === null) continue;
-    const current = starts.get(row.stage);
-    if (current === undefined || key < current) {
-      starts.set(row.stage, key);
-    }
-  }
-  return starts;
-}
-
-function isStageLocked(stage: string, starts: Map<string, number>, snapshotKey: number | null) {
-  const start = starts.get(stage);
-  return snapshotKey !== null && start !== undefined && snapshotKey >= start;
-}
-
 function stageRows(rows: Prediction[]) {
   return STAGE_ORDER.map((stage) => ({
     stage,
@@ -313,15 +296,15 @@ function stageRows(rows: Prediction[]) {
 }
 
 function isRoundManuallyLocked(rows: Prediction[]) {
-  return rows.length > 0 && rows.every((row) => row.round_locked || isPlayed(row));
+  return rows.length > 0 && rows.every((row) => row.round_locked);
 }
 
-function isStageClosed(stage: string, rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null) {
-  return isStageLocked(stage, starts, snapshotKey) || isRoundManuallyLocked(rows);
+function isStageClosed(rows: Prediction[]) {
+  return isRoundManuallyLocked(rows);
 }
 
-function firstOpenStage(sections: { stage: string; rows: Prediction[] }[], starts: Map<string, number>, snapshotKey: number | null) {
-  return sections.find((section) => !isStageClosed(section.stage, section.rows, starts, snapshotKey))?.stage || "";
+function firstOpenStage(sections: { stage: string; rows: Prediction[] }[]) {
+  return sections.find((section) => !isStageClosed(section.rows))?.stage || "";
 }
 
 function stageShouldOpen(stage: string, currentFillStage: string) {
@@ -332,9 +315,9 @@ function stageShouldOpen(stage: string, currentFillStage: string) {
   return stageIndex >= currentIndex;
 }
 
-function stageStatus(stage: string, rows: Prediction[], starts: Map<string, number>, snapshotKey: number | null, currentFillStage: string) {
+function stageStatus(stage: string, rows: Prediction[], currentFillStage: string) {
   if (rows.length && rows.every(isPlayed)) return { label: "Gespeeld", className: "green" };
-  if (isStageClosed(stage, rows, starts, snapshotKey)) return { label: "Vergrendeld", className: "orange" };
+  if (isStageClosed(rows)) return { label: "Vergrendeld", className: "orange" };
   if (stage === currentFillStage) return { label: "Nu invullen", className: "green" };
   return { label: "Later", className: "" };
 }
@@ -508,11 +491,9 @@ export default async function Home() {
 
   const playedMatches = data.predictions.filter(isPlayed);
   const playedPanelRows = playedMatches.map(playedPanelRow);
-  const starts = stageStartKeys(data.predictions);
-  const snapshotKey = dateKey(data.metadata.generated_at);
   const rounds = stageRows(data.predictions);
   const stageMap = new Map(rounds.map((section) => [section.stage, section.rows]));
-  const currentFillStage = firstOpenStage(rounds, starts, snapshotKey);
+  const currentFillStage = firstOpenStage(rounds);
   const groups = grouped(data.group_standings);
   const thirdPlaceRows = bestThirdPlaceRows(groups);
   const groupProjectionOpen = groupProjectionShouldOpen(groups);
@@ -527,7 +508,7 @@ export default async function Home() {
   const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
   const actionableChanges = data.changes.filter((row) => {
     const stage = row.stage || row.stage_old || "";
-    return !isStageClosed(stage, stageMap.get(stage) || [], starts, snapshotKey);
+    return !isStageClosed(stageMap.get(stage) || []);
   });
   const scoreChanges = actionableChanges.filter((row) => row.score_old !== row.score_new).length;
 
@@ -580,6 +561,16 @@ export default async function Home() {
             <div className="metric-note">historische testset</div>
           </div>
         </section>
+
+        {data.metadata.lineup_coverage?.message ? (
+          <p
+            className={`inline-note lineup-note ${
+              data.metadata.lineup_coverage.missing_matches ? "warning" : "complete"
+            }`}
+          >
+            {data.metadata.lineup_coverage.message}
+          </p>
+        ) : null}
 
         <section id="wijzigingen" className="section">
           <div className="section-header">
@@ -639,7 +630,7 @@ export default async function Home() {
           </div>
           <div className="round-stack">
             {rounds.map(({ stage, rows }) => {
-              const status = stageStatus(stage, rows, starts, snapshotKey, currentFillStage);
+              const status = stageStatus(stage, rows, currentFillStage);
               const changedRows = rows.filter((row) => row.new_model_score).length;
 
               return (
