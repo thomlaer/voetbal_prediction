@@ -1,33 +1,33 @@
-match_number,score,predicted_winner,note
-1,2-0,Mexico,User filled this score in Scorito before group stage lock.
-2,1-1,Draw,User filled this score in Scorito before group stage lock.
-3,2-0,Canada,User filled this score in Scorito before group stage lock.
-4,1-0,United States,User filled this score in Scorito before group stage lock.
-7,0-1,Scotland,User filled this score in Scorito before group stage lock.
-28,2-1,Mexico,Confirmed from user Scorito screenshot after group stage lock.
-29,1-0,United States,Confirmed from user Scorito screenshot after group stage lock.
-30,0-1,Morocco,Confirmed from user Scorito screenshot after group stage lock.
-31,2-1,Brazil,Confirmed from user Scorito screenshot after group stage lock.
-32,2-1,Turkey,Confirmed from user Scorito screenshot after group stage lock.
-33,1-0,Netherlands,Confirmed from user Scorito screenshot after group stage lock.
-34,2-1,Germany,Confirmed from user Scorito screenshot after group stage lock.
-35,3-0,Ecuador,Confirmed from user Scorito screenshot after group stage lock.
-42,2-1,France,Confirmed from user Scorito screenshot after group stage lock.
-43,2-1,Norway,Confirmed from user Scorito screenshot after group stage lock.
-44,1-2,Algeria,Confirmed from user Scorito screenshot after group stage lock.
-73,0-1,Canada,Locked by user for the Round of 32.
-74,2-1,Brazil,Locked by user for the Round of 32.
-75,2-1,Germany,Locked by user for the Round of 32.
-76,1-0,Netherlands,User override based on the safer match-specific score.
-77,1-2,Norway,Locked by user for the Round of 32.
-78,2-1,France,Locked by user for the Round of 32.
-79,1-1,Draw,Locked by user for the Round of 32.
-80,2-0,England,Locked by user for the Round of 32.
-81,2-1,Belgium,Locked by user for the Round of 32.
-82,1-0,United States,Locked by user for the Round of 32.
-83,1-0,Spain,Locked by user for the Round of 32.
-84,1-0,Portugal,User override based on the safer match-specific score.
-85,2-1,Switzerland,Locked by user for the Round of 32.
-86,1-1,Draw,Locked by user for the Round of 32.
-87,3-0,Argentina,Locked by user for the Round of 32.
-88,3-0,Colombia,Locked by user for the Round of 32.
+match_number,date,stage,home_team,away_team,score,predicted_winner,note
+1,,,,,2-0,Mexico,User filled this score in Scorito before group stage lock.
+2,,,,,1-1,Draw,User filled this score in Scorito before group stage lock.
+3,,,,,2-0,Canada,User filled this score in Scorito before group stage lock.
+4,,,,,1-0,United States,User filled this score in Scorito before group stage lock.
+7,,,,,0-1,Scotland,User filled this score in Scorito before group stage lock.
+28,,,,,2-1,Mexico,Confirmed from user Scorito screenshot after group stage lock.
+29,,,,,1-0,United States,Confirmed from user Scorito screenshot after group stage lock.
+30,,,,,0-1,Morocco,Confirmed from user Scorito screenshot after group stage lock.
+31,,,,,2-1,Brazil,Confirmed from user Scorito screenshot after group stage lock.
+32,,,,,2-1,Turkey,Confirmed from user Scorito screenshot after group stage lock.
+33,,,,,1-0,Netherlands,Confirmed from user Scorito screenshot after group stage lock.
+34,,,,,2-1,Germany,Confirmed from user Scorito screenshot after group stage lock.
+35,,,,,3-0,Ecuador,Confirmed from user Scorito screenshot after group stage lock.
+42,,,,,2-1,France,Confirmed from user Scorito screenshot after group stage lock.
+43,,,,,2-1,Norway,Confirmed from user Scorito screenshot after group stage lock.
+44,,,,,1-2,Algeria,Confirmed from user Scorito screenshot after group stage lock.
+73,2026-06-28,Round of 32,South Africa,Canada,0-1,Canada,locked_from_dashboard_2026-06-28T21:59:55.456Z
+74,2026-06-29,Round of 32,Brazil,Japan,2-1,Brazil,locked_from_dashboard_2026-06-28T21:59:55.456Z
+75,2026-06-29,Round of 32,Germany,Paraguay,2-1,Germany,locked_from_dashboard_2026-06-28T21:59:55.456Z
+76,2026-06-29,Round of 32,Netherlands,Morocco,1-1,Draw,locked_from_dashboard_2026-06-28T21:59:55.456Z
+77,2026-06-30,Round of 32,Ivory Coast,Norway,1-2,Norway,locked_from_dashboard_2026-06-28T21:59:55.456Z
+78,2026-06-30,Round of 32,France,Sweden,2-1,France,locked_from_dashboard_2026-06-28T21:59:55.456Z
+79,2026-06-30,Round of 32,Mexico,Ecuador,1-1,Draw,locked_from_dashboard_2026-06-28T21:59:55.456Z
+80,2026-07-01,Round of 32,England,DR Congo,2-0,England,locked_from_dashboard_2026-06-28T21:59:55.456Z
+81,2026-07-01,Round of 32,Belgium,Senegal,2-1,Belgium,locked_from_dashboard_2026-06-28T21:59:55.456Z
+82,2026-07-01,Round of 32,United States,Bosnia and Herzegovina,1-0,United States,locked_from_dashboard_2026-06-28T21:59:55.456Z
+83,2026-07-02,Round of 32,Spain,Austria,1-0,Spain,locked_from_dashboard_2026-06-28T21:59:55.456Z
+84,2026-07-02,Round of 32,Portugal,Croatia,1-1,Draw,locked_from_dashboard_2026-06-28T21:59:55.456Z
+85,2026-07-02,Round of 32,Switzerland,Algeria,2-1,Switzerland,locked_from_dashboard_2026-06-28T21:59:55.456Z
+86,2026-07-03,Round of 32,Australia,Egypt,1-1,Draw,locked_from_dashboard_2026-06-28T21:59:55.456Z
+87,2026-07-03,Round of 32,Argentina,Cape Verde,3-0,Argentina,locked_from_dashboard_2026-06-28T21:59:55.456Z
+88,2026-07-03,Round of 32,Colombia,Ghana,3-0,Colombia,locked_from_dashboard_2026-06-28T21:59:55.456Z
