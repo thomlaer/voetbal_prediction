@@ -123,6 +123,8 @@ mkdir -p "$DRAW_OUT"
   --output "$DRAW_OUT/future_predictions_xgboost_draw05.csv" \
   --template-output "data/extracted/manual_prediction_tweaks_template_cards_draw05_${LABEL}.csv" \
   --draw-multiplier 0.50 \
+  --knockout-draw-multiplier 0.95 \
+  --third-place-draw-multiplier 0.00 \
   --goal-multiplier 1.00
 
 "$PYTHON" -X utf8 predict_worldcup2026_montecarlo.py \

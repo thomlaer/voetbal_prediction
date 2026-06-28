@@ -22,6 +22,7 @@ type Prediction = {
   round_status?: string;
   score_source?: string;
   predicted_winner: string;
+  advancing_team?: string;
   confidence: string;
   safe_score: string;
   upside_score: string;
@@ -151,6 +152,7 @@ type DashboardData = {
     lineup_features_enabled?: boolean;
     stat_features_enabled?: boolean;
     card_features_enabled?: boolean;
+    known_knockout_xgboost_matches?: number;
     lineup_coverage?: {
       played_matches: number;
       complete_matches: number;
@@ -553,7 +555,12 @@ export default async function Home() {
           <div className="metric">
             <div className="metric-label">Model</div>
             <div className="metric-value">{pct(data.metadata.model_accuracy)}</div>
-            <div className="metric-note">holdout W/D/L accuracy</div>
+            <div className="metric-note">
+              holdout W/D/L accuracy
+              {data.metadata.known_knockout_xgboost_matches
+                ? ` - ${data.metadata.known_knockout_xgboost_matches} bekende KO-duels via XGBoost`
+                : ""}
+            </div>
           </div>
           <div className="metric">
             <div className="metric-label">Exact score</div>
@@ -676,7 +683,14 @@ export default async function Home() {
                             <td>
                               <span className="score">{displayScore(row)}</span>
                             </td>
-                            <td>{displayWinner(row)}</td>
+                            <td>
+                              {displayWinner(row)}
+                              {displayWinner(row) === "Draw" && row.advancing_team ? (
+                                <div className="metric-note">
+                                  Door: <strong>{row.advancing_team}</strong>
+                                </div>
+                              ) : null}
+                            </td>
                             <td>
                               {row.new_model_score ? (
                                 <span className="new-score" title="Nieuwe score uit de laatste modelrun">

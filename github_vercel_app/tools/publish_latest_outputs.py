@@ -212,6 +212,7 @@ def canonicalize_prediction_row(row: dict[str, Any]) -> dict[str, Any]:
         "filled_predicted_winner",
         "new_model_predicted_winner",
         "actual_winner",
+        "advancing_team",
         "pre_match_predicted_winner",
     ):
         if field in output:
@@ -301,7 +302,7 @@ def participant_winner(row: dict[str, Any]) -> str:
     away = canonical_team_name(row.get("away_team", ""))
     if row.get("actual_available") and row.get("actual_score"):
         winner = score_winner(row.get("actual_score"), home, away)
-        if winner:
+        if winner and winner != "Draw":
             return winner
 
     for score_field in ("filled_score", "pre_match_score", "score", "model_score"):
@@ -313,6 +314,7 @@ def participant_winner(row: dict[str, Any]) -> str:
 
     for winner_field in (
         "actual_winner",
+        "advancing_team",
         "filled_predicted_winner",
         "pre_match_predicted_winner",
         "predicted_winner",
@@ -372,6 +374,9 @@ def repair_knockout_bracket(predictions: list[dict[str, Any]]) -> list[dict[str,
 
         home_team = participant_winner(home_row)
         away_team = participant_winner(away_row)
+        if row.get("fixture_confirmed"):
+            normalize_row_winners(row)
+            continue
         if row.get("home_team") != home_team or row.get("away_team") != away_team:
             row["home_team"] = home_team
             row["away_team"] = away_team
@@ -387,6 +392,9 @@ def repair_knockout_bracket(predictions: list[dict[str, Any]]) -> list[dict[str,
 
         home_team = participant_loser(home_row)
         away_team = participant_loser(away_row)
+        if row.get("fixture_confirmed"):
+            normalize_row_winners(row)
+            continue
         if row.get("home_team") != home_team or row.get("away_team") != away_team:
             row["home_team"] = home_team
             row["away_team"] = away_team
@@ -1005,6 +1013,7 @@ def write_prediction_excel(
             "Kans gelijk",
             "Kans uit",
             "Voorspelde winnaar",
+            "Door bij gelijk",
             "Status",
             "Uitslag",
         ]
@@ -1050,6 +1059,7 @@ def write_prediction_excel(
                 "" if actual_available else row.get("prob_draw", ""),
                 "" if actual_available else row.get("prob_away_win", ""),
                 row.get("predicted_winner", ""),
+                row.get("advancing_team", "") if row.get("predicted_winner") == "Draw" else "",
                 "Vastgezet" if row.get("round_locked") else "Open",
                 row.get("actual_score", "") if actual_available else "",
             ]
@@ -1089,7 +1099,7 @@ def write_prediction_excel(
     sheet.freeze_panes = "A3"
     widths = [7, 13, 20, 9, 24, 14]
     if include_probabilities:
-        widths = [7, 13, 20, 9, 19, 19, 14, 13, 13, 13, 13, 13, 22, 13, 12]
+        widths = [7, 13, 20, 9, 19, 19, 14, 13, 13, 13, 13, 13, 22, 20, 13, 12]
     for column, width in enumerate(widths, start=1):
         sheet.column_dimensions[chr(64 + column)].width = width
     workbook.save(destination)
@@ -1357,6 +1367,9 @@ def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "home_score",
         "away_score",
         "predicted_winner",
+        "advancing_team",
+        "fixture_confirmed",
+        "probability_source",
         "confidence",
         "safe_score",
         "upside_score",
@@ -1530,6 +1543,11 @@ def main() -> None:
     ]
 
     predictions = repair_knockout_bracket(predictions)
+    known_knockout_xgboost_matches = sum(
+        1
+        for row in predictions
+        if row.get("probability_source") == "xgboost_known_fixture"
+    )
     champions = read_csv(run_dir / "scorito_champion_picks.csv")
     top_scorers = read_csv(run_dir / "scorito_topscorer_picks.csv")
     group_top_scorers = read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv")
@@ -1615,6 +1633,7 @@ def main() -> None:
             "stat_features_enabled": metrics.get("soccerbase_stat_features_enabled"),
             "card_features_enabled": metrics.get("soccerbase_card_features_enabled"),
             "lineup_coverage": lineup_coverage,
+            "known_knockout_xgboost_matches": known_knockout_xgboost_matches,
         },
         "downloads": downloads,
         "predictions": predictions,

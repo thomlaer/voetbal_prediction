@@ -134,6 +134,80 @@ def resolve_slot(
     raise ValueError(f"Onbekend label: {label}")
 
 
+def is_placeholder_slot(value: object) -> bool:
+    text = str(value or "").strip()
+    if not text or text.lower() == "nan":
+        return True
+    return bool(
+        re.fullmatch(r"(?:W|RU|L)\d+", text, flags=re.IGNORECASE)
+        or re.fullmatch(r"[123][A-L]+", text, flags=re.IGNORECASE)
+        or text.lower().startswith(("winner ", "runner-up ", "group "))
+    )
+
+
+def known_fixture_prediction(
+    fixture: pd.Series | None,
+    home: str,
+    away: str,
+    stage: str,
+) -> dict[str, float | str] | None:
+    if fixture is None:
+        return None
+    fixture_home = str(fixture.get("home_team", ""))
+    fixture_away = str(fixture.get("away_team", ""))
+    if is_placeholder_slot(fixture_home) or is_placeholder_slot(fixture_away):
+        return None
+
+    direct = (
+        normalize_name(fixture_home) == normalize_name(home)
+        and normalize_name(fixture_away) == normalize_name(away)
+    )
+    reverse = (
+        normalize_name(fixture_home) == normalize_name(away)
+        and normalize_name(fixture_away) == normalize_name(home)
+    )
+    if not direct and not reverse:
+        return None
+
+    try:
+        p_home = float(fixture.get("prob_home_win"))
+        p_draw = float(fixture.get("prob_draw"))
+        p_away = float(fixture.get("prob_away_win"))
+        home_xg = float(fixture.get("expected_home_goals"))
+        away_xg = float(fixture.get("expected_away_goals"))
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite([p_home, p_draw, p_away, home_xg, away_xg]).all():
+        return None
+    if reverse:
+        p_home, p_away = p_away, p_home
+        home_xg, away_xg = away_xg, home_xg
+
+    if "third place" in str(stage).lower():
+        p_draw = 0.0
+    total = p_home + p_draw + p_away
+    if total <= 0:
+        return None
+    p_home, p_draw, p_away = p_home / total, p_draw / total, p_away / total
+    advance_home = p_home + 0.5 * p_draw
+    advance_away = p_away + 0.5 * p_draw
+    if advance_home >= advance_away:
+        advancing_team, eliminated_team, advance_prob = home, away, advance_home
+    else:
+        advancing_team, eliminated_team, advance_prob = away, home, advance_away
+    return {
+        "predicted_winner": advancing_team,
+        "predicted_loser": eliminated_team,
+        "winner_win_prob": round(float(advance_prob), 3),
+        "prob_home_win": float(p_home),
+        "prob_draw": float(p_draw),
+        "prob_away_win": float(p_away),
+        "expected_home_goals": float(home_xg),
+        "expected_away_goals": float(away_xg),
+        "probability_source": "xgboost_known_fixture",
+    }
+
+
 def pick_winner(
     home: str, away: str, country: str, strength: dict[str, float]
 ) -> tuple[str, str, float]:
@@ -156,11 +230,18 @@ def build_bracket(
     third_order: list[tuple[str, str, dict]],
     knockout: pd.DataFrame,
     strength: dict[str, float],
+    fixture_predictions: pd.DataFrame | None = None,
 ) -> list[dict]:
     used_third_groups: set[str] = set()
     winners: dict[int, str] = {}
     losers: dict[int, str] = {}
     rows = []
+    fixtures_by_match = {}
+    if fixture_predictions is not None and "match_number" in fixture_predictions.columns:
+        fixtures_by_match = {
+            int(row["match_number"]): row
+            for _, row in fixture_predictions.dropna(subset=["match_number"]).iterrows()
+        }
 
     for row in knockout.sort_values("match_number").itertuples(index=False):
         match_number = int(row.match_number)
@@ -173,7 +254,27 @@ def build_bracket(
 
         home = resolve_slot(home_label, group_order, third_order, used_third_groups, winners, losers)
         away = resolve_slot(away_label, group_order, third_order, used_third_groups, winners, losers)
-        winner, loser, p_win = pick_winner(home, away, str(row.country), strength)
+        known_prediction = known_fixture_prediction(
+            fixtures_by_match.get(match_number),
+            home,
+            away,
+            str(row.stage),
+        )
+        if known_prediction:
+            winner = str(known_prediction["predicted_winner"])
+            loser = str(known_prediction["predicted_loser"])
+            p_win = float(known_prediction["winner_win_prob"])
+            probability_fields = known_prediction
+        else:
+            winner, loser, p_win = pick_winner(home, away, str(row.country), strength)
+            probability_fields = {
+                "prob_home_win": p_win if winner == home else 1.0 - p_win,
+                "prob_draw": 0.0,
+                "prob_away_win": p_win if winner == away else 1.0 - p_win,
+                "expected_home_goals": np.nan,
+                "expected_away_goals": np.nan,
+                "probability_source": "bracket_strength_fallback",
+            }
         winners[match_number] = winner
         losers[match_number] = loser
 
@@ -184,7 +285,10 @@ def build_bracket(
             "away_team": away,
             "predicted_winner": winner,
             "predicted_loser": loser,
+            "advancing_team": winner,
             "winner_win_prob": p_win,
+            **probability_fields,
+            "fixture_confirmed": not is_placeholder_slot(home_label) and not is_placeholder_slot(away_label),
             "city": row.city,
             "country": row.country,
         })
@@ -290,7 +394,13 @@ def main() -> None:
     print("Bracket voorspelling aanmaken...")
     group_order = determine_group_order(group_tables)
     third_order = determine_third_order(group_tables, group_order)
-    bracket = build_bracket(group_order, third_order, knockout, strength)
+    bracket = build_bracket(
+        group_order,
+        third_order,
+        knockout,
+        strength,
+        fixtures[fixtures["stage"].ne("Group Stage")].copy(),
+    )
 
     bracket_df = pd.DataFrame(bracket)
     out_bracket = args.output_dir / "worldcup2026_bracket_prediction.csv"

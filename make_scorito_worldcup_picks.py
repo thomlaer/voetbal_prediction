@@ -544,11 +544,25 @@ def load_knockout_rows(bracket_path: Path, schedule_path: Path) -> pd.DataFrame:
     if "stage_schedule" in bracket.columns:
         bracket["stage"] = bracket["stage_schedule"].fillna(bracket["stage"])
 
+    known_model = bracket.get(
+        "probability_source",
+        pd.Series("", index=bracket.index),
+    ).astype(str).eq("xgboost_known_fixture")
     p_winner = pd.to_numeric(bracket["winner_win_prob"], errors="coerce").fillna(0.55).clip(0.50, 0.95)
     home_is_winner = bracket["predicted_winner"].eq(bracket["home_team"])
-    bracket["prob_home_win"] = np.where(home_is_winner, p_winner, 1.0 - p_winner)
-    bracket["prob_away_win"] = np.where(home_is_winner, 1.0 - p_winner, p_winner)
-    bracket["prob_draw"] = 0.0
+    fallback = ~known_model
+    bracket["prob_home_win"] = pd.to_numeric(bracket.get("prob_home_win"), errors="coerce")
+    bracket["prob_draw"] = pd.to_numeric(bracket.get("prob_draw"), errors="coerce")
+    bracket["prob_away_win"] = pd.to_numeric(bracket.get("prob_away_win"), errors="coerce")
+    bracket.loc[fallback, "prob_home_win"] = np.where(home_is_winner[fallback], p_winner[fallback], 1.0 - p_winner[fallback])
+    bracket.loc[fallback, "prob_away_win"] = np.where(home_is_winner[fallback], 1.0 - p_winner[fallback], p_winner[fallback])
+    bracket.loc[fallback, "prob_draw"] = 0.0
+
+    third_place = bracket["stage"].astype(str).str.contains("third place", case=False, na=False)
+    bracket.loc[third_place, "prob_draw"] = 0.0
+    probability_total = bracket[["prob_home_win", "prob_draw", "prob_away_win"]].sum(axis=1)
+    for column in ("prob_home_win", "prob_draw", "prob_away_win"):
+        bracket[column] = bracket[column] / probability_total
 
     winner_xg = np.select(
         [p_winner >= 0.82, p_winner >= 0.68],
@@ -560,10 +574,13 @@ def load_knockout_rows(bracket_path: Path, schedule_path: Path) -> pd.DataFrame:
         [0.55, 0.75],
         default=1.02,
     )
-    bracket["expected_home_goals"] = np.where(home_is_winner, winner_xg, loser_xg)
-    bracket["expected_away_goals"] = np.where(home_is_winner, loser_xg, winner_xg)
+    bracket["expected_home_goals"] = pd.to_numeric(bracket.get("expected_home_goals"), errors="coerce")
+    bracket["expected_away_goals"] = pd.to_numeric(bracket.get("expected_away_goals"), errors="coerce")
+    bracket.loc[fallback, "expected_home_goals"] = np.where(home_is_winner[fallback], winner_xg[fallback], loser_xg[fallback])
+    bracket.loc[fallback, "expected_away_goals"] = np.where(home_is_winner[fallback], loser_xg[fallback], winner_xg[fallback])
+    bracket["advancing_team"] = bracket.get("advancing_team", bracket["predicted_winner"])
     bracket["group"] = ""
-    bracket["source"] = "predicted_bracket"
+    bracket["source"] = np.where(known_model, "xgboost_known_fixture", "predicted_bracket")
     return bracket
 
 
@@ -610,6 +627,9 @@ def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
         "expected_home_goals",
         "expected_away_goals",
         "source",
+        "advancing_team",
+        "fixture_confirmed",
+        "probability_source",
         "actual_available",
         "actual_home_score",
         "actual_away_score",
@@ -1586,6 +1606,12 @@ def write_summary(
 ) -> None:
     draws = int(pool["outcome"].eq("draw").sum())
     group_draws = int(pool[pool["stage"].eq("Group Stage")]["outcome"].eq("draw").sum())
+    known_knockout_xgboost = int(
+        pool.get("probability_source", pd.Series("", index=pool.index))
+        .astype(str)
+        .eq("xgboost_known_fixture")
+        .sum()
+    )
     top_champion = champion.iloc[0].to_dict() if not champion.empty else {}
     top_scorer = topscorers.iloc[0].to_dict() if not topscorers.empty else {}
     summary = {
@@ -1619,9 +1645,21 @@ def write_summary(
             "hybrid_with_close_second_winner_outcome_accuracy": 0.53125,
             "hybrid_with_close_second_winner_one_nil_picks": 19,
         },
+        "knockout_strategy_backtest_2018_2022": {
+            "matches": 32,
+            "no_draw_outcome_accuracy": 0.50,
+            "no_draw_exact_accuracy": 0.09375,
+            "no_draw_scorito_points": 525,
+            "controlled_draw_outcome_accuracy": 0.5625,
+            "controlled_draw_exact_accuracy": 0.09375,
+            "controlled_draw_scorito_points": 585,
+            "draw_multiplier": 0.95,
+            "third_place_draw_multiplier": 0.0,
+        },
         "matches": int(len(pool)),
         "draw_picks_total": draws,
         "draw_picks_group_stage": group_draws,
+        "known_knockout_xgboost_matches": known_knockout_xgboost,
         "recommended_champion": top_champion.get("team"),
         "recommended_champion_probability": top_champion.get("champion_prob"),
         "recommended_topscorer": top_scorer.get("player"),
@@ -1631,7 +1669,8 @@ def write_summary(
             "Safe scores maximize expected pool points under the configured point weights. "
             "Final score picks use a robust 2018+2022 hybrid layer plus a small close-second-winner "
             "mechanism to reduce excessive 1-0/0-1 and improve combined historical pool points. "
-            "Scores remain consistent with the selected winner/draw."
+            "Known knockout fixtures use XGBoost 1X2 probabilities with a conservative draw layer; "
+            "the team advancing after a draw is tracked separately."
         ),
     }
     (output_dir / "scorito_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
@@ -1649,6 +1688,9 @@ def clean_entry_sheet(pool: pd.DataFrame) -> pd.DataFrame:
         "home_score",
         "away_score",
         "predicted_winner",
+        "advancing_team",
+        "fixture_confirmed",
+        "probability_source",
         "confidence",
         "safe_score",
         "upside_score",

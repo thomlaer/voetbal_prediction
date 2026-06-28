@@ -125,31 +125,58 @@ def load_data(output_dir: Path, schedule_path: Path) -> pd.DataFrame:
     bracket = bracket.merge(
         schedule.rename(columns={"stage": "stage_en"}), on="match_number", how="left"
     )
+    advice_path = output_dir / "scorito_invuladvies.csv"
+    if advice_path.exists():
+        advice = pd.read_csv(advice_path)
+        if "advancing_team" not in advice.columns:
+            advice["advancing_team"] = ""
+        advice = advice[advice["stage"].ne("Group Stage")][
+            ["match_number", "score", "predicted_winner", "advancing_team"]
+        ].rename(
+            columns={
+                "score": "scorito_score",
+                "predicted_winner": "scorito_winner",
+                "advancing_team": "scorito_advancing_team",
+            }
+        )
+        bracket = bracket.merge(advice, on="match_number", how="left")
     bracket["stage_nl"] = bracket["stage"].map(STAGE_NL).fillna(bracket["stage"])
     bracket["groep"] = ""
-    bracket["score_model"] = bracket.apply(
+    fallback_score = bracket.apply(
         lambda r: estimate_ko_score(r["predicted_winner"], r["home_team"], r["winner_win_prob"]),
         axis=1,
     )
+    bracket["score_model"] = bracket.get("scorito_score", pd.Series(index=bracket.index)).fillna(fallback_score)
     bracket["score_sim"] = bracket["score_model"]
-    bracket["sim_winner"] = bracket["predicted_winner"]
+    bracket["sim_winner"] = bracket.get("scorito_winner", pd.Series(index=bracket.index)).fillna(
+        bracket["predicted_winner"]
+    )
     bracket["odds_h"] = None
     bracket["odds_g"] = None
     bracket["odds_u"] = None
     bracket["pct_odds_h"] = None
     bracket["pct_odds_g"] = None
     bracket["pct_odds_u"] = None
-    bracket["pct_model_h"] = bracket.apply(
-        lambda r: round(r["winner_win_prob"] * 100, 1) if r["predicted_winner"] == r["home_team"]
-        else round((1 - r["winner_win_prob"]) * 100, 1),
+    fallback_home = bracket.apply(
+        lambda r: r["winner_win_prob"] if r["predicted_winner"] == r["home_team"] else 1 - r["winner_win_prob"],
         axis=1,
     )
-    bracket["pct_model_g"] = None
-    bracket["pct_model_u"] = bracket.apply(
-        lambda r: round(r["winner_win_prob"] * 100, 1) if r["predicted_winner"] == r["away_team"]
-        else round((1 - r["winner_win_prob"]) * 100, 1),
-        axis=1,
+    fallback_away = 1.0 - fallback_home
+    home_prob = pd.to_numeric(
+        bracket["prob_home_win"] if "prob_home_win" in bracket else pd.Series(index=bracket.index),
+        errors="coerce",
     )
+    draw_prob = pd.to_numeric(
+        bracket["prob_draw"] if "prob_draw" in bracket else pd.Series(index=bracket.index),
+        errors="coerce",
+    )
+    away_prob = pd.to_numeric(
+        bracket["prob_away_win"] if "prob_away_win" in bracket else pd.Series(index=bracket.index),
+        errors="coerce",
+    )
+    bracket["pct_model_h"] = (home_prob.fillna(fallback_home) * 100).round(1)
+    bracket["pct_model_g"] = (draw_prob.fillna(0.0) * 100).round(1)
+    bracket["pct_model_u"] = (away_prob.fillna(fallback_away) * 100).round(1)
 
     ko_rows = bracket[[
         "match_number", "date", "stage_nl", "groep",

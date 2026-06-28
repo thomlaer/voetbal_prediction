@@ -23,6 +23,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=Path("outputs_worldcup2026_default/future_predictions_xgboost_tweaked.csv"))
     parser.add_argument("--template-output", type=Path, default=Path("data/extracted/manual_prediction_tweaks_template.csv"))
     parser.add_argument("--draw-multiplier", type=float, default=1.10)
+    parser.add_argument("--knockout-draw-multiplier", type=float, default=0.95)
+    parser.add_argument("--third-place-draw-multiplier", type=float, default=0.0)
     parser.add_argument("--goal-multiplier", type=float, default=1.00)
     parser.add_argument("--score-max-goals", type=int, default=8)
     return parser.parse_args()
@@ -92,7 +94,13 @@ def main() -> None:
     predictions = apply_manual_tweaks(predictions, args.manual_tweaks)
 
     probs = predictions[PROB_COLUMNS].to_numpy(dtype=float)
-    probs[:, tw.OUTCOME_TO_ID["draw"]] *= args.draw_multiplier
+    stage = predictions.get("stage", pd.Series("", index=predictions.index)).astype(str).str.lower()
+    knockout_mask = stage.ne("") & ~stage.str.contains("group")
+    third_place_mask = stage.str.contains("third place|troost", regex=True)
+    draw_multipliers = np.full(len(predictions), args.draw_multiplier, dtype=float)
+    draw_multipliers[knockout_mask.to_numpy()] = args.knockout_draw_multiplier
+    draw_multipliers[third_place_mask.to_numpy()] = args.third_place_draw_multiplier
+    probs[:, tw.OUTCOME_TO_ID["draw"]] *= draw_multipliers
 
     mult_cols = {
         "prob_away_win": "away_prob_mult",
@@ -164,7 +172,7 @@ def main() -> None:
             )
         ]
 
-    output["tweak_draw_multiplier"] = args.draw_multiplier
+    output["tweak_draw_multiplier"] = draw_multipliers
     output["tweak_goal_multiplier"] = args.goal_multiplier
     args.output.parent.mkdir(parents=True, exist_ok=True)
     output.to_csv(args.output, index=False)
