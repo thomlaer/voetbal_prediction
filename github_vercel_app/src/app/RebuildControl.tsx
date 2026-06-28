@@ -14,6 +14,7 @@ export type LockStage = {
   rows: number;
   lockedRows: number;
   playedRows: number;
+  fixtureConfirmed: boolean;
 };
 
 type RebuildControlProps = {
@@ -39,6 +40,8 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
     kind: "idle",
     message: "Alleen gebruiken als je per ongeluk een ronde hebt vastgezet.",
   });
+  const selectedLockStage = lockStages.find((stage) => stage.stage === lockStage);
+  const canLockSelectedStage = Boolean(selectedLockStage?.fixtureConfirmed);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -223,7 +226,8 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
             <select onChange={(event) => setLockStage(event.target.value)} value={lockStage}>
               {lockStages.map((stage) => (
                 <option key={stage.stage} value={stage.stage}>
-                  {stage.label} ({stage.rows - stage.playedRows} nog te spelen, {stage.lockedRows} vast)
+                  {stage.label} ({stage.rows - stage.playedRows} nog te spelen, {stage.lockedRows} vast
+                  {stage.fixtureConfirmed ? "" : ", voorlopig"})
                 </option>
               ))}
             </select>
@@ -243,7 +247,7 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
 
           <button
             className="primary-button"
-            disabled={lockStatus.kind === "loading" || !lockCode.trim() || !lockStage}
+            disabled={lockStatus.kind === "loading" || !lockCode.trim() || !lockStage || !canLockSelectedStage}
             type="submit"
           >
             {lockStatus.kind === "loading" ? "Bezig..." : "Zet ronde vast"}

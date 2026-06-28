@@ -23,6 +23,8 @@ type Prediction = {
   score_source?: string;
   predicted_winner: string;
   advancing_team?: string;
+  fixture_confirmed?: boolean | number | string;
+  probability_source?: string;
   confidence: string;
   safe_score: string;
   upside_score: string;
@@ -301,6 +303,15 @@ function isRoundManuallyLocked(rows: Prediction[]) {
   return rows.length > 0 && rows.every((row) => row.round_locked);
 }
 
+function isFixtureConfirmed(row: Prediction) {
+  if (row.stage === "Group Stage") return true;
+  return row.fixture_confirmed === true || Number(row.fixture_confirmed) === 1;
+}
+
+function isStageFixtureConfirmed(rows: Prediction[]) {
+  return rows.length > 0 && rows.every(isFixtureConfirmed);
+}
+
 function isStageClosed(rows: Prediction[]) {
   return isRoundManuallyLocked(rows);
 }
@@ -320,6 +331,7 @@ function stageShouldOpen(stage: string, currentFillStage: string) {
 function stageStatus(stage: string, rows: Prediction[], currentFillStage: string) {
   if (rows.length && rows.every(isPlayed)) return { label: "Gespeeld", className: "green" };
   if (isStageClosed(rows)) return { label: "Vergrendeld", className: "orange" };
+  if (!isStageFixtureConfirmed(rows)) return { label: "Voorlopig", className: "" };
   if (stage === currentFillStage) return { label: "Nu invullen", className: "green" };
   return { label: "Later", className: "" };
 }
@@ -362,6 +374,9 @@ function hasOutcomeProbabilities(row: Prediction) {
 }
 
 function probabilityLine(row: Prediction) {
+  if (!isFixtureConfirmed(row)) {
+    return `Voorlopig door: thuis ${pct(row.prob_home_win)} · uit ${pct(row.prob_away_win)}`;
+  }
   return `Thuis ${pct(row.prob_home_win)} · Gelijk ${pct(row.prob_draw)} · Uit ${pct(row.prob_away_win)}`;
 }
 
@@ -506,6 +521,7 @@ export default async function Home() {
     rows: rows.length,
     lockedRows: rows.filter((row) => row.round_locked).length,
     playedRows: rows.filter(isPlayed).length,
+    fixtureConfirmed: isStageFixtureConfirmed(rows),
   }));
   const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
   const actionableChanges = data.changes.filter((row) => {

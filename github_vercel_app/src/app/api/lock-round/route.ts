@@ -32,6 +32,7 @@ type Prediction = {
   filled_predicted_winner?: string;
   actual_available?: boolean;
   actual_score?: string;
+  fixture_confirmed?: boolean | number | string;
 };
 
 type LockRow = {
@@ -226,6 +227,15 @@ export async function POST(request: Request) {
   const stageMatchNumbers = new Set(
     stageRows.map((row) => String(row.match_number || "").trim()).filter(Boolean),
   );
+  const fixturesConfirmed =
+    stage === "Group Stage" ||
+    stageRows.every((row) => row.fixture_confirmed === true || Number(row.fixture_confirmed) === 1);
+  if (action === "lock" && !fixturesConfirmed) {
+    return NextResponse.json(
+      { ok: false, message: "Deze ronde is nog voorlopig; wacht tot de wedstrijden officieel bekend zijn." },
+      { status: 400 },
+    );
+  }
 
   try {
     const remote = await loadRemoteLocks(repository, token, ref);
