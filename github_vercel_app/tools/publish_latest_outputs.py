@@ -739,24 +739,34 @@ def attach_actual_results(
         output["round_status"] = "locked" if locked else "open"
         output["score_source"] = "current_run"
 
-        if locked and previous:
-            filled_score = (
-                previous.get("filled_score")
-                or previous.get("pre_match_score")
-                or previous.get("score")
-                or model_score
-            )
-            filled_winner = (
-                previous.get("filled_predicted_winner")
-                or previous.get("pre_match_predicted_winner")
-                or previous.get("predicted_winner")
-                or model_winner
-            )
+        if locked:
+            explicit_override = locked_score or prematch_score
+            if explicit_override:
+                filled_score = explicit_override.get("score") or model_score
+                filled_winner = canonical_winner(
+                    explicit_override.get("predicted_winner")
+                    or score_winner(filled_score, output["home_team"], output["away_team"]),
+                    output["home_team"],
+                    output["away_team"],
+                )
+            else:
+                filled_score = (
+                    previous.get("filled_score")
+                    or previous.get("pre_match_score")
+                    or previous.get("score")
+                    or model_score
+                )
+                filled_winner = (
+                    previous.get("filled_predicted_winner")
+                    or previous.get("pre_match_predicted_winner")
+                    or previous.get("predicted_winner")
+                    or model_winner
+                )
             output["filled_score"] = filled_score
             output["filled_predicted_winner"] = filled_winner
             output["score"] = filled_score
             output["predicted_winner"] = filled_winner
-            output["score_source"] = previous.get("score_source") or "previous_dashboard"
+            output["score_source"] = "locked_score" if locked_score else "prematch_score" if prematch_score else previous.get("score_source") or "previous_dashboard"
             if str(model_score) != str(filled_score):
                 output["new_model_score"] = model_score
             if str(model_winner) != str(filled_winner):
