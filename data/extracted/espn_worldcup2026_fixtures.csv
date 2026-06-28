@@ -77,16 +77,16 @@ espn,760489,75,2026-06-29,2026-06-29T20:30Z,Round of 32,Germany,Paraguay,,,False
 espn,760488,76,2026-06-30,2026-06-30T01:00Z,Round of 32,Netherlands,Morocco,,,False,False,Netherlands,Morocco,Morocco at Netherlands,NED,MAR
 espn,760490,77,2026-06-30,2026-06-30T17:00Z,Round of 32,Ivory Coast,Norway,,,False,False,Ivory Coast,Norway,Norway at Ivory Coast,CIV,NOR
 espn,760492,78,2026-06-30,2026-06-30T21:00Z,Round of 32,France,Sweden,,,False,False,France,Sweden,Sweden at France,FRA,SWE
-espn,760491,79,2026-07-01,2026-07-01T01:00Z,Round of 32,Mexico,3CEFHI,,3CEFHI,False,True,Mexico,Third Place Group C/E/F/H/I,Third Place Group C/E/F/H/I at Mexico,MEX,3RD
-espn,760495,80,2026-07-01,2026-07-01T16:00Z,Round of 32,1L,3EHIJK,1L,3EHIJK,True,True,Group L Winner,Third Place Group E/H/I/J/K,Third Place Group E/H/I/J/K at Group L Winner,1L,3RD
-espn,760493,81,2026-07-01,2026-07-01T20:00Z,Round of 32,Belgium,3AEHIJ,,3AEHIJ,False,True,Belgium,Third Place Group A/E/H/I/J,Third Place Group A/E/H/I/J at Belgium,BEL,3RD
+espn,760491,79,2026-07-01,2026-07-01T01:00Z,Round of 32,Mexico,Ecuador,,,False,False,Mexico,Ecuador,Ecuador at Mexico,MEX,ECU
+espn,760495,80,2026-07-01,2026-07-01T16:00Z,Round of 32,England,DR Congo,,,False,False,England,Congo DR,Congo DR at England,ENG,COD
+espn,760493,81,2026-07-01,2026-07-01T20:00Z,Round of 32,Belgium,Senegal,,,False,False,Belgium,Senegal,Senegal at Belgium,BEL,SEN
 espn,760494,82,2026-07-02,2026-07-02T00:00Z,Round of 32,United States,Bosnia and Herzegovina,,,False,False,United States,Bosnia-Herzegovina,Bosnia-Herzegovina at United States,USA,BIH
-espn,760497,83,2026-07-02,2026-07-02T19:00Z,Round of 32,Spain,2J,,2J,False,True,Spain,Group J 2nd Place,Group J 2nd Place at Spain,ESP,2J
-espn,760496,84,2026-07-02,2026-07-02T23:00Z,Round of 32,2K,2L,2K,2L,True,True,Group K 2nd Place,Group L 2nd Place,Group L 2nd Place at Group K 2nd Place,2K,2L
-espn,760498,85,2026-07-03,2026-07-03T03:00Z,Round of 32,Switzerland,3EFGIJ,,3EFGIJ,False,True,Switzerland,Third Place Group E/F/G/I/J,Third Place Group E/F/G/I/J at Switzerland,SUI,3RD
+espn,760497,83,2026-07-02,2026-07-02T19:00Z,Round of 32,Spain,Austria,,,False,False,Spain,Austria,Austria at Spain,ESP,AUT
+espn,760496,84,2026-07-02,2026-07-02T23:00Z,Round of 32,Portugal,Croatia,,,False,False,Portugal,Croatia,Croatia at Portugal,POR,CRO
+espn,760498,85,2026-07-03,2026-07-03T03:00Z,Round of 32,Switzerland,Algeria,,,False,False,Switzerland,Algeria,Algeria at Switzerland,SUI,ALG
 espn,760499,86,2026-07-03,2026-07-03T18:00Z,Round of 32,Australia,Egypt,,,False,False,Australia,Egypt,Egypt at Australia,AUS,EGY
 espn,760500,87,2026-07-03,2026-07-03T22:00Z,Round of 32,Argentina,Cape Verde,,,False,False,Argentina,Cape Verde,Cape Verde at Argentina,ARG,CPV
-espn,760501,88,2026-07-04,2026-07-04T01:30Z,Round of 32,1K,3DEIJL,1K,3DEIJL,True,True,Group K Winner,Third Place Group D/E/I/J/L,Third Place Group D/E/I/J/L at Group K Winner,1K,3RD
+espn,760501,88,2026-07-04,2026-07-04T01:30Z,Round of 32,Colombia,Ghana,,,False,False,Colombia,Ghana,Ghana at Colombia,COL,GHA
 espn,760502,89,2026-07-04,2026-07-04T17:00Z,Round of 16,W73,W75,W73,W75,True,True,Round of 32 1 Winner,Round of 32 3 Winner,Round of 32 3 Winner at Round of 32 1 Winner,RD32,RD32
 espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,W74,W77,W74,W77,True,True,Round of 32 2 Winner,Round of 32 5 Winner,Round of 32 5 Winner at Round of 32 2 Winner,RD32,RD32
 espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,W76,W78,W76,W78,True,True,Round of 32 4 Winner,Round of 32 6 Winner,Round of 32 6 Winner at Round of 32 4 Winner,RD32,RD32
