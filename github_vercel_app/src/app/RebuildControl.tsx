@@ -17,15 +17,43 @@ export type LockStage = {
   fixtureConfirmed: boolean;
 };
 
+export type EditableMatch = {
+  matchNumber: string;
+  label: string;
+  score: string;
+};
+
 type RebuildControlProps = {
   lockStages?: LockStage[];
   defaultLockStage?: string;
+  editableMatches?: EditableMatch[];
 };
 
-export function RebuildControl({ lockStages = [], defaultLockStage = "" }: RebuildControlProps) {
+function scoreParts(score: string) {
+  const match = String(score || "").match(/^(\d+)-(\d+)$/);
+  return match ? [match[1], match[2]] : ["", ""];
+}
+
+function validGoalInput(value: string) {
+  if (!/^\d{1,2}$/.test(value)) return false;
+  const goals = Number(value);
+  return Number.isInteger(goals) && goals >= 0 && goals <= 20;
+}
+
+export function RebuildControl({
+  lockStages = [],
+  defaultLockStage = "",
+  editableMatches = [],
+}: RebuildControlProps) {
+  const initialEditableMatch = editableMatches[0];
+  const [initialHomeScore, initialAwayScore] = scoreParts(initialEditableMatch?.score || "");
   const [code, setCode] = useState("");
   const [lockCode, setLockCode] = useState("");
+  const [scoreCode, setScoreCode] = useState("");
   const [lockStage, setLockStage] = useState(defaultLockStage || lockStages[0]?.stage || "");
+  const [scoreMatchNumber, setScoreMatchNumber] = useState(initialEditableMatch?.matchNumber || "");
+  const [homeScore, setHomeScore] = useState(initialHomeScore);
+  const [awayScore, setAwayScore] = useState(initialAwayScore);
   const [updateSoccerbase, setUpdateSoccerbase] = useState(true);
   const [deployToVercel, setDeployToVercel] = useState(true);
   const [status, setStatus] = useState<Status>({
@@ -40,8 +68,23 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
     kind: "idle",
     message: "Alleen gebruiken als je per ongeluk een ronde hebt vastgezet.",
   });
+  const [scoreStatus, setScoreStatus] = useState<Status>({
+    kind: "idle",
+    message: editableMatches.length
+      ? "Wijzigt één ingevulde score, zet die wedstrijd vast en start daarna een rebuild."
+      : "Er zijn nu geen bevestigde, nog te spelen wedstrijden om aan te passen.",
+  });
   const selectedLockStage = lockStages.find((stage) => stage.stage === lockStage);
   const canLockSelectedStage = Boolean(selectedLockStage?.fixtureConfirmed);
+  const hasValidManualScore = validGoalInput(homeScore) && validGoalInput(awayScore);
+
+  function selectScoreMatch(matchNumber: string) {
+    setScoreMatchNumber(matchNumber);
+    const selected = editableMatches.find((match) => match.matchNumber === matchNumber);
+    const [nextHomeScore, nextAwayScore] = scoreParts(selected?.score || "");
+    setHomeScore(nextHomeScore);
+    setAwayScore(nextAwayScore);
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -164,6 +207,46 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
       setLockCode("");
     } catch {
       setUnlockStatus({ kind: "error", message: "Geen verbinding met de lock-route." });
+    }
+  }
+
+  async function updateScore(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setScoreStatus({ kind: "loading", message: "Score opslaan en rebuild starten..." });
+
+    try {
+      const response = await fetch("/api/lock-round", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update-score",
+          code: scoreCode,
+          matchNumber: scoreMatchNumber,
+          homeScore,
+          awayScore,
+          updateSoccerbase: false,
+          deployToVercel: true,
+        }),
+      });
+      const data = (await response.json()) as {
+        ok?: boolean;
+        message?: string;
+        actionsUrl?: string;
+      };
+
+      if (!response.ok || !data.ok) {
+        setScoreStatus({ kind: "error", message: data.message || "Score wijzigen is mislukt." });
+        return;
+      }
+
+      setScoreStatus({
+        kind: "success",
+        message: data.message || "Score gewijzigd.",
+        actionsUrl: data.actionsUrl,
+      });
+      setScoreCode("");
+    } catch {
+      setScoreStatus({ kind: "error", message: "Geen verbinding met de score-route." });
     }
   }
 
@@ -295,6 +378,90 @@ export function RebuildControl({ lockStages = [], defaultLockStage = "" }: Rebui
             <>
               {" "}
               <a href={unlockStatus.actionsUrl} rel="noreferrer" target="_blank">
+                Bekijk GitHub Actions
+              </a>
+            </>
+          ) : null}
+        </div>
+      </form>
+
+      <form className="control-panel" data-testid="manual-score-form" onSubmit={updateScore}>
+        <div className="control-grid manual-score-grid">
+          <label className="control-field">
+            <span>Handmatige score wijzigen</span>
+            <select
+              disabled={!editableMatches.length}
+              onChange={(event) => selectScoreMatch(event.target.value)}
+              value={scoreMatchNumber}
+            >
+              {editableMatches.map((match) => (
+                <option key={match.matchNumber} value={match.matchNumber}>
+                  {match.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="score-inputs" aria-label="Nieuwe score">
+            <label className="control-field">
+              <span>Thuis</span>
+              <input
+                inputMode="numeric"
+                max="20"
+                min="0"
+                onChange={(event) => setHomeScore(event.target.value)}
+                type="number"
+                value={homeScore}
+              />
+            </label>
+            <span aria-hidden="true">-</span>
+            <label className="control-field">
+              <span>Uit</span>
+              <input
+                inputMode="numeric"
+                max="20"
+                min="0"
+                onChange={(event) => setAwayScore(event.target.value)}
+                type="number"
+                value={awayScore}
+              />
+            </label>
+          </div>
+
+          <label className="control-field">
+            <span>Code</span>
+            <input
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              onChange={(event) => setScoreCode(event.target.value)}
+              placeholder="Update-code"
+              type="password"
+              value={scoreCode}
+            />
+          </label>
+
+          <button
+            className="primary-button"
+            disabled={
+              scoreStatus.kind === "loading" ||
+              !scoreCode.trim() ||
+              !scoreMatchNumber ||
+              !hasValidManualScore
+            }
+            type="submit"
+          >
+            {scoreStatus.kind === "loading" ? "Bezig..." : "Score opslaan"}
+          </button>
+        </div>
+
+        <div
+          className={`status-line ${scoreStatus.kind === "error" ? "red" : scoreStatus.kind === "success" ? "green" : ""}`}
+        >
+          {scoreStatus.message}
+          {scoreStatus.actionsUrl ? (
+            <>
+              {" "}
+              <a href={scoreStatus.actionsUrl} rel="noreferrer" target="_blank">
                 Bekijk GitHub Actions
               </a>
             </>

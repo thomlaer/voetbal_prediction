@@ -208,6 +208,32 @@ def known_fixture_prediction(
     }
 
 
+def actual_fixture_prediction(
+    fixture: pd.Series | None,
+    home: str,
+    away: str,
+) -> dict[str, float | str] | None:
+    if fixture is None or not bool(fixture.get("actual_available", False)):
+        return None
+    advancing_team = str(fixture.get("actual_advancing_team", "") or "").strip()
+    if normalize_name(advancing_team) not in {normalize_name(home), normalize_name(away)}:
+        return None
+    advancing_team = home if normalize_name(advancing_team) == normalize_name(home) else away
+    eliminated_team = away if advancing_team == home else home
+    outcome = str(fixture.get("actual_outcome", "") or "")
+    return {
+        "predicted_winner": advancing_team,
+        "predicted_loser": eliminated_team,
+        "winner_win_prob": 1.0,
+        "prob_home_win": 1.0 if outcome == "home_win" else 0.0,
+        "prob_draw": 1.0 if outcome == "draw" else 0.0,
+        "prob_away_win": 1.0 if outcome == "away_win" else 0.0,
+        "expected_home_goals": float(fixture.get("actual_home_score", 0.0)),
+        "expected_away_goals": float(fixture.get("actual_away_score", 0.0)),
+        "probability_source": "actual_result",
+    }
+
+
 def pick_winner(
     home: str, away: str, country: str, strength: dict[str, float]
 ) -> tuple[str, str, float]:
@@ -254,17 +280,21 @@ def build_bracket(
 
         home = resolve_slot(home_label, group_order, third_order, used_third_groups, winners, losers)
         away = resolve_slot(away_label, group_order, third_order, used_third_groups, winners, losers)
+        fixture_prediction = fixtures_by_match.get(match_number)
+        actual_prediction = actual_fixture_prediction(fixture_prediction, home, away)
         known_prediction = known_fixture_prediction(
-            fixtures_by_match.get(match_number),
+            fixture_prediction,
             home,
             away,
             str(row.stage),
         )
-        if known_prediction:
-            winner = str(known_prediction["predicted_winner"])
-            loser = str(known_prediction["predicted_loser"])
-            p_win = float(known_prediction["winner_win_prob"])
-            probability_fields = known_prediction
+        if actual_prediction or known_prediction:
+            resolved_prediction = actual_prediction or known_prediction
+            assert resolved_prediction is not None
+            winner = str(resolved_prediction["predicted_winner"])
+            loser = str(resolved_prediction["predicted_loser"])
+            p_win = float(resolved_prediction["winner_win_prob"])
+            probability_fields = resolved_prediction
         else:
             winner, loser, p_win = pick_winner(home, away, str(row.country), strength)
             probability_fields = {

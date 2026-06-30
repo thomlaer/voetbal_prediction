@@ -22,6 +22,7 @@ APP_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_ROOT = APP_ROOT.parent
 DEFAULT_CARDS_PATH = DEFAULT_MODEL_ROOT / "data" / "extracted" / "soccerbase_cards_events.csv"
 DEFAULT_ESPN_RESULTS_PATH = DEFAULT_MODEL_ROOT / "data" / "extracted" / "espn_worldcup2026_results.csv"
+DEFAULT_SHOOTOUTS_PATH = DEFAULT_MODEL_ROOT / "data" / "shootouts.csv"
 STAGE_ORDER = [
     "Group Stage",
     "Round of 32",
@@ -212,6 +213,7 @@ def canonicalize_prediction_row(row: dict[str, Any]) -> dict[str, Any]:
         "filled_predicted_winner",
         "new_model_predicted_winner",
         "actual_winner",
+        "actual_advancing_team",
         "advancing_team",
         "pre_match_predicted_winner",
     ):
@@ -275,9 +277,9 @@ def is_placeholder_team(value: Any) -> bool:
 
 
 KNOCKOUT_WINNER_LINKS = {
-    89: (73, 75),
-    90: (74, 77),
-    91: (76, 78),
+    89: (73, 76),
+    90: (75, 77),
+    91: (74, 78),
     92: (79, 80),
     93: (83, 84),
     94: (81, 82),
@@ -300,6 +302,10 @@ KNOCKOUT_LOSER_LINKS = {
 def participant_winner(row: dict[str, Any]) -> str:
     home = canonical_team_name(row.get("home_team", ""))
     away = canonical_team_name(row.get("away_team", ""))
+    if row.get("actual_available"):
+        advancing_team = canonical_winner(row.get("actual_advancing_team", ""), home, away)
+        if normalize_key(advancing_team) in {normalize_key(home), normalize_key(away)}:
+            return advancing_team
     if row.get("actual_available") and row.get("actual_score"):
         winner = score_winner(row.get("actual_score"), home, away)
         if winner and winner != "Draw":
@@ -623,6 +629,20 @@ def load_espn_actuals(results_path: Path = DEFAULT_ESPN_RESULTS_PATH) -> dict[tu
     return actuals
 
 
+def load_shootout_winners(path: Path = DEFAULT_SHOOTOUTS_PATH) -> dict[tuple[str, str, str], str]:
+    winners: dict[tuple[str, str, str], str] = {}
+    for row in read_csv(path):
+        date = normalize_date_text(row.get("date", ""))
+        home = normalize_key(row.get("home_team", ""))
+        away = normalize_key(row.get("away_team", ""))
+        winner = canonical_team_name(row.get("winner", ""))
+        if not date or not home or not away or not winner:
+            continue
+        winners[(date, home, away)] = winner
+        winners[(date, away, home)] = winner
+    return winners
+
+
 def prediction_key(row: dict[str, Any]) -> tuple[str, str, str]:
     return (
         str(row.get("match_number", "")),
@@ -697,6 +717,18 @@ def attach_actual_results(
     actuals = load_soccerbase_actuals(soccerbase_stats_path)
     actuals.update(load_worldcup_actuals(results_path))
     actuals.update(load_espn_actuals())
+    shootout_winners = load_shootout_winners(results_path.with_name("shootouts.csv"))
+    # ESPN stores the same result under its reported date and the previous date
+    # to absorb timezone differences. Those aliases can point at the same dict,
+    # so create a row-specific copy before attaching a shootout winner. Otherwise
+    # the fallback date can overwrite the real winner on the canonical date.
+    for key, actual in list(actuals.items()):
+        actual_with_advancer = dict(actual)
+        actual_with_advancer["actual_advancing_team"] = (
+            shootout_winners.get(key)
+            or (actual.get("actual_winner", "") if actual.get("actual_winner") != "Draw" else "")
+        )
+        actuals[key] = actual_with_advancer
     previous_rows = previous_dashboard.get("predictions", [])
     previous_by_key = {
         prediction_key(row): row
@@ -1022,6 +1054,8 @@ def write_prediction_excel(
             "Kans thuis",
             "Kans gelijk",
             "Kans uit",
+            "xG thuis",
+            "xG uit",
             "Voorspelde winnaar",
             "Door bij gelijk",
             "Status",
@@ -1068,6 +1102,8 @@ def write_prediction_excel(
                 "" if actual_available else row.get("prob_home_win", ""),
                 "" if actual_available else row.get("prob_draw", ""),
                 "" if actual_available else row.get("prob_away_win", ""),
+                "" if actual_available else row.get("expected_home_goals", ""),
+                "" if actual_available else row.get("expected_away_goals", ""),
                 row.get("predicted_winner", ""),
                 row.get("advancing_team", "") if row.get("predicted_winner") == "Draw" else "",
                 "Vastgezet" if row.get("round_locked") else "Open",
@@ -1109,7 +1145,7 @@ def write_prediction_excel(
     sheet.freeze_panes = "A3"
     widths = [7, 13, 20, 9, 24, 14]
     if include_probabilities:
-        widths = [7, 13, 20, 9, 19, 19, 14, 13, 13, 13, 13, 13, 22, 20, 13, 12]
+        widths = [7, 13, 20, 9, 19, 19, 14, 13, 13, 13, 13, 13, 11, 11, 22, 20, 13, 12]
     for column, width in enumerate(widths, start=1):
         sheet.column_dimensions[chr(64 + column)].width = width
     workbook.save(destination)
@@ -1397,12 +1433,15 @@ def compact_predictions(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "prob_home_win",
         "prob_draw",
         "prob_away_win",
+        "expected_home_goals",
+        "expected_away_goals",
         "actual_available",
         "actual_home_score",
         "actual_away_score",
         "actual_score",
         "actual_outcome",
         "actual_winner",
+        "actual_advancing_team",
         "actual_source",
         "pre_match_score",
         "pre_match_predicted_winner",

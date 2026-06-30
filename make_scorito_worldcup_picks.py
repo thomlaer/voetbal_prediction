@@ -636,6 +636,7 @@ def build_pool_predictions(args: argparse.Namespace) -> pd.DataFrame:
         "actual_score",
         "actual_outcome",
         "actual_winner",
+        "actual_advancing_team",
     ]
     for col in base_cols:
         if col not in group.columns:
@@ -1699,12 +1700,15 @@ def clean_entry_sheet(pool: pd.DataFrame) -> pd.DataFrame:
         "prob_home_win",
         "prob_draw",
         "prob_away_win",
+        "expected_home_goals",
+        "expected_away_goals",
         "actual_available",
         "actual_home_score",
         "actual_away_score",
         "actual_score",
         "actual_outcome",
         "actual_winner",
+        "actual_advancing_team",
     ]
     return pool[[col for col in columns if col in pool.columns]].copy()
 

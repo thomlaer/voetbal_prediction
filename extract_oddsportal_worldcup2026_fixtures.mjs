@@ -770,6 +770,20 @@ function hydrateFixturesWithEspn(fixtures, espnFixtures) {
       }
     } else {
       hydrated.fixture_hydrated_from = "espn_partial";
+      if (espnHomePlaceholder && espn.home_slot) {
+        hydrated.home_team = espn.home_slot;
+        hydrated.home_is_placeholder = "True";
+      } else if (!espnHomePlaceholder && espn.home_team) {
+        hydrated.home_team = espn.home_team;
+        hydrated.home_is_placeholder = "False";
+      }
+      if (espnAwayPlaceholder && espn.away_slot) {
+        hydrated.away_team = espn.away_slot;
+        hydrated.away_is_placeholder = "True";
+      } else if (!espnAwayPlaceholder && espn.away_team) {
+        hydrated.away_team = espn.away_team;
+        hydrated.away_is_placeholder = "False";
+      }
     }
     return hydrated;
   });

@@ -25,6 +25,7 @@ DEFAULT_SCHEDULE = Path("data/extracted/oddsportal_worldcup2026_fixture_odds_sch
 DEFAULT_MODEL_PREDICTIONS = Path("outputs_worldcup2026_default/future_predictions_xgboost.csv")
 DEFAULT_RANKINGS = Path("fifa_ranking-2026-04-01.csv")
 DEFAULT_RESULTS = Path("data/results.csv")
+DEFAULT_SHOOTOUTS = Path("data/shootouts.csv")
 DEFAULT_CARDS = Path("data/extracted/soccerbase_cards_events.csv")
 DEFAULT_ESPN_RESULTS = Path("data/extracted/espn_worldcup2026_results.csv")
 DEFAULT_OUTPUT_DIR = Path("outputs_worldcup2026_default")
@@ -156,16 +157,41 @@ def load_espn_actual_results(path: Path) -> dict[tuple[str, str, str], dict[str,
     return lookup
 
 
-def apply_actual_results(fixtures: pd.DataFrame, results_path: Path, espn_results_path: Path) -> pd.DataFrame:
+def load_shootout_winners(path: Path) -> dict[tuple[str, str, str], str]:
+    if not path.exists():
+        return {}
+    shootouts = pd.read_csv(path)
+    required = {"date", "home_team", "away_team", "winner"}
+    if not required.issubset(shootouts.columns):
+        return {}
+    shootouts["date"] = pd.to_datetime(shootouts["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    shootouts = shootouts.dropna(subset=["date", "home_team", "away_team", "winner"])
+
+    lookup: dict[tuple[str, str, str], str] = {}
+    for row in shootouts.itertuples(index=False):
+        date_key = str(row.date)
+        winner = str(row.winner)
+        lookup[(date_key, normalize_name(row.home_team), normalize_name(row.away_team))] = winner
+        lookup[(date_key, normalize_name(row.away_team), normalize_name(row.home_team))] = winner
+    return lookup
+
+
+def apply_actual_results(
+    fixtures: pd.DataFrame,
+    results_path: Path,
+    espn_results_path: Path,
+    shootouts_path: Path = DEFAULT_SHOOTOUTS,
+) -> pd.DataFrame:
     fixtures = fixtures.copy()
     fixtures["actual_available"] = False
     fixtures["actual_home_score"] = np.nan
     fixtures["actual_away_score"] = np.nan
-    for column in ["actual_score", "actual_outcome", "actual_winner"]:
+    for column in ["actual_score", "actual_outcome", "actual_winner", "actual_advancing_team"]:
         fixtures[column] = pd.Series([""] * len(fixtures), index=fixtures.index, dtype="object")
 
     lookup = load_actual_results(results_path)
     lookup.update(load_espn_actual_results(espn_results_path))
+    shootout_winners = load_shootout_winners(shootouts_path)
     if not lookup:
         return fixtures
 
@@ -181,6 +207,11 @@ def apply_actual_results(fixtures: pd.DataFrame, results_path: Path, espn_result
         actual = lookup.get(key)
         if not actual:
             continue
+        actual = dict(actual)
+        actual["actual_advancing_team"] = (
+            shootout_winners.get(key)
+            or (actual["actual_winner"] if actual["actual_winner"] != "Draw" else "")
+        )
         for column, value in actual.items():
             fixtures.at[idx, column] = value
         fixtures.at[idx, "expected_home_goals"] = actual["actual_home_score"]
@@ -226,6 +257,7 @@ def merge_schedule_predictions(
     odds_weight: float,
     results_path: Path,
     espn_results_path: Path = DEFAULT_ESPN_RESULTS,
+    shootouts_path: Path = DEFAULT_SHOOTOUTS,
 ) -> pd.DataFrame:
     schedule = pd.read_csv(schedule_path)
     predictions = pd.read_csv(predictions_path)
@@ -266,7 +298,7 @@ def merge_schedule_predictions(
 
     sim_probs = merged[["sim_prob_away_win", "sim_prob_draw", "sim_prob_home_win"]].to_numpy()
     merged["sim_predicted_outcome"] = OUTCOMES[sim_probs.argmax(axis=1)]
-    merged = apply_actual_results(merged, results_path, espn_results_path)
+    merged = apply_actual_results(merged, results_path, espn_results_path, shootouts_path)
     return merged
 
 
@@ -596,11 +628,20 @@ def simulate_tournament(
             away_label = str(row.away_team)
             home = resolve_slot(home_label, group_order, third_order, used_third_groups, winners, losers)
             away = resolve_slot(away_label, group_order, third_order, used_third_groups, winners, losers)
-            p_home = knockout_advance_probability(home, away, row_series, strength)
-            if rng.random() < p_home:
-                winner, loser = home, away
+            actual_advancing_team = str(getattr(row, "actual_advancing_team", "") or "").strip()
+            actual_advancing_key = normalize_name(actual_advancing_team)
+            if bool(getattr(row, "actual_available", False)) and actual_advancing_key in {
+                normalize_name(home),
+                normalize_name(away),
+            }:
+                winner = home if actual_advancing_key == normalize_name(home) else away
+                loser = away if winner == home else home
             else:
-                winner, loser = away, home
+                p_home = knockout_advance_probability(home, away, row_series, strength)
+                if rng.random() < p_home:
+                    winner, loser = home, away
+                else:
+                    winner, loser = away, home
             winners[match_number] = winner
             losers[match_number] = loser
             if row.stage == "Semifinals":

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { EspnLivePanel } from "./EspnLivePanel";
 import { PlayedMatchesPanel, type PlayedMatchRow } from "./PlayedMatchesPanel";
-import { RebuildControl } from "./RebuildControl";
+import { RebuildControl, type EditableMatch } from "./RebuildControl";
 
 type Prediction = {
   match_number: string;
@@ -32,6 +32,8 @@ type Prediction = {
   prob_home_win: number | null;
   prob_draw: number | null;
   prob_away_win: number | null;
+  expected_home_goals?: number | null;
+  expected_away_goals?: number | null;
   actual_available?: boolean;
   actual_home_score?: number | "";
   actual_away_score?: number | "";
@@ -374,10 +376,21 @@ function hasOutcomeProbabilities(row: Prediction) {
 }
 
 function probabilityLine(row: Prediction) {
+  const homeXg = hasExpectedGoals(row) ? ` · xG ${num(row.expected_home_goals, 2)}` : "";
+  const awayXg = hasExpectedGoals(row) ? ` · xG ${num(row.expected_away_goals, 2)}` : "";
   if (!isFixtureConfirmed(row)) {
-    return `Voorlopig door: thuis ${pct(row.prob_home_win)} · uit ${pct(row.prob_away_win)}`;
+    return `Voorlopig door: thuis ${pct(row.prob_home_win)}${homeXg} · uit ${pct(row.prob_away_win)}${awayXg}`;
   }
-  return `Thuis ${pct(row.prob_home_win)} · Gelijk ${pct(row.prob_draw)} · Uit ${pct(row.prob_away_win)}`;
+  return `Thuis ${pct(row.prob_home_win)}${homeXg} · Gelijk ${pct(row.prob_draw)} · Uit ${pct(row.prob_away_win)}${awayXg}`;
+}
+
+function hasExpectedGoals(row: Prediction) {
+  return (
+    isFixtureConfirmed(row) &&
+    [row.expected_home_goals, row.expected_away_goals].every(
+      (value) => value !== undefined && value !== null && Number.isFinite(Number(value)),
+    )
+  );
 }
 
 function grouped<T extends { group: string }>(items: T[]) {
@@ -523,6 +536,14 @@ export default async function Home() {
     playedRows: rows.filter(isPlayed).length,
     fixtureConfirmed: isStageFixtureConfirmed(rows),
   }));
+  const editableMatches: EditableMatch[] = data.predictions
+    .filter((row) => !isPlayed(row) && isFixtureConfirmed(row))
+    .sort((left, right) => Number(left.match_number) - Number(right.match_number))
+    .map((row) => ({
+      matchNumber: String(row.match_number),
+      label: `#${row.match_number} · ${row.home_team} - ${row.away_team} · ${displayScore(row)}`,
+      score: displayScore(row) === "-" ? "" : displayScore(row),
+    }));
   const topScorerRounds = scorerRoundSections(data.round_top_scorers || []);
   const actionableChanges = data.changes.filter((row) => {
     const stage = row.stage || row.stage_old || "";
@@ -962,14 +983,18 @@ export default async function Home() {
             <summary className="section-header collapse-summary">
               <div>
                 <h2 className="section-title">Beheer</h2>
-                <p className="section-subtitle">Update starten of een invulronde vastzetten.</p>
+                <p className="section-subtitle">Update starten, een invulronde vastzetten of één score wijzigen.</p>
               </div>
               <span className="collapse-actions">
                 <span className="pill">code nodig</span>
                 <span className="collapse-caret" aria-hidden="true" />
               </span>
             </summary>
-            <RebuildControl defaultLockStage={currentFillStage || lockStages[0]?.stage || ""} lockStages={lockStages} />
+            <RebuildControl
+              defaultLockStage={currentFillStage || lockStages[0]?.stage || ""}
+              editableMatches={editableMatches}
+              lockStages={lockStages}
+            />
           </details>
         </section>
 

@@ -487,6 +487,23 @@ tr:last-child td {
   grid-template-columns: minmax(190px, 1fr) auto;
 }
 
+.control-grid.manual-score-grid {
+  grid-template-columns: minmax(280px, 1.5fr) minmax(150px, 0.7fr) minmax(150px, 0.6fr) auto;
+}
+
+.score-inputs {
+  display: grid;
+  grid-template-columns: minmax(58px, 1fr) auto minmax(58px, 1fr);
+  gap: 7px;
+  align-items: end;
+}
+
+.score-inputs > span {
+  padding-bottom: 9px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
 .control-copy {
   display: grid;
   gap: 4px;
@@ -835,6 +852,10 @@ tr:last-child td {
   }
 
   .control-grid.unlock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .control-grid.manual-score-grid {
     grid-template-columns: 1fr;
   }
 

@@ -15,6 +15,9 @@ type LockRequest = {
   action?: unknown;
   code?: unknown;
   stage?: unknown;
+  matchNumber?: unknown;
+  homeScore?: unknown;
+  awayScore?: unknown;
   updateSoccerbase?: unknown;
   deployToVercel?: unknown;
 };
@@ -70,9 +73,22 @@ function parseScore(value: unknown) {
   return /^(\d+)-(\d+)$/.test(String(value || "").trim());
 }
 
+function goalValue(value: unknown) {
+  const text = String(value ?? "").trim();
+  if (!/^\d{1,2}$/.test(text)) return null;
+  const goals = Number(text);
+  return Number.isInteger(goals) && goals >= 0 && goals <= 20 ? goals : null;
+}
+
+function scoreWinner(homeScore: number, awayScore: number, homeTeam: string, awayTeam: string) {
+  if (homeScore > awayScore) return homeTeam;
+  if (awayScore > homeScore) return awayTeam;
+  return "Draw";
+}
+
 function isPlaceholder(value: unknown) {
   const text = String(value || "").trim().toLowerCase();
-  return !text || text === "nan" || text.startsWith("winner ") || text.startsWith("group ") || /^w\d+|ru\d+|l\d+$/.test(text);
+  return !text || text === "nan" || text.startsWith("winner ") || text.startsWith("group ") || /^(?:w|ru|l)\d+$/.test(text);
 }
 
 function csvEscape(value: unknown) {
@@ -209,32 +225,58 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Code klopt niet." }, { status: 401 });
   }
 
-  const stage = textValue(body.stage);
-  if (!stage) {
-    return NextResponse.json({ ok: false, message: "Kies eerst een ronde." }, { status: 400 });
-  }
   const action = textValue(body.action, "lock").toLowerCase();
-  if (!["lock", "unlock"].includes(action)) {
-    return NextResponse.json({ ok: false, message: "Ongeldige ronde-actie." }, { status: 400 });
+  if (!["lock", "unlock", "update-score"].includes(action)) {
+    return NextResponse.json({ ok: false, message: "Ongeldige beheeractie." }, { status: 400 });
   }
 
   const dashboardPath = path.join(process.cwd(), "public", "data", "dashboard.json");
   const dashboard = JSON.parse(await readFile(dashboardPath, "utf8")) as { predictions?: Prediction[] };
-  const stageRows = (dashboard.predictions || []).filter((row) => row.stage === stage);
+  const predictions = dashboard.predictions || [];
+  const matchNumber = String(body.matchNumber ?? "").trim();
+  const targetMatch = action === "update-score"
+    ? predictions.find((row) => String(row.match_number || "").trim() === matchNumber)
+    : undefined;
+  const stage = action === "update-score" ? String(targetMatch?.stage || "").trim() : textValue(body.stage);
+  if (!stage) {
+    return NextResponse.json(
+      { ok: false, message: action === "update-score" ? "Kies eerst een wedstrijd." : "Kies eerst een ronde." },
+      { status: 400 },
+    );
+  }
+  if (action === "update-score" && !targetMatch) {
+    return NextResponse.json({ ok: false, message: "Deze wedstrijd staat niet in de huidige dashboarddata." }, { status: 404 });
+  }
+  const stageRows = predictions.filter((row) => row.stage === stage);
   if (!stageRows.length) {
     return NextResponse.json({ ok: false, message: "Deze ronde staat niet in de huidige dashboarddata." }, { status: 404 });
   }
   const stageMatchNumbers = new Set(
     stageRows.map((row) => String(row.match_number || "").trim()).filter(Boolean),
   );
-  const fixturesConfirmed =
-    stage === "Group Stage" ||
-    stageRows.every((row) => row.fixture_confirmed === true || Number(row.fixture_confirmed) === 1);
-  if (action === "lock" && !fixturesConfirmed) {
+  const fixturesConfirmed = action === "update-score"
+    ? stage === "Group Stage" || targetMatch?.fixture_confirmed === true || Number(targetMatch?.fixture_confirmed) === 1
+    : stage === "Group Stage" ||
+      stageRows.every((row) => row.fixture_confirmed === true || Number(row.fixture_confirmed) === 1);
+  if (["lock", "update-score"].includes(action) && !fixturesConfirmed) {
     return NextResponse.json(
       { ok: false, message: "Deze ronde is nog voorlopig; wacht tot de wedstrijden officieel bekend zijn." },
       { status: 400 },
     );
+  }
+
+  const manualHomeScore = action === "update-score" ? goalValue(body.homeScore) : null;
+  const manualAwayScore = action === "update-score" ? goalValue(body.awayScore) : null;
+  if (action === "update-score") {
+    if (manualHomeScore === null || manualAwayScore === null) {
+      return NextResponse.json({ ok: false, message: "Vul een geldige thuis- en uitscore van 0 tot 20 in." }, { status: 400 });
+    }
+    if (targetMatch?.actual_available || targetMatch?.actual_score) {
+      return NextResponse.json({ ok: false, message: "Een gespeelde wedstrijd kan niet meer worden aangepast." }, { status: 400 });
+    }
+    if (isPlaceholder(targetMatch?.home_team) || isPlaceholder(targetMatch?.away_team)) {
+      return NextResponse.json({ ok: false, message: "Deze wedstrijd is nog voorlopig." }, { status: 400 });
+    }
   }
 
   try {
@@ -243,7 +285,25 @@ export async function POST(request: Request) {
     let successMessage: string;
     let changedCount = 0;
 
-    if (action === "unlock") {
+    if (action === "update-score" && targetMatch && manualHomeScore !== null && manualAwayScore !== null) {
+      const home = String(targetMatch.home_team || "").trim();
+      const away = String(targetMatch.away_team || "").trim();
+      const score = `${manualHomeScore}-${manualAwayScore}`;
+      const updatedLock: LockRow = {
+        match_number: matchNumber,
+        date: String(targetMatch.date || "").slice(0, 10),
+        stage,
+        home_team: home,
+        away_team: away,
+        score,
+        predicted_winner: scoreWinner(manualHomeScore, manualAwayScore, home, away),
+        note: `manual_score_from_dashboard_${new Date().toISOString()}`,
+      };
+      merged = remote.rows.filter((row) => String(row.match_number || "").trim() !== matchNumber);
+      merged.push(updatedLock);
+      changedCount = 1;
+      successMessage = `${home} - ${away} aangepast naar ${score}. GitHub rebuild is gestart.`;
+    } else if (action === "unlock") {
       const before = remote.rows.length;
       merged = remote.rows.filter((row) => {
         const rowStage = String(row.stage || "").trim();
@@ -299,7 +359,10 @@ export async function POST(request: Request) {
     const response = await githubRequest(repository, token, `/contents/${LOCK_PATH}`, {
       method: "PUT",
       body: JSON.stringify({
-        message: `${action === "unlock" ? "Unlock" : "Lock"} ${stage} Scorito scores`,
+        message:
+          action === "update-score"
+            ? `Update match ${matchNumber} Scorito score`
+            : `${action === "unlock" ? "Unlock" : "Lock"} ${stage} Scorito scores`,
         content: Buffer.from(writeCsv(merged), "utf8").toString("base64"),
         branch: ref,
         ...(remote.sha ? { sha: remote.sha } : {}),
@@ -328,11 +391,12 @@ export async function POST(request: Request) {
       actionsUrl: `https://github.com/${repository}/actions/workflows/${workflow}`,
       locked: action === "lock" ? changedCount : 0,
       unlocked: action === "unlock" ? changedCount : 0,
+      updated: action === "update-score" ? changedCount : 0,
       action,
     });
   } catch (error) {
     return NextResponse.json(
-      { ok: false, message: "Ronde-actie is mislukt.", detail: error instanceof Error ? error.message : String(error) },
+      { ok: false, message: "Beheeractie is mislukt.", detail: error instanceof Error ? error.message : String(error) },
       { status: 502 },
     );
   }
