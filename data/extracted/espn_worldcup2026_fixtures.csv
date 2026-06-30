@@ -87,9 +87,9 @@ espn,760498,85,2026-07-03,2026-07-03T03:00Z,Round of 32,Switzerland,Algeria,,,Fa
 espn,760499,86,2026-07-03,2026-07-03T18:00Z,Round of 32,Australia,Egypt,,,False,False,Australia,Egypt,Egypt at Australia,AUS,EGY
 espn,760500,87,2026-07-03,2026-07-03T22:00Z,Round of 32,Argentina,Cape Verde,,,False,False,Argentina,Cape Verde,Cape Verde at Argentina,ARG,CPV
 espn,760501,88,2026-07-04,2026-07-04T01:30Z,Round of 32,Colombia,Ghana,,,False,False,Colombia,Ghana,Ghana at Colombia,COL,GHA
-espn,760502,89,2026-07-04,2026-07-04T17:00Z,Round of 16,Canada,W75,,W75,False,True,Canada,Round of 32 3 Winner,Round of 32 3 Winner at Canada,CAN,RD32
-espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,W74,W77,W74,W77,True,True,Round of 32 2 Winner,Round of 32 5 Winner,Round of 32 5 Winner at Round of 32 2 Winner,RD32,RD32
-espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,W76,W78,W76,W78,True,True,Round of 32 4 Winner,Round of 32 6 Winner,Round of 32 6 Winner at Round of 32 4 Winner,RD32,RD32
+espn,760502,89,2026-07-04,2026-07-04T17:00Z,Round of 16,Canada,Morocco,,,False,False,Canada,Morocco,Morocco at Canada,CAN,MAR
+espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,Paraguay,W77,,W77,False,True,Paraguay,Round of 32 5 Winner,Round of 32 5 Winner at Paraguay,PAR,RD32
+espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,Brazil,W78,,W78,False,True,Brazil,Round of 32 6 Winner,Round of 32 6 Winner at Brazil,BRA,RD32
 espn,760505,92,2026-07-06,2026-07-06T00:00Z,Round of 16,W79,W80,W79,W80,True,True,Round of 32 7 Winner,Round of 32 8 Winner,Round of 32 8 Winner at Round of 32 7 Winner,RD32,RD32
 espn,760506,93,2026-07-06,2026-07-06T19:00Z,Round of 16,W83,W84,W83,W84,True,True,Round of 32 11 Winner,Round of 32 12 Winner,Round of 32 12 Winner at Round of 32 11 Winner,RD32,RD32
 espn,760507,94,2026-07-07,2026-07-07T00:00Z,Round of 16,W81,W82,W81,W82,True,True,Round of 32 9 Winner,Round of 32 10 Winner,Round of 32 10 Winner at Round of 32 9 Winner,RD32,RD32
