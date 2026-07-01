@@ -77,7 +77,7 @@ espn,760489,75,2026-06-29,2026-06-29T20:30Z,Round of 32,Germany,Paraguay,,,False
 espn,760488,76,2026-06-30,2026-06-30T01:00Z,Round of 32,Netherlands,Morocco,,,False,False,Netherlands,Morocco,Morocco at Netherlands,NED,MAR
 espn,760490,77,2026-06-30,2026-06-30T17:00Z,Round of 32,Ivory Coast,Norway,,,False,False,Ivory Coast,Norway,Norway at Ivory Coast,CIV,NOR
 espn,760492,78,2026-06-30,2026-06-30T21:00Z,Round of 32,France,Sweden,,,False,False,France,Sweden,Sweden at France,FRA,SWE
-espn,760491,79,2026-07-01,2026-07-01T01:00Z,Round of 32,Mexico,Ecuador,,,False,False,Mexico,Ecuador,Ecuador at Mexico,MEX,ECU
+espn,760491,79,2026-07-01,2026-07-01T02:00Z,Round of 32,Mexico,Ecuador,,,False,False,Mexico,Ecuador,Ecuador at Mexico,MEX,ECU
 espn,760495,80,2026-07-01,2026-07-01T16:00Z,Round of 32,England,DR Congo,,,False,False,England,Congo DR,Congo DR at England,ENG,COD
 espn,760493,81,2026-07-01,2026-07-01T20:00Z,Round of 32,Belgium,Senegal,,,False,False,Belgium,Senegal,Senegal at Belgium,BEL,SEN
 espn,760494,82,2026-07-02,2026-07-02T00:00Z,Round of 32,United States,Bosnia and Herzegovina,,,False,False,United States,Bosnia-Herzegovina,Bosnia-Herzegovina at United States,USA,BIH
@@ -88,9 +88,9 @@ espn,760499,86,2026-07-03,2026-07-03T18:00Z,Round of 32,Australia,Egypt,,,False,
 espn,760500,87,2026-07-03,2026-07-03T22:00Z,Round of 32,Argentina,Cape Verde,,,False,False,Argentina,Cape Verde,Cape Verde at Argentina,ARG,CPV
 espn,760501,88,2026-07-04,2026-07-04T01:30Z,Round of 32,Colombia,Ghana,,,False,False,Colombia,Ghana,Ghana at Colombia,COL,GHA
 espn,760502,89,2026-07-04,2026-07-04T17:00Z,Round of 16,Canada,Morocco,,,False,False,Canada,Morocco,Morocco at Canada,CAN,MAR
-espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,Paraguay,W77,,W77,False,True,Paraguay,Round of 32 5 Winner,Round of 32 5 Winner at Paraguay,PAR,RD32
-espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,Brazil,W78,,W78,False,True,Brazil,Round of 32 6 Winner,Round of 32 6 Winner at Brazil,BRA,RD32
-espn,760505,92,2026-07-06,2026-07-06T00:00Z,Round of 16,W79,W80,W79,W80,True,True,Round of 32 7 Winner,Round of 32 8 Winner,Round of 32 8 Winner at Round of 32 7 Winner,RD32,RD32
+espn,760503,90,2026-07-04,2026-07-04T21:00Z,Round of 16,Paraguay,France,,,False,False,Paraguay,France,France at Paraguay,PAR,FRA
+espn,760504,91,2026-07-05,2026-07-05T20:00Z,Round of 16,Brazil,Norway,,,False,False,Brazil,Norway,Norway at Brazil,BRA,NOR
+espn,760505,92,2026-07-06,2026-07-06T00:00Z,Round of 16,Mexico,W80,,W80,False,True,Mexico,Round of 32 8 Winner,Round of 32 8 Winner at Mexico,MEX,RD32
 espn,760506,93,2026-07-06,2026-07-06T19:00Z,Round of 16,W83,W84,W83,W84,True,True,Round of 32 11 Winner,Round of 32 12 Winner,Round of 32 12 Winner at Round of 32 11 Winner,RD32,RD32
 espn,760507,94,2026-07-07,2026-07-07T00:00Z,Round of 16,W81,W82,W81,W82,True,True,Round of 32 9 Winner,Round of 32 10 Winner,Round of 32 10 Winner at Round of 32 9 Winner,RD32,RD32
 espn,760509,95,2026-07-07,2026-07-07T16:00Z,Round of 16,W86,W88,W86,W88,True,True,Round of 32 14 Winner,Round of 32 16 Winner,Round of 32 16 Winner at Round of 32 14 Winner,RD32,RD32

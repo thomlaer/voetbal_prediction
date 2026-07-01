@@ -9179,3 +9179,6 @@ soccerbase_game_id,date,home_team,away_team,status
 949449,2026-06-30,Netherlands,Morocco,lineup_fetched
 949450,2026-06-29,Brazil,Japan,lineup_fetched
 966308,2026-06-29,Germany,Paraguay,lineup_fetched
+966310,2026-07-01,Mexico,Ecuador,lineup_fetched
+966309,2026-06-30,France,Sweden,lineup_fetched
+966307,2026-06-30,Ivory Coast,Norway,lineup_fetched
