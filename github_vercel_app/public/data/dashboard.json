@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2026-07-03 07:29",
-    "source_run": "outputs_worldcup2026_cards_draw05_28644999849",
+    "generated_at": "2026-07-03 08:52",
+    "source_run": "outputs_worldcup2026_cards_draw05_28649199753",
     "model_accuracy": 0.613630192777627,
     "exact_score_accuracy": 0.14118924789573717,
     "row_count": 49499,
@@ -4434,10 +4434,10 @@
       "group": "",
       "home_team": "Canada",
       "away_team": "Morocco",
-      "score": "1-1",
+      "score": "1-2",
       "home_score": 1,
       "away_score": 1,
-      "predicted_winner": "Draw",
+      "predicted_winner": "Morocco",
       "advancing_team": "Morocco",
       "fixture_confirmed": 1.0,
       "probability_source": "xgboost_known_fixture",
@@ -4447,13 +4447,13 @@
       "recommended_rule": "safe_expected_points",
       "model_score": "1-1",
       "model_predicted_winner": "Draw",
-      "filled_score": "1-1",
-      "filled_predicted_winner": "Draw",
-      "new_model_score": "",
-      "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "filled_score": "1-2",
+      "filled_predicted_winner": "Morocco",
+      "new_model_score": "1-1",
+      "new_model_predicted_winner": "Draw",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.4095505954889342,
       "prob_home_win": 0.2145969479481501,
       "prob_draw": 0.3758524565629156,
@@ -4468,11 +4468,11 @@
       "actual_winner": "",
       "actual_advancing_team": "",
       "actual_source": "",
-      "pre_match_score": "1-1",
-      "pre_match_predicted_winner": "Draw",
+      "pre_match_score": "1-2",
+      "pre_match_predicted_winner": "Morocco",
       "pre_match_confidence": "low",
       "pre_match_model_favourite_prob": 0.4095505954889342,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -173678,56 +173678,56 @@
       "name": "International results",
       "status": "ok",
       "rows": 49499,
-      "last_modified": "2026-07-03 07:19",
+      "last_modified": "2026-07-03 08:44",
       "note": "martj42 international_results"
     },
     {
       "name": "ESPN online results",
       "status": "ok",
       "rows": 85,
-      "last_modified": "2026-07-03 07:19",
+      "last_modified": "2026-07-03 08:44",
       "note": "online completed-match check from ESPN scoreboard"
     },
     {
       "name": "OddsPortal WK odds",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-03 07:19",
+      "last_modified": "2026-07-03 08:44",
       "note": "current 1X2 odds and fixture mapping"
     },
     {
       "name": "ESPN fixture schedule",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-03 07:19",
+      "last_modified": "2026-07-03 08:44",
       "note": "online fixture/team mapping for unresolved knockout slots"
     },
     {
       "name": "Soccerbase lineups",
       "status": "ok",
       "rows": 21052,
-      "last_modified": "2026-07-03 07:22",
+      "last_modified": "2026-07-03 08:43",
       "note": "used for live player starts/apps; current default outcome model keeps lineup features disabled"
     },
     {
       "name": "Soccerbase stats",
       "status": "ok",
       "rows": 9198,
-      "last_modified": "2026-07-03 07:22",
+      "last_modified": "2026-07-03 08:43",
       "note": "rolling shots/corners/possession/fouls source"
     },
     {
       "name": "Soccerbase cards",
       "status": "ok",
       "rows": 22823,
-      "last_modified": "2026-07-03 07:22",
+      "last_modified": "2026-07-03 08:43",
       "note": "rolling cards/referee source"
     },
     {
       "name": "Manual player adjustments",
       "status": "ok",
       "rows": 0,
-      "last_modified": "2026-07-03 07:18",
+      "last_modified": "2026-07-03 08:43",
       "note": "optional injuries, suspensions, penalty takers and player notes"
     }
   ]
