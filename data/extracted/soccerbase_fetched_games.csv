@@ -9185,3 +9185,6 @@ soccerbase_game_id,date,home_team,away_team,status
 966154,2026-07-02,USA,Bosnia-HZ.,lineup_fetched
 966313,2026-07-01,Belgium,Senegal,lineup_fetched
 966314,2026-07-01,England,DR Congo,lineup_fetched
+966311,2026-07-03,Portugal,Croatia,lineup_fetched
+966316,2026-07-03,Switzerland,Algeria,lineup_fetched
+966315,2026-07-02,Spain,Austria,lineup_fetched
