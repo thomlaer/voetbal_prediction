@@ -31,3 +31,4 @@ match_number,date,stage,home_team,away_team,score,predicted_winner,note
 86,2026-07-03,Round of 32,Australia,Egypt,1-1,Draw,locked_from_dashboard_2026-06-28T21:59:55.456Z
 87,2026-07-03,Round of 32,Argentina,Cape Verde,3-0,Argentina,locked_from_dashboard_2026-06-28T21:59:55.456Z
 88,2026-07-03,Round of 32,Colombia,Ghana,3-0,Colombia,locked_from_dashboard_2026-06-28T21:59:55.456Z
+89,2026-07-04,Round of 16,Canada,Morocco,1-2,Morocco,manual_score_from_dashboard_2026-07-03T08:43:33.182Z
