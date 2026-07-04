@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2026-07-04 15:07",
-    "source_run": "outputs_worldcup2026_cards_draw05_28710055966",
+    "generated_at": "2026-07-04 16:55",
+    "source_run": "outputs_worldcup2026_cards_draw05_28712983079",
     "model_accuracy": 0.6136733586543679,
     "exact_score_accuracy": 0.1410743353228432,
     "row_count": 49501,
@@ -4551,9 +4551,9 @@
       "filled_predicted_winner": "Brazil",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.614013671643305,
       "prob_home_win": 0.614013671643305,
       "prob_draw": 0.1823817559891203,
@@ -4572,7 +4572,7 @@
       "pre_match_predicted_winner": "Brazil",
       "pre_match_confidence": "medium",
       "pre_match_model_favourite_prob": 0.614013671643305,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -4601,9 +4601,9 @@
       "filled_predicted_winner": "England",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.5113396327903038,
       "prob_home_win": 0.2284815504419309,
       "prob_draw": 0.2601788167677654,
@@ -4622,7 +4622,7 @@
       "pre_match_predicted_winner": "England",
       "pre_match_confidence": "low",
       "pre_match_model_favourite_prob": 0.5113396327903038,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -4651,9 +4651,9 @@
       "filled_predicted_winner": "Spain",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.48153025609466144,
       "prob_home_win": 0.22852215885497063,
       "prob_draw": 0.28994758505036794,
@@ -4672,7 +4672,7 @@
       "pre_match_predicted_winner": "Spain",
       "pre_match_confidence": "low",
       "pre_match_model_favourite_prob": 0.48153025609466144,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -4701,9 +4701,9 @@
       "filled_predicted_winner": "Belgium",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.5513554105432678,
       "prob_home_win": 0.2263447856952687,
       "prob_draw": 0.2222998037614635,
@@ -4722,7 +4722,7 @@
       "pre_match_predicted_winner": "Belgium",
       "pre_match_confidence": "medium",
       "pre_match_model_favourite_prob": 0.5513554105432678,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -4751,9 +4751,9 @@
       "filled_predicted_winner": "Argentina",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.7945362453750643,
       "prob_home_win": 0.7945362453750643,
       "prob_draw": 0.1442666920973743,
@@ -4772,7 +4772,7 @@
       "pre_match_predicted_winner": "Argentina",
       "pre_match_confidence": "high",
       "pre_match_model_favourite_prob": 0.7945362453750643,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -4801,9 +4801,9 @@
       "filled_predicted_winner": "Colombia",
       "new_model_score": "",
       "new_model_predicted_winner": "",
-      "round_locked": false,
-      "round_status": "open",
-      "score_source": "current_run",
+      "round_locked": true,
+      "round_status": "locked",
+      "score_source": "manual_locked_score",
       "model_favourite_prob": 0.4984104395440275,
       "prob_home_win": 0.2567184070408999,
       "prob_draw": 0.2448711534150726,
@@ -4822,7 +4822,7 @@
       "pre_match_predicted_winner": "Colombia",
       "pre_match_confidence": "low",
       "pre_match_model_favourite_prob": 0.4984104395440275,
-      "pre_match_source": "current_run",
+      "pre_match_source": "manual_locked_score",
       "prediction_exact": "",
       "prediction_outcome_correct": "",
       "actual_online_verified": false
@@ -5240,6 +5240,18 @@
       "away_team_new": "Morocco",
       "score_new": "1-1",
       "predicted_winner_new": "Draw"
+    },
+    {
+      "match_number": "90",
+      "stage": "Round of 16",
+      "home_team_old": "Paraguay",
+      "away_team_old": "France",
+      "score_old": "0-2",
+      "predicted_winner_old": "France",
+      "home_team_new": "Paraguay",
+      "away_team_new": "France",
+      "score_new": "0-1",
+      "predicted_winner_new": "France"
     }
   ],
   "champions": [
@@ -173691,56 +173703,56 @@
       "name": "International results",
       "status": "ok",
       "rows": 49501,
-      "last_modified": "2026-07-04 15:00",
+      "last_modified": "2026-07-04 16:48",
       "note": "martj42 international_results"
     },
     {
       "name": "ESPN online results",
       "status": "ok",
       "rows": 88,
-      "last_modified": "2026-07-04 15:00",
+      "last_modified": "2026-07-04 16:49",
       "note": "online completed-match check from ESPN scoreboard"
     },
     {
       "name": "OddsPortal WK odds",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-04 15:00",
+      "last_modified": "2026-07-04 16:49",
       "note": "current 1X2 odds and fixture mapping"
     },
     {
       "name": "ESPN fixture schedule",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-04 15:00",
+      "last_modified": "2026-07-04 16:49",
       "note": "online fixture/team mapping for unresolved knockout slots"
     },
     {
       "name": "Soccerbase lineups",
       "status": "ok",
       "rows": 21203,
-      "last_modified": "2026-07-04 14:59",
+      "last_modified": "2026-07-04 16:48",
       "note": "used for live player starts/apps; current default outcome model keeps lineup features disabled"
     },
     {
       "name": "Soccerbase stats",
       "status": "ok",
       "rows": 9201,
-      "last_modified": "2026-07-04 14:59",
+      "last_modified": "2026-07-04 16:48",
       "note": "rolling shots/corners/possession/fouls source"
     },
     {
       "name": "Soccerbase cards",
       "status": "ok",
       "rows": 22831,
-      "last_modified": "2026-07-04 14:59",
+      "last_modified": "2026-07-04 16:48",
       "note": "rolling cards/referee source"
     },
     {
       "name": "Manual player adjustments",
       "status": "ok",
       "rows": 0,
-      "last_modified": "2026-07-04 14:59",
+      "last_modified": "2026-07-04 16:48",
       "note": "optional injuries, suspensions, penalty takers and player notes"
     }
   ]
