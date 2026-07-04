@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import re
 import shutil
 import unicodedata
@@ -1335,6 +1336,92 @@ ROUND_TOPSCORER_ROUTE_STAGES = {
     "Final/Third": {"Final", "Third Place Playoff"},
 }
 
+TOPSCORER_STAR_BLEND = 0.45
+
+
+def finite_float(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def prediction_team_goals(row: dict[str, Any]) -> tuple[float, float]:
+    """Return actual goals for played matches and xG for unplayed matches."""
+    if row.get("actual_available") or has_score_value(row.get("actual_score")):
+        home_goals = finite_float(row.get("actual_home_score"))
+        away_goals = finite_float(row.get("actual_away_score"))
+        if home_goals is not None and away_goals is not None:
+            return max(home_goals, 0.0), max(away_goals, 0.0)
+        parsed_actual = parse_score(row.get("actual_score"))
+        if parsed_actual is not None:
+            return float(parsed_actual[0]), float(parsed_actual[1])
+
+    home_xg = finite_float(row.get("expected_home_goals"))
+    away_xg = finite_float(row.get("expected_away_goals"))
+    if home_xg is not None and away_xg is not None:
+        return max(home_xg, 0.0), max(away_xg, 0.0)
+
+    parsed_prediction = parse_score(row.get("model_score") or row.get("score"))
+    if parsed_prediction is not None:
+        return float(parsed_prediction[0]), float(parsed_prediction[1])
+    return 0.0, 0.0
+
+
+def stage_team_goals_from_predictions(
+    predictions: list[dict[str, Any]],
+) -> dict[str, dict[str, float]]:
+    goals_by_stage: dict[str, dict[str, float]] = {}
+    match_stage_to_topscorer_stage = {
+        match_stage: topscorer_stage
+        for topscorer_stage, match_stages in ROUND_TOPSCORER_ROUTE_STAGES.items()
+        for match_stage in match_stages
+    }
+    for prediction in predictions:
+        topscorer_stage = match_stage_to_topscorer_stage.get(str(prediction.get("stage", "")))
+        if topscorer_stage is None:
+            continue
+        home_goals, away_goals = prediction_team_goals(prediction)
+        stage_goals = goals_by_stage.setdefault(topscorer_stage, {})
+        for team_field, goals in (("home_team", home_goals), ("away_team", away_goals)):
+            team = canonical_team_name(prediction.get(team_field, ""))
+            team_key = normalize_key(team)
+            if not team_key or is_placeholder_team(team):
+                continue
+            stage_goals[team_key] = stage_goals.get(team_key, 0.0) + goals
+    return goals_by_stage
+
+
+def recompute_stage_top_scorers(
+    rows: list[dict[str, Any]],
+    predictions: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Align round scorer projections with the final published match xG."""
+    goals_by_stage = stage_team_goals_from_predictions(predictions)
+    output: list[dict[str, Any]] = []
+    for source_row in rows:
+        row = dict(source_row)
+        stage = str(row.get("stage", ""))
+        team_key = normalize_key(canonical_team_name(row.get("team", "")))
+        team_stage_goals = goals_by_stage.get(stage, {}).get(team_key)
+        if team_stage_goals is None:
+            output.append(row)
+            continue
+
+        goal_share = max(finite_float(row.get("goal_share")) or 0.0, 0.0)
+        points_per_goal = max(finite_float(row.get("points_per_goal")) or 0.0, 0.0)
+        star_power = max(finite_float(row.get("star_scorer_power")) or 0.0, 0.0)
+        expected_goals = team_stage_goals * goal_share
+        expected_points = expected_goals * points_per_goal
+        row["expected_goals"] = expected_goals
+        row["expected_scorito_points"] = expected_points
+        row["recommended_stage_topscorer_score"] = expected_points * (
+            1.0 - TOPSCORER_STAR_BLEND + TOPSCORER_STAR_BLEND * star_power
+        )
+        output.append(row)
+    return output
+
 
 def route_team_keys_by_topscorer_stage(predictions: list[dict[str, Any]]) -> dict[str, set[str]]:
     teams_by_stage: dict[str, set[str]] = {}
@@ -1601,6 +1688,7 @@ def main() -> None:
     top_scorers = read_csv(run_dir / "scorito_topscorer_picks.csv")
     group_top_scorers = read_csv(run_dir / "scorito_groupstage_topscorer_picks.csv")
     stage_top_scorers = read_csv(run_dir / "scorito_stage_topscorer_picks.csv")
+    stage_top_scorers = recompute_stage_top_scorers(stage_top_scorers, predictions)
     group_standings = build_group_standings(predictions, champions)
     round_top_scorers = (
         normalize_stage_top_scorers(stage_top_scorers, predictions)
