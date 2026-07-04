@@ -201,6 +201,92 @@ class KnockoutDashboardTests(unittest.TestCase):
         self.assertEqual(headers[12:14], ["xG thuis", "xG uit"])
         self.assertEqual(values[12:14], [1.23, 1.08])
 
+    def test_round_topscorers_are_recomputed_from_published_xg(self) -> None:
+        predictions = [
+            {
+                "stage": "Round of 16",
+                "home_team": "Paraguay",
+                "away_team": "France",
+                "score": "0-1",
+                "expected_home_goals": 0.74,
+                "expected_away_goals": 1.74,
+                "actual_available": False,
+            },
+            {
+                "stage": "Round of 16",
+                "home_team": "United States",
+                "away_team": "Belgium",
+                "score": "1-2",
+                "expected_home_goals": 1.02,
+                "expected_away_goals": 1.46,
+                "actual_available": False,
+            },
+        ]
+        stale_rows = [
+            {
+                "stage": "Round of 16",
+                "stage_label": "Achtste finale",
+                "team": "France",
+                "player": "Kylian Mbappe",
+                "goal_share": 0.38,
+                "points_per_goal": 24,
+                "star_scorer_power": 0.86,
+                "expected_goals": 0.38,
+                "expected_scorito_points": 9.12,
+                "recommended_stage_topscorer_score": 8.55,
+                "stage_order": 2,
+            },
+            {
+                "stage": "Round of 16",
+                "stage_label": "Achtste finale",
+                "team": "Belgium",
+                "player": "Romelu Lukaku",
+                "goal_share": 0.30,
+                "points_per_goal": 24,
+                "star_scorer_power": 0.97,
+                "expected_goals": 0.60,
+                "expected_scorito_points": 14.40,
+                "recommended_stage_topscorer_score": 14.21,
+                "stage_order": 2,
+            },
+        ]
+
+        recomputed = publisher.recompute_stage_top_scorers(stale_rows, predictions)
+        ranked = publisher.normalize_stage_top_scorers(recomputed, predictions)
+        by_player = {row["player"]: row for row in ranked}
+
+        self.assertAlmostEqual(by_player["Kylian Mbappe"]["expected_goals"], 1.74 * 0.38)
+        self.assertAlmostEqual(by_player["Romelu Lukaku"]["expected_goals"], 1.46 * 0.30)
+        self.assertEqual(by_player["Kylian Mbappe"]["round_rank"], 1)
+        self.assertEqual(by_player["Romelu Lukaku"]["round_rank"], 2)
+
+    def test_round_topscorers_use_actual_goals_after_match_is_played(self) -> None:
+        prediction = {
+            "stage": "Group Stage",
+            "home_team": "France",
+            "away_team": "Belgium",
+            "score": "1-1",
+            "expected_home_goals": 1.2,
+            "expected_away_goals": 1.1,
+            "actual_available": True,
+            "actual_home_score": 3,
+            "actual_away_score": 0,
+            "actual_score": "3-0",
+        }
+        scorer_row = {
+            "stage": "Group Stage",
+            "team": "France",
+            "player": "Kylian Mbappe",
+            "goal_share": 0.5,
+            "points_per_goal": 8,
+            "star_scorer_power": 1.0,
+        }
+
+        result = publisher.recompute_stage_top_scorers([scorer_row], [prediction])[0]
+
+        self.assertEqual(result["expected_goals"], 1.5)
+        self.assertEqual(result["expected_scorito_points"], 12.0)
+
 
 if __name__ == "__main__":
     unittest.main()
