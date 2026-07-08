@@ -9197,3 +9197,5 @@ soccerbase_game_id,date,home_team,away_team,status
 966801,2026-07-04,Paraguay,France,lineup_fetched
 967645,2026-07-07,USA,Belgium,lineup_fetched
 968498,2026-07-06,Portugal,Spain,lineup_fetched
+968884,2026-07-07,Argentina,Egypt,lineup_fetched
+968885,2026-07-07,Switzerland,Colombia,lineup_fetched
