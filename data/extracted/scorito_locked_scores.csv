@@ -39,3 +39,7 @@ match_number,date,stage,home_team,away_team,score,predicted_winner,note
 94,2026-07-06,Round of 16,United States,Belgium,1-2,Belgium,locked_from_dashboard_2026-07-04T16:48:02.612Z
 95,2026-07-07,Round of 16,Argentina,Egypt,2-1,Argentina,locked_from_dashboard_2026-07-04T16:48:02.612Z
 96,2026-07-07,Round of 16,Switzerland,Colombia,1-2,Colombia,locked_from_dashboard_2026-07-04T16:48:02.612Z
+97,2026-07-09,Quarterfinals,France,Morocco,2-1,France,locked_from_dashboard_2026-07-09T21:04:54.279Z
+98,2026-07-10,Quarterfinals,Spain,Belgium,2-1,Spain,locked_from_dashboard_2026-07-09T21:04:54.279Z
+99,2026-07-11,Quarterfinals,Norway,England,1-2,England,locked_from_dashboard_2026-07-09T21:04:54.279Z
+100,2026-07-11,Quarterfinals,Argentina,Switzerland,2-1,Argentina,locked_from_dashboard_2026-07-09T21:04:54.279Z
