@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2026-07-08 04:52",
-    "source_run": "outputs_worldcup2026_cards_draw05_28918014220",
+    "generated_at": "2026-07-09 13:13",
+    "source_run": "outputs_worldcup2026_cards_draw05_29019960489",
     "model_accuracy": 0.6139685977260422,
     "exact_score_accuracy": 0.14103952355170546,
     "row_count": 49505,
@@ -173678,56 +173678,56 @@
       "name": "International results",
       "status": "ok",
       "rows": 49505,
-      "last_modified": "2026-07-08 04:42",
+      "last_modified": "2026-07-09 13:04",
       "note": "martj42 international_results"
     },
     {
       "name": "ESPN online results",
       "status": "ok",
       "rows": 96,
-      "last_modified": "2026-07-08 04:42",
+      "last_modified": "2026-07-09 13:04",
       "note": "online completed-match check from ESPN scoreboard"
     },
     {
       "name": "OddsPortal WK odds",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-08 04:42",
+      "last_modified": "2026-07-09 13:04",
       "note": "current 1X2 odds and fixture mapping"
     },
     {
       "name": "ESPN fixture schedule",
       "status": "ok",
       "rows": 104,
-      "last_modified": "2026-07-08 04:42",
+      "last_modified": "2026-07-09 13:04",
       "note": "online fixture/team mapping for unresolved knockout slots"
     },
     {
       "name": "Soccerbase lineups",
       "status": "ok",
       "rows": 21611,
-      "last_modified": "2026-07-08 04:44",
+      "last_modified": "2026-07-09 13:07",
       "note": "used for live player starts/apps; current default outcome model keeps lineup features disabled"
     },
     {
       "name": "Soccerbase stats",
       "status": "ok",
-      "rows": 9207,
-      "last_modified": "2026-07-08 04:44",
+      "rows": 9208,
+      "last_modified": "2026-07-09 13:07",
       "note": "rolling shots/corners/possession/fouls source"
     },
     {
       "name": "Soccerbase cards",
       "status": "ok",
       "rows": 22863,
-      "last_modified": "2026-07-08 04:44",
+      "last_modified": "2026-07-09 13:07",
       "note": "rolling cards/referee source"
     },
     {
       "name": "Manual player adjustments",
       "status": "ok",
       "rows": 0,
-      "last_modified": "2026-07-08 04:41",
+      "last_modified": "2026-07-09 13:03",
       "note": "optional injuries, suspensions, penalty takers and player notes"
     }
   ]
