@@ -43,3 +43,5 @@ match_number,date,stage,home_team,away_team,score,predicted_winner,note
 98,2026-07-10,Quarterfinals,Spain,Belgium,2-1,Spain,locked_from_dashboard_2026-07-09T21:04:54.279Z
 99,2026-07-11,Quarterfinals,Norway,England,1-2,England,locked_from_dashboard_2026-07-09T21:04:54.279Z
 100,2026-07-11,Quarterfinals,Argentina,Switzerland,2-1,Argentina,locked_from_dashboard_2026-07-09T21:04:54.279Z
+101,2026-07-14,Semifinals,France,Spain,0-1,Spain,locked_from_dashboard_2026-07-14T19:30:58.872Z
+102,2026-07-15,Semifinals,England,Argentina,1-2,Argentina,locked_from_dashboard_2026-07-14T19:30:58.872Z
