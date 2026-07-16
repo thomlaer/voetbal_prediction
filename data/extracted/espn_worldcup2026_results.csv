@@ -1,101 +1,103 @@
 ﻿source,espn_event_id,date,home_team,away_team,home_score,away_score,status,completed,fetched_at,source_url
-espn,760415,2026-06-11,Mexico,South Africa,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760414,2026-06-12,South Korea,Czechia,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760416,2026-06-12,Canada,Bosnia-Herzegovina,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760417,2026-06-13,United States,Paraguay,4,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760419,2026-06-13,Brazil,Morocco,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760420,2026-06-13,Qatar,Switzerland,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760418,2026-06-14,Haiti,Scotland,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760421,2026-06-14,Australia,Türkiye,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760422,2026-06-14,Germany,Curaçao,7,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760423,2026-06-14,Ivory Coast,Ecuador,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760425,2026-06-14,Netherlands,Japan,2,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760424,2026-06-15,Sweden,Tunisia,5,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760426,2026-06-15,Belgium,Egypt,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760428,2026-06-15,Spain,Cape Verde,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760429,2026-06-15,Saudi Arabia,Uruguay,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760427,2026-06-16,Iran,New Zealand,2,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760430,2026-06-16,Iraq,Norway,1,4,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760432,2026-06-16,France,Senegal,3,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760431,2026-06-17,Austria,Jordan,3,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760433,2026-06-17,Argentina,Algeria,3,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760434,2026-06-17,Ghana,Panama,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760435,2026-06-17,Portugal,Congo DR,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760437,2026-06-17,England,Croatia,4,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760436,2026-06-18,Uzbekistan,Colombia,1,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760438,2026-06-18,Czechia,South Africa,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760439,2026-06-18,Switzerland,Bosnia-Herzegovina,4,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760440,2026-06-18,Canada,Qatar,6,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760441,2026-06-19,Mexico,South Korea,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760442,2026-06-19,United States,Australia,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760445,2026-06-19,Scotland,Morocco,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760443,2026-06-20,Türkiye,Paraguay,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760444,2026-06-20,Brazil,Haiti,3,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760447,2026-06-20,Netherlands,Sweden,5,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760448,2026-06-20,Germany,Ivory Coast,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760446,2026-06-21,Ecuador,Curaçao,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760449,2026-06-21,Tunisia,Japan,0,4,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760450,2026-06-21,Uruguay,Cape Verde,2,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760451,2026-06-21,Belgium,Iran,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760453,2026-06-21,Spain,Saudi Arabia,4,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760452,2026-06-22,New Zealand,Egypt,1,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760456,2026-06-22,Argentina,Austria,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760457,2026-06-22,France,Iraq,3,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760454,2026-06-23,Norway,Senegal,3,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760455,2026-06-23,Jordan,Algeria,1,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760458,2026-06-23,England,Ghana,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760460,2026-06-23,Panama,Croatia,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760461,2026-06-23,Portugal,Uzbekistan,5,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760459,2026-06-24,Colombia,Congo DR,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760462,2026-06-24,Bosnia-Herzegovina,Qatar,3,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760463,2026-06-24,Switzerland,Canada,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760464,2026-06-24,Morocco,Haiti,4,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760465,2026-06-24,Scotland,Brazil,0,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760466,2026-06-25,South Africa,South Korea,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760467,2026-06-25,Czechia,Mexico,0,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760468,2026-06-25,Ecuador,Germany,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760471,2026-06-25,Japan,Sweden,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760472,2026-06-25,Tunisia,Netherlands,1,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760473,2026-06-25,Curaçao,Ivory Coast,0,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760469,2026-06-26,Paraguay,Australia,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760470,2026-06-26,Türkiye,United States,3,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760474,2026-06-26,Senegal,Iraq,5,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760475,2026-06-26,Norway,France,1,4,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760476,2026-06-27,Egypt,Iran,1,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760477,2026-06-27,New Zealand,Belgium,1,5,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760478,2026-06-27,Cape Verde,Saudi Arabia,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760479,2026-06-27,Uruguay,Spain,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760480,2026-06-27,Croatia,Ghana,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760481,2026-06-27,Colombia,Portugal,0,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760482,2026-06-27,Congo DR,Uzbekistan,3,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760485,2026-06-27,Panama,England,0,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760483,2026-06-28,Jordan,Argentina,1,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760484,2026-06-28,Algeria,Austria,3,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760486,2026-06-28,South Africa,Canada,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760487,2026-06-29,Brazil,Japan,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760489,2026-06-29,Germany,Paraguay,1,1,STATUS_FINAL_PEN,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760488,2026-06-30,Netherlands,Morocco,1,1,STATUS_FINAL_PEN,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760490,2026-06-30,Ivory Coast,Norway,1,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760492,2026-06-30,France,Sweden,3,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760491,2026-07-01,Mexico,Ecuador,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760493,2026-07-01,Belgium,Senegal,3,2,STATUS_FINAL_AET,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760495,2026-07-01,England,Congo DR,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760494,2026-07-02,United States,Bosnia-Herzegovina,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760496,2026-07-02,Portugal,Croatia,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760497,2026-07-02,Spain,Austria,3,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760498,2026-07-03,Switzerland,Algeria,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760499,2026-07-03,Australia,Egypt,1,1,STATUS_FINAL_PEN,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760500,2026-07-03,Argentina,Cape Verde,3,2,STATUS_FINAL_AET,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760501,2026-07-04,Colombia,Ghana,1,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760502,2026-07-04,Canada,Morocco,0,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760503,2026-07-04,Paraguay,France,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760504,2026-07-05,Brazil,Norway,1,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760505,2026-07-06,Mexico,England,2,3,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760506,2026-07-06,Portugal,Spain,0,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760507,2026-07-07,United States,Belgium,1,4,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760508,2026-07-07,Switzerland,Colombia,0,0,STATUS_FINAL_PEN,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760509,2026-07-07,Argentina,Egypt,3,2,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760510,2026-07-09,France,Morocco,2,0,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760511,2026-07-10,Spain,Belgium,2,1,STATUS_FULL_TIME,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760512,2026-07-11,Norway,England,1,2,STATUS_FINAL_AET,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
-espn,760513,2026-07-12,Argentina,Switzerland,3,1,STATUS_FINAL_AET,True,2026-07-14,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760415,2026-06-11,Mexico,South Africa,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760414,2026-06-12,South Korea,Czechia,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760416,2026-06-12,Canada,Bosnia-Herzegovina,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760417,2026-06-13,United States,Paraguay,4,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760419,2026-06-13,Brazil,Morocco,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760420,2026-06-13,Qatar,Switzerland,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760418,2026-06-14,Haiti,Scotland,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760421,2026-06-14,Australia,Türkiye,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760422,2026-06-14,Germany,Curaçao,7,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760423,2026-06-14,Ivory Coast,Ecuador,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760425,2026-06-14,Netherlands,Japan,2,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760424,2026-06-15,Sweden,Tunisia,5,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760426,2026-06-15,Belgium,Egypt,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760428,2026-06-15,Spain,Cape Verde,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760429,2026-06-15,Saudi Arabia,Uruguay,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760427,2026-06-16,Iran,New Zealand,2,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760430,2026-06-16,Iraq,Norway,1,4,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760432,2026-06-16,France,Senegal,3,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760431,2026-06-17,Austria,Jordan,3,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760433,2026-06-17,Argentina,Algeria,3,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760434,2026-06-17,Ghana,Panama,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760435,2026-06-17,Portugal,Congo DR,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760437,2026-06-17,England,Croatia,4,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760436,2026-06-18,Uzbekistan,Colombia,1,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760438,2026-06-18,Czechia,South Africa,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760439,2026-06-18,Switzerland,Bosnia-Herzegovina,4,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760440,2026-06-18,Canada,Qatar,6,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760441,2026-06-19,Mexico,South Korea,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760442,2026-06-19,United States,Australia,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760445,2026-06-19,Scotland,Morocco,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760443,2026-06-20,Türkiye,Paraguay,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760444,2026-06-20,Brazil,Haiti,3,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760447,2026-06-20,Netherlands,Sweden,5,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760448,2026-06-20,Germany,Ivory Coast,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760446,2026-06-21,Ecuador,Curaçao,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760449,2026-06-21,Tunisia,Japan,0,4,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760450,2026-06-21,Uruguay,Cape Verde,2,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760451,2026-06-21,Belgium,Iran,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760453,2026-06-21,Spain,Saudi Arabia,4,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760452,2026-06-22,New Zealand,Egypt,1,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760456,2026-06-22,Argentina,Austria,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760457,2026-06-22,France,Iraq,3,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760454,2026-06-23,Norway,Senegal,3,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760455,2026-06-23,Jordan,Algeria,1,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760458,2026-06-23,England,Ghana,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760460,2026-06-23,Panama,Croatia,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760461,2026-06-23,Portugal,Uzbekistan,5,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760459,2026-06-24,Colombia,Congo DR,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760462,2026-06-24,Bosnia-Herzegovina,Qatar,3,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760463,2026-06-24,Switzerland,Canada,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760464,2026-06-24,Morocco,Haiti,4,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760465,2026-06-24,Scotland,Brazil,0,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760466,2026-06-25,South Africa,South Korea,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760467,2026-06-25,Czechia,Mexico,0,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760468,2026-06-25,Ecuador,Germany,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760471,2026-06-25,Japan,Sweden,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760472,2026-06-25,Tunisia,Netherlands,1,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760473,2026-06-25,Curaçao,Ivory Coast,0,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760469,2026-06-26,Paraguay,Australia,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760470,2026-06-26,Türkiye,United States,3,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760474,2026-06-26,Senegal,Iraq,5,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760475,2026-06-26,Norway,France,1,4,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760476,2026-06-27,Egypt,Iran,1,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760477,2026-06-27,New Zealand,Belgium,1,5,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760478,2026-06-27,Cape Verde,Saudi Arabia,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760479,2026-06-27,Uruguay,Spain,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760480,2026-06-27,Croatia,Ghana,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760481,2026-06-27,Colombia,Portugal,0,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760482,2026-06-27,Congo DR,Uzbekistan,3,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760485,2026-06-27,Panama,England,0,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760483,2026-06-28,Jordan,Argentina,1,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760484,2026-06-28,Algeria,Austria,3,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760486,2026-06-28,South Africa,Canada,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760487,2026-06-29,Brazil,Japan,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760489,2026-06-29,Germany,Paraguay,1,1,STATUS_FINAL_PEN,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760488,2026-06-30,Netherlands,Morocco,1,1,STATUS_FINAL_PEN,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760490,2026-06-30,Ivory Coast,Norway,1,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760492,2026-06-30,France,Sweden,3,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760491,2026-07-01,Mexico,Ecuador,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760493,2026-07-01,Belgium,Senegal,3,2,STATUS_FINAL_AET,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760495,2026-07-01,England,Congo DR,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760494,2026-07-02,United States,Bosnia-Herzegovina,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760496,2026-07-02,Portugal,Croatia,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760497,2026-07-02,Spain,Austria,3,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760498,2026-07-03,Switzerland,Algeria,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760499,2026-07-03,Australia,Egypt,1,1,STATUS_FINAL_PEN,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760500,2026-07-03,Argentina,Cape Verde,3,2,STATUS_FINAL_AET,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760501,2026-07-04,Colombia,Ghana,1,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760502,2026-07-04,Canada,Morocco,0,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760503,2026-07-04,Paraguay,France,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760504,2026-07-05,Brazil,Norway,1,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760505,2026-07-06,Mexico,England,2,3,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760506,2026-07-06,Portugal,Spain,0,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760507,2026-07-07,United States,Belgium,1,4,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760508,2026-07-07,Switzerland,Colombia,0,0,STATUS_FINAL_PEN,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760509,2026-07-07,Argentina,Egypt,3,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760510,2026-07-09,France,Morocco,2,0,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760511,2026-07-10,Spain,Belgium,2,1,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760512,2026-07-11,Norway,England,1,2,STATUS_FINAL_AET,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760513,2026-07-12,Argentina,Switzerland,3,1,STATUS_FINAL_AET,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760514,2026-07-14,France,Spain,0,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
+espn,760515,2026-07-15,England,Argentina,1,2,STATUS_FULL_TIME,True,2026-07-16,https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard
