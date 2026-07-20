@@ -9205,3 +9205,5 @@ soccerbase_game_id,date,home_team,away_team,status
 969117,2026-07-11,Norway,England,lineup_fetched
 949453,2026-07-15,England,Argentina,lineup_fetched
 949452,2026-07-14,France,Spain,lineup_fetched
+949455,2026-07-19,Spain,Argentina,lineup_fetched
+949454,2026-07-18,France,England,lineup_fetched
